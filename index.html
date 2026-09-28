@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GestionBea - Panel de Gestión</title>
+  <link rel="stylesheet" href="css/styles.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div class="app-layout">
+    <!-- Sidebar / Menú lateral -->
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="brand-icon">GB</div>
+        <div>
+          <h1 class="brand-title">GestionBea</h1>
+          <span class="brand-sub">Tu espacio de trabajo</span>
+        </div>
+      </div>
+
+      <nav class="nav-menu">
+        <button class="nav-item active" data-tab="dashboard">
+          <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 3h7v7H3zM14 3h7v7h-7zM14 14h7v7h-7zM3 14h7v7H3z"/></svg>
+          Dashboard
+        </button>
+        <button class="nav-item" data-tab="tasks">
+          <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
+          Tareas
+        </button>
+        <button class="nav-item" data-tab="notes">
+          <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+          Notas
+        </button>
+      </nav>
+
+      <div class="sidebar-footer">
+        <button id="exportBtn" class="btn-secondary btn-sm" title="Descargar copia de seguridad">
+          <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          Exportar datos
+        </button>
+      </div>
+    </aside>
+
+    <!-- Contenido principal -->
+    <main class="main-content">
+      <header class="topbar">
+        <div class="search-box">
+          <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+          <input type="text" id="searchInput" placeholder="Buscar tareas o notas...">
+        </div>
+        <div class="user-pill">
+          <span class="user-avatar">B</span>
+          <span class="user-name">Bea</span>
+        </div>
+      </header>
+
+      <div class="content-container">
+        <!-- Vista: Dashboard -->
+        <section id="dashboardView" class="view active">
+          <div class="welcome-banner">
+            <h2>¡Hola de nuevo, Bea! 👋</h2>
+            <p>Aquí tienes el estado actual de tus tareas y recordatorios.</p>
+          </div>
+
+          <div class="stats-grid">
+            <div class="stat-card">
+              <span class="stat-label">Total Tareas</span>
+              <span class="stat-value" id="statTotalTasks">0</span>
+            </div>
+            <div class="stat-card stat-pending">
+              <span class="stat-label">Pendientes</span>
+              <span class="stat-value" id="statPendingTasks">0</span>
+            </div>
+            <div class="stat-card stat-completed">
+              <span class="stat-label">Completadas</span>
+              <span class="stat-value" id="statCompletedTasks">0</span>
+            </div>
+            <div class="stat-card stat-notes">
+              <span class="stat-label">Notas Guardadas</span>
+              <span class="stat-value" id="statTotalNotes">0</span>
+            </div>
+          </div>
+
+          <div class="dashboard-columns">
+            <div class="panel">
+              <div class="panel-header">
+                <h3>Tareas prioritarias</h3>
+                <button class="link-btn" onclick="app.switchTab('tasks')">Ver todas</button>
+              </div>
+              <ul id="priorityTaskList" class="task-list"></ul>
+            </div>
+            <div class="panel">
+              <div class="panel-header">
+                <h3>Últimas notas</h3>
+                <button class="link-btn" onclick="app.switchTab('notes')">Ver todas</button>
+              </div>
+              <div id="recentNotesList" class="notes-mini-grid"></div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Vista: Tareas -->
+        <section id="tasksView" class="view">
+          <div class="section-header">
+            <div>
+              <h2>Gestión de Tareas</h2>
+              <p>Organiza tu día a día por prioridad y categorías</p>
+            </div>
+            <button class="btn-primary" id="openTaskModalBtn">
+              + Nueva Tarea
+            </button>
+          </div>
+
+          <!-- Filtros de tareas -->
+          <div class="filters-bar">
+            <div class="filter-group">
+              <button class="filter-chip active" data-filter="all">Todas</button>
+              <button class="filter-chip" data-filter="pending">Pendientes</button>
+              <button class="filter-chip" data-filter="completed">Completadas</button>
+            </div>
+            <select id="priorityFilter" class="select-input">
+              <option value="all">Todas las prioridades</option>
+              <option value="high">Prioridad Alta 🔴</option>
+              <option value="medium">Prioridad Media 🟡</option>
+              <option value="low">Prioridad Baja 🟢</option>
+            </select>
+          </div>
+
+          <ul id="allTasksList" class="task-list"></ul>
+        </section>
+
+        <!-- Vista: Notas -->
+        <section id="notesView" class="view">
+          <div class="section-header">
+            <div>
+              <h2>Bloc de Notas</h2>
+              <p>Captura ideas, listas rápidas y recordatorios importantes</p>
+            </div>
+            <button class="btn-primary" id="openNoteModalBtn">
+              + Nueva Nota
+            </button>
+          </div>
+
+          <div id="allNotesGrid" class="notes-grid"></div>
+        </section>
+      </div>
+    </main>
+  </div>
+
+  <!-- Modal: Crear/Editar Tarea -->
+  <div id="taskModal" class="modal-overlay">
+    <div class="modal">
+      <div class="modal-header">
+        <h3 id="taskModalTitle">Nueva Tarea</h3>
+        <button class="close-btn" id="closeTaskModal">&times;</button>
+      </div>
+      <form id="taskForm">
+        <div class="form-group">
+          <label for="taskTitle">Título de la tarea</label>
+          <input type="text" id="taskTitle" required placeholder="Ej: Revisar presupuesto mensual">
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="taskPriority">Prioridad</label>
+            <select id="taskPriority">
+              <option value="low">Baja 🟢</option>
+              <option value="medium" selected>Media 🟡</option>
+              <option value="high">Alta 🔴</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="taskCategory">Categoría</label>
+            <input type="text" id="taskCategory" placeholder="Ej: Trabajo, Personal, Casa">
+          </div>
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="btn-secondary" id="cancelTaskModal">Cancelar</button>
+          <button type="submit" class="btn-primary">Guardar Tarea</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal: Crear/Editar Nota -->
+  <div id="noteModal" class="modal-overlay">
+    <div class="modal">
+      <div class="modal-header">
+        <h3>Nueva Nota</h3>
+        <button class="close-btn" id="closeNoteModal">&times;</button>
+      </div>
+      <form id="noteForm">
+        <div class="form-group">
+          <label for="noteTitle">Título</label>
+          <input type="text" id="noteTitle" required placeholder="Ej: Ideas para el proyecto">
+        </div>
+        <div class="form-group">
+          <label for="noteContent">Contenido</label>
+          <textarea id="noteContent" rows="4" required placeholder="Escribe aquí los detalles..."></textarea>
+        </div>
+        <div class="form-group">
+          <label for="noteColor">Color de tarjeta</label>
+          <select id="noteColor">
+            <option value="blue">Azul suave</option>
+            <option value="purple">Violeta</option>
+            <option value="emerald">Verde esmeralda</option>
+            <option value="amber">Ámbar cálido</option>
+          </select>
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="btn-secondary" id="cancelNoteModal">Cancelar</button>
+          <button type="submit" class="btn-primary">Guardar Nota</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script src="js/app.js"></script>
+</body>
+</html>
