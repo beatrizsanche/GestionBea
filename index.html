@@ -7,7 +7,7 @@
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
   <title>PROMOVIL OPS - Cockpit de Control con Desglose y Trazabilidad Documental</title>
-  <link rel="stylesheet" href="css/styles.css?v=2.8.0">
+  <link rel="stylesheet" href="css/styles.css?v=2.9.0">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -42,15 +42,19 @@
       </div>
 
       <nav class="nav-tree">
-        <div class="nav-section-title">OPERACIONES & TMT</div>
-        <button class="nav-tab active" data-tab="comercial">
-          <svg width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M18 20V10M12 20V4M6 20v-6"/></svg>
-          Seguimiento TMT & Ventas
-        </button>
+        <div class="nav-section-title">🎯 OBJETIVOS DE EMPRESA</div>
         <button class="nav-tab" data-tab="objetivos">
           <svg width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>
-          Objetivos del Mes & Planes
+          Objetivos de Empresa (11 Tiendas)
         </button>
+
+        <div class="nav-section-title">📞 TELEMARKETING & TMT</div>
+        <button class="nav-tab active" data-tab="comercial">
+          <svg width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M18 20V10M12 20V4M6 20v-6"/></svg>
+          Seguimiento TMT & Campañas
+        </button>
+
+        <div class="nav-section-title">📊 ANALÍTICA & HORARIOS</div>
         <button class="nav-tab" data-tab="estadisticas">
           <svg width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 3v18h18"/><path d="M18 17V9"/><path d="M13 17V5"/><path d="M8 17v-3"/></svg>
           Datos & Estadísticas BI
@@ -164,17 +168,51 @@
           <div class="section-title-bar">
             <div>
               <div style="display:flex; align-items:center; gap:0.6rem; flex-wrap:wrap;">
-                <h2 class="view-h2">Seguimiento Comercial TMT & Objetivos del Mes</h2>
+                <h2 class="view-h2">📞 Seguimiento Operativo TMT & Campañas Telefónicas</h2>
                 <span class="doc-source-tag" onclick="cockpit.openDocViewer('DOC-01')" title="Ver documento fuente original">
                   📄 Doc Fuente: Informe_TMT_Consolidado_28-09-2026.xlsx 🔍
                 </span>
               </div>
-              <p class="view-sub">Haz clic en cualquier métrica, tienda o comercial para abrir el desglose analítico completo.</p>
+              <p class="view-sub">Embudo de llamadas, citas concertadas a las 11 tiendas y conversión de ventas que nutren los objetivos de empresa.</p>
             </div>
-            <div class="runrate-pill clickable" onclick="cockpit.showDrilldown('runrate')">
-              <span class="r-label">RUN-RATE PROYECTADO:</span>
-              <strong class="r-val" id="kpiRunRate">108.4%</strong>
-              <span class="chip-badge success">Ver Desglose 🔍</span>
+            <div class="header-actions">
+              <button class="btn btn-outline" style="background:#eff6ff; color:#1d4ed8; border-color:#bfdbfe;" onclick="cockpit.switchTab('objetivos')" title="Ir a los Objetivos Generales de Empresa">
+                🎯 Ver Objetivos de Empresa & Tiendas
+              </button>
+              <div class="runrate-pill clickable" onclick="cockpit.showDrilldown('runrate')">
+                <span class="r-label">RUN-RATE PROYECTADO:</span>
+                <strong class="r-val" id="kpiRunRate">108.4%</strong>
+                <span class="chip-badge success">Ver Desglose 🔍</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Banner Informativo: Dependencia & Contribución de TMT en Objetivos de Empresa -->
+          <div class="flat-panel" style="background:linear-gradient(135deg, #f0fdf4 0%, #eff6ff 100%); border:1px solid #bfdbfe; margin-bottom:1.25rem; padding:1rem 1.25rem;">
+            <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.75rem;">
+              <div style="max-width:700px;">
+                <div style="display:flex; align-items:center; gap:0.5rem; margin-bottom:0.25rem;">
+                  <span style="font-size:1.15rem;">🔗</span>
+                  <strong style="color:#0f172a; font-size:0.95rem;">Alineación Estratégica: TMT como motor de los Objetivos de Empresa</strong>
+                </div>
+                <p style="font-size:0.82rem; color:#475569; margin:0; line-height:1.45;">
+                  El equipo de <strong>Telemarketing (TMT)</strong> canaliza citas concertadas hacia las 11 tiendas físicas. El cumplimiento de los objetivos de la empresa (Móvil, Fibra, Energía) depende directamente del flujo y efectividad de estas campañas telefónicas.
+                </p>
+              </div>
+              <div style="display:flex; gap:0.75rem; flex-wrap:wrap;">
+                <div style="background:#ffffff; border:1px solid #cbd5e1; border-radius:var(--radius); padding:0.4rem 0.75rem; text-align:center; min-width:110px;">
+                  <span style="display:block; font-size:0.68rem; color:#64748b; font-weight:700;">CITAS GENERADAS</span>
+                  <strong style="font-size:1.1rem; color:#2563eb;">412</strong>
+                </div>
+                <div style="background:#ffffff; border:1px solid #cbd5e1; border-radius:var(--radius); padding:0.4rem 0.75rem; text-align:center; min-width:110px;">
+                  <span style="display:block; font-size:0.68rem; color:#64748b; font-weight:700;">ASISTENCIA TIENDA</span>
+                  <strong style="font-size:1.1rem; color:#16a34a;">326 (79%)</strong>
+                </div>
+                <div style="background:#ffffff; border:1px solid #cbd5e1; border-radius:var(--radius); padding:0.4rem 0.75rem; text-align:center; min-width:110px;">
+                  <span style="display:block; font-size:0.68rem; color:#64748b; font-weight:700;">VENTAS APORTADAS</span>
+                  <strong style="font-size:1.1rem; color:#ea580c;">136 cierres</strong>
+                </div>
+              </div>
             </div>
           </div>
 
@@ -351,18 +389,18 @@
 
 
         <!-- ======================================================== -->
-        <!-- MÓDULO: OBJETIVOS DEL MES & PLANES DE ACCIÓN OPERATIVO   -->
+        <!-- MÓDULO: OBJETIVOS DE EMPRESA & PLANES OPERATIVOS         -->
         <!-- ======================================================== -->
         <section id="objetivosView" class="view-panel">
           <div class="section-title-bar">
             <div>
               <div style="display:flex; align-items:center; gap:0.6rem; flex-wrap:wrap;">
-                <h2 class="view-h2">🎯 Objetivos del Mes, Consecución & Planes de Acción</h2>
+                <h2 class="view-h2">🎯 Objetivos de Empresa (11 Tiendas Promovil)</h2>
                 <span class="doc-source-tag" onclick="cockpit.openDocViewer('DOC-01')">
                   📄 Doc Fuente: Informe_TMT_Consolidado_28-09-2026.xlsx 🔍
                 </span>
               </div>
-              <p class="view-sub">Seguimiento en tiempo real de metas mensuales de empresa, control de brechas por tienda, directivas tácticas y generador de planes de actuación transferibles.</p>
+              <p class="view-sub">Metas comerciales globales de tienda fijadas por la empresa, control de brechas por punto de venta, directivas operativas y sinergia con el canal TMT.</p>
             </div>
             <div class="header-actions">
               <button class="btn btn-secondary" onclick="cockpit.copiarWhatsAppResumenTienda('all')">
@@ -444,6 +482,9 @@
             </button>
             <button class="subtab-btn" id="btnObjSubAcciones" onclick="cockpit.switchObjSubTab('acciones')">
               🚀 Acciones a Tomar & 5 Focos Operativos
+            </button>
+            <button class="subtab-btn" id="btnObjSubTmt" onclick="cockpit.switchObjSubTab('tmt')">
+              🔗 Contribución & Dependencia TMT
             </button>
             <button class="subtab-btn" id="btnObjSubGenerador" onclick="cockpit.switchObjSubTab('generador')">
               📝 Generador & Editor de Informes para Tiendas
@@ -573,7 +614,64 @@
             </div>
           </div>
 
-          <!-- SUBTAB 3: GENERADOR & EDITOR DE INFORMES PARA TIENDAS -->
+          <!-- SUBTAB 3: CONTRIBUCIÓN & DEPENDENCIA TMT -->
+          <div id="objSubTmt" class="obj-subtab-pane" style="display:none;">
+            <div class="flat-panel" style="margin-bottom:1rem;">
+              <div class="panel-head" style="justify-content:space-between; align-items:center;">
+                <div>
+                  <h3 style="margin-bottom:0.15rem;">🔗 Sinergia y Dependencia: Cómo TMT alimenta las Metas de Empresa</h3>
+                  <small style="color:var(--text-muted);">Las tiendas físicas alcanzan sus cuotas combinando venta de mostrador (orgánica) y citas derivadas de telemarketing.</small>
+                </div>
+                <button class="btn btn-outline" onclick="cockpit.switchTab('comercial')" title="Ir a la sección detallada de TMT">
+                  📞 Ver Campañas TMT
+                </button>
+              </div>
+              <div class="panel-body" style="padding:1rem;">
+                <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap:1rem; margin-bottom:1.25rem;">
+                  <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:var(--radius); padding:0.85rem;">
+                    <span style="font-size:0.75rem; color:#64748b; font-weight:700; text-transform:uppercase;">Citas Asignadas a Tienda</span>
+                    <div style="font-size:1.35rem; font-weight:800; color:#2563eb; margin:0.25rem 0;">412 Citas</div>
+                    <small style="color:#64748b;">Campañas TMT activas</small>
+                  </div>
+                  <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:var(--radius); padding:0.85rem;">
+                    <span style="font-size:0.75rem; color:#64748b; font-weight:700; text-transform:uppercase;">Asistencia en Mostrador</span>
+                    <div style="font-size:1.35rem; font-weight:800; color:#16a34a; margin:0.25rem 0;">326 Clientes</div>
+                    <small style="color:#16a34a;">79.1% asistencia a citas</small>
+                  </div>
+                  <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:var(--radius); padding:0.85rem;">
+                    <span style="font-size:0.75rem; color:#64748b; font-weight:700; text-transform:uppercase;">Ventas Derivadas TMT</span>
+                    <div style="font-size:1.35rem; font-weight:800; color:#ea580c; margin:0.25rem 0;">136 Ventas</div>
+                    <small style="color:#ea580c;">41.7% tasa de cierre</small>
+                  </div>
+                  <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:var(--radius); padding:0.85rem;">
+                    <span style="font-size:0.75rem; color:#64748b; font-weight:700; text-transform:uppercase;">Peso TMT en Meta Empresa</span>
+                    <div style="font-size:1.35rem; font-weight:800; color:#9333ea; margin:0.25rem 0;">29.8%</div>
+                    <small style="color:#9333ea;">Del volumen global de la zona</small>
+                  </div>
+                </div>
+
+                <div class="table-responsive">
+                  <table class="data-table">
+                    <thead>
+                      <tr>
+                        <th>Tienda (PDV)</th>
+                        <th>Meta Total Empresa</th>
+                        <th>Venta Mostrador</th>
+                        <th>Aporte Citas TMT</th>
+                        <th>% Dependencia TMT</th>
+                        <th>Citas Pendientes</th>
+                        <th>Sinergia TMT</th>
+                        <th>Acción Directa</th>
+                      </tr>
+                    </thead>
+                    <tbody id="objetivosTmtTbody"></tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- SUBTAB 4: GENERADOR & EDITOR DE INFORMES PARA TIENDAS -->
           <div id="objSubGenerador" class="obj-subtab-pane" style="display:none;">
             <div class="flat-panel" style="margin-bottom:1rem;">
               <div class="panel-head" style="justify-content:space-between; align-items:center;">
@@ -2206,6 +2304,6 @@
 
   <div id="toastMessage" class="toast-popup"></div>
 
-  <script src="js/app.js?v=2.8.0"></script>
+  <script src="js/app.js?v=2.9.0"></script>
 </body>
 </html>
