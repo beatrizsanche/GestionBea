@@ -369,8 +369,9 @@
           <div class="email-layout-grid">
             <!-- Formulario Redactor -->
             <div class="flat-panel">
-              <div class="panel-head">
-                <h3>📝 Redactor Inteligente de Correo</h3>
+              <div class="panel-head" style="justify-content:space-between; align-items:center;">
+                <h3>📝 Bandeja de Salida & Redactor Oficial de Correo</h3>
+                <span class="chip-badge success" id="editorStatusBadge" style="font-size:0.7rem;">🟢 Modo Redactor Activo</span>
               </div>
               <div class="panel-body">
                 <div class="field-block">
@@ -403,7 +404,7 @@
                 </div>
 
                 <div class="field-block">
-                  <label>Cuerpo del Correo (Editable):</label>
+                  <label>Cuerpo del Correo (Totalmente Editable):</label>
                   <textarea id="emailBody" class="textarea-flat" rows="12"></textarea>
                 </div>
 
@@ -411,8 +412,11 @@
                   <button class="btn btn-secondary" onclick="cockpit.copyEmail()">
                     📋 Copiar al Portapapeles
                   </button>
+                  <button class="btn btn-outline" onclick="cockpit.guardarBorradorSalida()" style="background:#f8fafc;">
+                    💾 Guardar en Salida
+                  </button>
                   <button class="btn btn-primary" onclick="cockpit.sendEmail()">
-                    🚀 Enviar vía Correo (Ionos/Gmail)
+                    🚀 Enviar vía Correo (Doble Comprobación)
                   </button>
                 </div>
               </div>
@@ -1088,9 +1092,14 @@
         </div>
       </div>
 
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" onclick="cockpit.closeModal('modalConfirmEmail')">❌ Cancelar Envío</button>
-        <button type="button" class="btn btn-primary" onclick="cockpit.confirmAndDispatchEmail()">✅ Confirmar y Enviar Ahora</button>
+      <div class="modal-footer" style="display:flex; justify-content:space-between; flex-wrap:wrap; gap:0.5rem;">
+        <button type="button" class="btn btn-outline" onclick="cockpit.editarEnBandejaDeSalida()" style="background:#fffbeb; color:#92400e; border-color:#fde68a; font-weight:700;">
+          ✏️ Ir a Bandeja de Salida para Editar
+        </button>
+        <div style="display:flex; gap:0.4rem;">
+          <button type="button" class="btn btn-secondary" onclick="cockpit.closeModal('modalConfirmEmail')">❌ Cancelar</button>
+          <button type="button" class="btn btn-primary" onclick="cockpit.confirmAndDispatchEmail()">✅ Confirmar y Enviar</button>
+        </div>
       </div>
     </div>
   </div>
