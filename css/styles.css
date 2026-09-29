@@ -1666,6 +1666,74 @@ body {
   height: 16px;
 }
 
+/* Feedback & Bug Reporting */
+.feedback-type-selector {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.feedback-type-btn {
+  flex: 1;
+  padding: 0.6rem 0.75rem;
+  border: 1px solid var(--border-color);
+  background: var(--bg-card);
+  border-radius: var(--radius);
+  font-weight: 700;
+  font-size: 0.8rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  transition: all 0.15s ease;
+  color: var(--text-secondary);
+}
+
+.feedback-type-btn:hover {
+  background: var(--bg-subtle);
+  border-color: #cbd5e1;
+}
+
+.feedback-type-btn.active.type-idea {
+  background: #fffbeb;
+  border-color: #f59e0b;
+  color: #b45309;
+}
+
+.feedback-type-btn.active.type-error {
+  background: #fef2f2;
+  border-color: #ef4444;
+  color: #b91c1c;
+}
+
+.feedback-type-btn.active.type-feature {
+  background: #eff6ff;
+  border-color: #3b82f6;
+  color: #1d4ed8;
+}
+
+.badge-prio-baja {
+  background: #f1f5f9;
+  color: #475569;
+}
+
+.badge-prio-media {
+  background: #eff6ff;
+  color: #1d4ed8;
+}
+
+.badge-prio-alta {
+  background: #fffbeb;
+  color: #b45309;
+}
+
+.badge-prio-urgente {
+  background: #fef2f2;
+  color: #b91c1c;
+  font-weight: 800;
+}
+
 /* Responsive */
 @media (max-width: 960px) {
   .app-shell { flex-direction: column; }
