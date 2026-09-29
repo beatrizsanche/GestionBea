@@ -1064,7 +1064,7 @@ class PromovilCockpit {
   // ========================================================
   switchObjSubTab(subtab) {
     this.currentObjSubTab = subtab;
-    const panes = ['estado', 'acciones', 'generador'];
+    const panes = ['estado', 'acciones', 'tmt', 'generador'];
     panes.forEach(p => {
       const btn = document.getElementById(`btnObjSub${p.charAt(0).toUpperCase() + p.slice(1)}`);
       const pane = document.getElementById(`objSub${p.charAt(0).toUpperCase() + p.slice(1)}`);
@@ -1074,6 +1074,8 @@ class PromovilCockpit {
 
     if (subtab === 'estado') {
       this.renderObjetivosStoresTable();
+    } else if (subtab === 'tmt') {
+      this.renderObjetivosTmtTable();
     } else if (subtab === 'generador') {
       this.generarBorradorEnObjetivosView();
     }
@@ -1118,6 +1120,50 @@ class PromovilCockpit {
           <td>
             <button class="btn btn-secondary" onclick="cockpit.cargarTiendaEnGeneradorObjetivos('${s.id}')" style="padding:0.3rem 0.6rem; font-size:0.75rem; gap:0.25rem;">
               🎯 Generar Plan
+            </button>
+          </td>
+        </tr>
+      `;
+    }).join('');
+  }
+
+  renderObjetivosTmtTable() {
+    const tbody = document.getElementById('objetivosTmtTbody');
+    if (!tbody) return;
+
+    const tmtWeights = {
+      '234-CC LA GAVIA': { mostrador: 39, tmtVentas: 19, citasPend: 8, dep: '32.8%' },
+      '238-TRES AGUAS': { mostrador: 35, tmtVentas: 17, citasPend: 6, dep: '32.7%' },
+      '226-CC LA VAGUADA 2': { mostrador: 41, tmtVentas: 19, citasPend: 9, dep: '31.7%' },
+      '205-CC PRINCIPE PIO': { mostrador: 38, tmtVentas: 16, citasPend: 7, dep: '29.6%' },
+      '208-CC LORANCA': { mostrador: 34, tmtVentas: 14, citasPend: 5, dep: '29.2%' },
+      '209-CC PARLA': { mostrador: 31, tmtVentas: 13, citasPend: 6, dep: '29.5%' },
+      '025-GRAN VIA HORTALEZA': { mostrador: 34, tmtVentas: 12, citasPend: 4, dep: '26.1%' },
+      '030-PALACIO DE HIELO': { mostrador: 32, tmtVentas: 10, citasPend: 5, dep: '23.8%' },
+      '246-GETAFE': { mostrador: 31, tmtVentas: 9, citasPend: 4, dep: '22.5%' },
+      '045-VILLAVICIOSA DE ODON': { mostrador: 27, tmtVentas: 8, citasPend: 3, dep: '22.9%' },
+      '245-PASEO EXTREMADURA': { mostrador: 27, tmtVentas: 9, citasPend: 4, dep: '25.0%' }
+    };
+
+    tbody.innerHTML = this.stores.map(s => {
+      const d = tmtWeights[s.id] || { mostrador: s.realMovil + s.realFibra - 10, tmtVentas: 10, citasPend: 4, dep: '25.0%' };
+      const totalReal = s.realMovil + s.realFibra;
+
+      return `
+        <tr>
+          <td>
+            <strong style="color:var(--orange);">${s.name}</strong><br>
+            <small style="color:var(--text-muted);">${s.canal === 'cc' ? 'Centro Comercial' : 'Tienda Urbana'}</small>
+          </td>
+          <td><strong>${s.objMovil + s.objFibra} uds</strong> (Móvil+Fibra)</td>
+          <td>${d.mostrador} ventas (${Math.round((d.mostrador / totalReal) * 100)}%)</td>
+          <td><strong style="color:#2563eb;">+${d.tmtVentas} ventas</strong> (${Math.round((d.tmtVentas / totalReal) * 100)}%)</td>
+          <td><span class="chip-badge info" style="font-weight:700;">${d.dep}</span></td>
+          <td><span class="chip-badge warning">${d.citasPend} Citas Agendadas</span></td>
+          <td><span class="chip-badge success">🟢 Sinergia Activa</span></td>
+          <td>
+            <button class="btn btn-secondary" onclick="cockpit.cargarTiendaEnGeneradorObjetivos('${s.id}')" style="padding:0.25rem 0.5rem; font-size:0.75rem;">
+              🎯 Plan Tienda
             </button>
           </td>
         </tr>
@@ -1933,6 +1979,7 @@ Coordinadora de Zona | Grupo Promovil`;
     try { this.renderCoverageGrid(); } catch (e) { console.error('Error in renderCoverageGrid:', e); }
     try { this.renderCuadranteSemanal(); } catch (e) { console.error('Error in renderCuadranteSemanal:', e); }
     try { this.renderObjetivosStoresTable(); } catch (e) { console.error('Error in renderObjetivosStoresTable:', e); }
+    try { this.renderObjetivosTmtTable(); } catch (e) { console.error('Error in renderObjetivosTmtTable:', e); }
     try { this.renderStock(); } catch (e) { console.error('Error in renderStock:', e); }
     try { this.renderComisiones(); } catch (e) { console.error('Error in renderComisiones:', e); }
     try { this.renderVacaciones(); } catch (e) { console.error('Error in renderVacaciones:', e); }
