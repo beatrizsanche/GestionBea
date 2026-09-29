@@ -235,6 +235,9 @@ const MASTER_DOCUMENTS = [
       ["principepio@promovil.es", "Parte de baja médica Cristina López", "28/09 19:40", "CC Príncipe Pío", "Baja_Medica_CL.pdf", "Baja médica estimada de 15 días. Solicitud de correturnos."],
       ["vaguada@promovil.es", "Auditoría mensual y gastos tienda", "28/09 14:10", "CC La Vaguada", "Ticket_Limpieza.jpg", "Faltante 1 terminal gama media (-180€). Ticket limpieza 35€."]
     ]
+  }
+];
+
 // REPOSITORIO DE ARCHIVOS & ADJUNTOS DESCARGADOS (EMAIL, WHATSAPP, DESCARGAS MAC)
 const DOWNLOADED_DOCUMENTS = [
   {
@@ -3446,6 +3449,7 @@ ${email.body}
       closeBtn.disabled = false;
       closeBtn.textContent = '✅ Cerrar y Volver al Cockpit';
     }
+  }
 
   // ========================================================
   // CONFIGURACIÓN & COPIAS DE SEGURIDAD PROGRAMABLES
