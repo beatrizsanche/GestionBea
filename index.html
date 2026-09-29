@@ -33,6 +33,14 @@
         </div>
       </div>
 
+      <!-- BOTÓN PRINCIPAL: SINCRONIZAR TODO EN LA BARRA LATERAL -->
+      <div style="margin-bottom: 0.85rem;">
+        <button class="btn btn-primary full" id="sidebarMasterSyncBtn" onclick="cockpit.iniciarSincronizacionIntegral()" style="justify-content:center; gap:0.5rem; padding:0.6rem; font-weight:700;" title="Sincronizar emails, adjuntos, disco duro y WhatsApp">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21.5 2v6h-6M2.5 22v-6h6M2 11.5a10 10 0 0 1 18.8-4.3M22 12.5a10 10 0 0 1-18.8 4.3"/></svg>
+          <span>🔄 Sincronizar Todo</span>
+        </button>
+      </div>
+
       <nav class="nav-tree">
         <div class="nav-section-title">OPERACIONES & TMT</div>
         <button class="nav-tab active" data-tab="comercial">
@@ -90,9 +98,6 @@
           <span class="status-dot green"></span>
           <span>Vercel MCP: Conectado</span>
         </div>
-        <button class="btn btn-outline full" style="font-size:0.75rem; justify-content:center; gap:0.4rem; padding:0.35rem; margin-top:0.25rem; font-weight:700; border-color:var(--border-color);" onclick="cockpit.iniciarSincronizacionOnline()">
-          ☁️ Sincronizar GitHub & Vercel
-        </button>
       </div>
     </aside>
 
@@ -133,27 +138,11 @@
             <span class="status-dot green"></span>
             <span id="topbarSyncTime">Sincronizado: Hoy 05:55</span>
           </div>
-          <button class="btn-sync" id="masterSyncBtn" onclick="cockpit.iniciarSincronizacionIntegral()" title="Sincronizar emails, adjuntos, disco duro y WhatsApp">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21.5 2v6h-6M2.5 22v-6h6M2 11.5a10 10 0 0 1 18.8-4.3M22 12.5a10 10 0 0 1-18.8 4.3"/></svg>
-            <span>🔄 Sincronizar Todo</span>
-          </button>
-          <button class="btn btn-secondary" onclick="cockpit.iniciarSincronizacionOnline()" title="Sincronizar con GitHub y desplegar en Vercel">
-            ☁️ Sincronización Online (GitHub & Vercel)
+          <button class="btn btn-secondary" onclick="cockpit.openIngestaModal()">
+            📥 Registrar Cierre
           </button>
           <button class="btn btn-outline" style="background:#fffbeb; color:#92400e; border-color:#fde68a;" onclick="cockpit.openFeedbackModal()" title="Sugerir ideas de mejora o notificar errores técnicos">
             💡 Sugerencias & Errores
-          </button>
-          <button class="btn btn-secondary" onclick="cockpit.switchTab('configuracion')" title="Ir a Configuración, Backups y Buzón">
-            ⚙️ Configuración
-          </button>
-          <button class="btn btn-secondary" onclick="cockpit.switchTab('documentos')">
-            📁 Documentos (15)
-          </button>
-          <button class="btn btn-secondary" onclick="cockpit.openIngestaModal()">
-            📥 Cierre Rápido
-          </button>
-          <button class="btn btn-primary" onclick="cockpit.switchTab('emails')">
-            ✉️ Redactar
           </button>
         </div>
       </header>
