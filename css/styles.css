@@ -1304,6 +1304,180 @@ body {
   overflow-x: auto;
 }
 
+/* ======================================================== */
+/* CONFIRMACIÓN UNIVERSAL EN 2 PASOS (DOBLE COMPROBACIÓN)   */
+/* ======================================================== */
+.confirm-action-card {
+  background: var(--bg-subtle);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius);
+  padding: 1rem;
+  margin-top: 0.5rem;
+}
+
+.confirm-details-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.5rem 1rem;
+  margin-top: 0.5rem;
+}
+
+.confirm-detail-item {
+  font-size: 0.8rem;
+}
+
+.confirm-detail-item strong {
+  color: var(--text-muted);
+  display: block;
+  font-size: 0.725rem;
+  text-transform: uppercase;
+}
+
+.confirm-warning-banner {
+  margin-top: 0.85rem;
+  font-size: 0.775rem;
+  color: #92400e;
+  background: #fef3c7;
+  padding: 0.65rem 0.85rem;
+  border-radius: var(--radius);
+  border: 1px solid #fde68a;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  line-height: 1.4;
+}
+
+/* ======================================================== */
+/* WORKFLOW DE VACACIONES & BANDEJA DE PETICIONES           */
+/* ======================================================== */
+.vac-subnav-tabs {
+  display: flex;
+  gap: 0.5rem;
+  border-bottom: 2px solid var(--border-color);
+  margin-bottom: 1.25rem;
+  padding-bottom: 0.25rem;
+}
+
+.vac-subnav-btn {
+  background: none;
+  border: none;
+  font-family: inherit;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  padding: 0.5rem 1rem;
+  border-radius: var(--radius) var(--radius) 0 0;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: all 0.15s ease;
+}
+
+.vac-subnav-btn:hover {
+  color: var(--text-primary);
+  background: var(--bg-subtle);
+}
+
+.vac-subnav-btn.active {
+  color: var(--orange);
+  border-bottom: 2px solid var(--orange);
+  background: var(--orange-light);
+}
+
+.vac-kpi-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 0.75rem;
+  margin-bottom: 1.25rem;
+}
+
+.vac-kpi-card {
+  background: #ffffff;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius);
+  padding: 0.85rem 1rem;
+  display: flex;
+  flex-direction: column;
+}
+
+.vac-kpi-card .num {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: var(--text-primary);
+  line-height: 1.2;
+}
+
+.vac-kpi-card .lbl {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  font-weight: 700;
+  margin-top: 0.25rem;
+}
+
+.badge-solicitud {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.2rem 0.6rem;
+  border-radius: 9999px;
+  font-size: 0.725rem;
+  font-weight: 700;
+}
+
+.badge-solicitud.pendiente {
+  background: #fef3c7;
+  color: #92400e;
+  border: 1px solid #fde68a;
+}
+
+.badge-solicitud.validada {
+  background: #dcfce7;
+  color: #166534;
+  border: 1px solid #bbf7d0;
+}
+
+.badge-solicitud.denegada {
+  background: #fee2e2;
+  color: #991b1b;
+  border: 1px solid #fecaca;
+}
+
+.badge-solicitud.aclaracion {
+  background: #e0e7ff;
+  color: #3730a3;
+  border: 1px solid #c7d2fe;
+}
+
+.validation-checklist {
+  background: #ffffff;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius);
+  padding: 0.85rem 1rem;
+  margin: 0.85rem 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.validation-check-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.65rem;
+  font-size: 0.825rem;
+  padding: 0.35rem 0;
+}
+
+.validation-check-item:not(:last-child) {
+  border-bottom: 1px dashed var(--border-color);
+}
+
+.validation-check-item .check-icon {
+  font-size: 1.1rem;
+  line-height: 1;
+}
+
 /* Responsive */
 @media (max-width: 960px) {
   .app-shell { flex-direction: column; }
@@ -1311,4 +1485,5 @@ body {
   .grid-split, .email-layout-grid { grid-template-columns: 1fr; }
   .workspace { padding: 1rem; }
   .drawer-flat { width: 100vw; }
+  .confirm-details-grid { grid-template-columns: 1fr; }
 }
