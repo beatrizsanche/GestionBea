@@ -657,6 +657,8 @@ class PromovilCockpit {
     this.biCrossChart4 = null;
     this.biScatterChart = null;
 
+    this.currentObjSubTab = 'estado';
+
     this.initDOMElements();
     this.bindEvents();
     this.loadVacationsData();
@@ -1054,6 +1056,274 @@ class PromovilCockpit {
           }
         }
       }
+    });
+  }
+
+  // ========================================================
+  // MÓDULO: OBJETIVOS DEL MES & PLANES DE ACCIÓN OPERATIVO
+  // ========================================================
+  switchObjSubTab(subtab) {
+    this.currentObjSubTab = subtab;
+    const panes = ['estado', 'acciones', 'generador'];
+    panes.forEach(p => {
+      const btn = document.getElementById(`btnObjSub${p.charAt(0).toUpperCase() + p.slice(1)}`);
+      const pane = document.getElementById(`objSub${p.charAt(0).toUpperCase() + p.slice(1)}`);
+      if (btn) btn.classList.toggle('active', p === subtab);
+      if (pane) pane.style.display = (p === subtab) ? 'block' : 'none';
+    });
+
+    if (subtab === 'estado') {
+      this.renderObjetivosStoresTable();
+    } else if (subtab === 'generador') {
+      this.generarBorradorEnObjetivosView();
+    }
+  }
+
+  renderObjetivosStoresTable() {
+    const tbody = document.getElementById('objetivosStoresTbody');
+    if (!tbody) return;
+
+    tbody.innerHTML = this.stores.map(s => {
+      const pctM = Math.round((s.realMovil / s.objMovil) * 100);
+      const pctF = Math.round((s.realFibra / s.objFibra) * 100);
+      const gapM = Math.max(0, s.objMovil - s.realMovil);
+      const gapF = Math.max(0, s.objFibra - s.realFibra);
+      const totalGap = gapM + gapF;
+      
+      const badgeClass = totalGap === 0 ? 'success' : (totalGap <= 3 ? 'warning' : 'danger');
+      const badgeText = totalGap === 0 ? '🟢 Cumplido' : (totalGap <= 3 ? '🟡 En Consecución' : '🔴 Brecha Abierta');
+      const segClass = s.segurosPct >= 40.0 ? 'text-success' : (s.segurosPct >= 35.0 ? 'text-warning' : 'text-danger');
+
+      return `
+        <tr>
+          <td>
+            <strong style="color:var(--orange);">${s.name}</strong><br>
+            <small style="color:var(--text-muted);">${s.id}</small>
+          </td>
+          <td><span class="chip-badge">${s.canal === 'cc' ? 'Centro Comercial' : 'Urbana'}</span></td>
+          <td>
+            <strong>${s.realMovil}</strong> / ${s.objMovil}
+            <small class="${pctM >= 90 ? 'text-success' : 'text-warning'}">(${pctM}%)</small>
+          </td>
+          <td>
+            <strong>${s.realFibra}</strong> / ${s.objFibra}
+            <small class="${pctF >= 90 ? 'text-success' : 'text-warning'}">(${pctF}%)</small>
+          </td>
+          <td><strong class="${segClass}">${s.segurosPct}%</strong></td>
+          <td><strong>${s.energia}</strong> ctos</td>
+          <td>
+            ${totalGap === 0 ? '<strong class="text-success">0 uds</strong>' : `<strong style="color:var(--danger);">${gapM} M + ${gapF} F</strong>`}
+          </td>
+          <td><span class="chip-badge ${badgeClass}">${badgeText}</span></td>
+          <td>
+            <button class="btn btn-secondary" onclick="cockpit.cargarTiendaEnGeneradorObjetivos('${s.id}')" style="padding:0.3rem 0.6rem; font-size:0.75rem; gap:0.25rem;">
+              🎯 Generar Plan
+            </button>
+          </td>
+        </tr>
+      `;
+    }).join('');
+  }
+
+  cargarTiendaEnGeneradorObjetivos(storeId) {
+    const sel = document.getElementById('objGenStoreSelect');
+    if (sel) sel.value = storeId;
+    this.switchObjSubTab('generador');
+    this.generarBorradorEnObjetivosView();
+    const editor = document.getElementById('objGenEmailBody');
+    if (editor) editor.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }
+
+  generarBorradorEnObjetivosView() {
+    const storeId = document.getElementById('objGenStoreSelect')?.value || '234-CC LA GAVIA';
+    const reportType = document.getElementById('objGenTypeSelect')?.value || 'despliegue';
+    const toInput = document.getElementById('objGenEmailTo');
+    const subjInput = document.getElementById('objGenEmailSubject');
+    const bodyInput = document.getElementById('objGenEmailBody');
+
+    const totalM = this.stores.reduce((a, b) => a + b.realMovil, 0);
+    const objM = this.stores.reduce((a, b) => a + b.objMovil, 0);
+    const totalF = this.stores.reduce((a, b) => a + b.realFibra, 0);
+    const objF = this.stores.reduce((a, b) => a + b.objFibra, 0);
+    const avgSeg = (this.stores.reduce((a, b) => a + b.segurosPct, 0) / this.stores.length).toFixed(1);
+    const totalEne = this.stores.reduce((a, b) => a + b.energia, 0);
+
+    if (storeId === 'all') {
+      if (toInput) toInput.value = 'tiendas.zonacentro@promovil.es; responsables@promovil.es';
+      if (subjInput) subjInput.value = `🎯 [DIRECTIVA OFICIAL] Despliegue de Objetivos de Mes & Plan de Acción Zona Centro - Beatriz Sánchez`;
+      
+      let storeLines = this.stores.map(s => {
+        const gapM = Math.max(0, s.objMovil - s.realMovil);
+        const gapF = Math.max(0, s.objFibra - s.realFibra);
+        return `• ${s.name.padEnd(24, ' ')} | Móvil: ${s.realMovil}/${s.objMovil} (Faltan ${gapM}) | Fibra: ${s.realFibra}/${s.objFibra} (Faltan ${gapF}) | Seguros: ${s.segurosPct}% | Luz: ${s.energia}`;
+      }).join('\n');
+
+      if (bodyInput) {
+        bodyInput.value = `Estimado equipo de Responsables de Tienda (Zona Centro),
+
+A continuación os traslado los OBJETIVOS OFICIALES DE LA EMPRESA para el mes en curso y las PAUTAS OPERATIVAS obligatorias para asegurar la consecución del 100% en todos los puntos de venta.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+1. MARCO GLOBAL DE OBJETIVOS - ZONA CENTRO:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+• Líneas Móviles (Altas + Portabilidades): ${totalM} / ${objM} (Faltan ${objM - totalM} líneas)
+• Fibra Óptica & Convergencia: ${totalF} / ${objF} (Faltan ${objF - totalF} servicios)
+• Penetración de Seguros & SVA: ${avgSeg}% (Umbral mínimo Orange: 35.0% | Tramo Bonificado: >= 40.0%)
+• Captación Energía (Orange Luz): ${totalEne} / 60 contratos (Campaña Energy Days)
+• Run-Rate Proyectado de Zona: 108.4%
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+2. ESTADO Y CUOTAS POR PUNTO DE VENTA (11 TIENDAS):
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+${storeLines}
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+3. PLAN DE ACCIÓN OPERATIVO: CÓMO APLICAR LOS OBJETIVOS EN TIENDA
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Para garantizar el cumplimiento en cada turno de trabajo, debéis ejecutar de forma sistemática los siguientes 5 FOCOS:
+
+1. FOCO EN PORTABILIDAD (VALOR):
+   - Cada cliente que entre a tienda para una consulta, duplicado o renove debe ser auditado en sistema para ofrecer portabilidad de líneas adicionales o familiares.
+   - Utilizar el argumento de ahorro combinado en tarifas Love y convergencia.
+
+2. SISTEMÁTICA DE SEGUROS CHUBB (OBLIGATORIO):
+   - Ofrecimiento sistemático en el 100% de terminales libres y financiados (Gama Premium y Media).
+   - Explicar la cobertura de rotura de pantalla, daño accidental y robo desde el primer mes.
+
+3. PALANCA ORANGE ENERGÍA (LUZ):
+   - Solicitar la factura de electricidad en cada contratación de fibra o pack Love.
+   - Recordar el descuento directo en factura de telecomunicaciones por cada contrato de luz activo.
+
+4. GESTIÓN DE HORARIOS EN HORAS PUNTA:
+   - Mantener el 100% del personal en mostrador durante las franjas de mayor tráfico (17:30 a 20:30 y sábados completos).
+   - Ninguna pausa comercial autorizada durante picos de afluencia de clientes.
+
+5. CONTROL DE CAJA Y ARQUEO DIARIO:
+   - Cuadre estricto de caja física y recuento por IMEI al cierre de cada jornada. Tolerancia cero a descuadres.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+4. RITMO DE SEGUIMIENTO Y REPORTES:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+• Check de avance intermedio: 14:00 horas vía chat de coordinación.
+• Cierre definitivo y parte diario: 21:00 horas por correo oficial.
+
+Contáis con todo mi apoyo para cualquier apoyo de correturnos o gestión comercial que preciséis.
+
+¡A por el cierre mensual al 100%!
+
+Un saludo,
+Beatriz Sánchez Alonso
+Coordinadora de Zona Centro | Grupo Promovil`;
+      }
+    } else {
+      const st = this.stores.find(s => s.id === storeId) || this.stores[0];
+      const advisors = this.advisors.filter(a => a.centerId === st.id);
+      const gapM = Math.max(0, st.objMovil - st.realMovil);
+      const gapF = Math.max(0, st.objFibra - st.realFibra);
+      const pctM = Math.round((st.realMovil / st.objMovil) * 100);
+      const pctF = Math.round((st.realFibra / st.objFibra) * 100);
+
+      const storeEmailSlug = st.name.toLowerCase().replace(/[^a-z0-9]/g, '');
+      if (toInput) toInput.value = `${storeEmailSlug}@promovil.es`;
+      if (subjInput) subjInput.value = `🎯 [PLAN DE OBJETIVOS & ACCIÓN] - ${st.name} - Mes en Curso`;
+
+      let advisorsText = advisors.map(a => {
+        const quota = a.obj || Math.round(st.objMovil / (advisors.length || 1));
+        const currentTot = a.movil + a.fibra;
+        const pctAdv = Math.round((currentTot / quota) * 100);
+        return `• ${a.name} (${a.role} - Jornada: ${a.jornada}):
+   - Cuota Asignada: ${quota} ventas (Actual: ${a.movil} Móvil + ${a.fibra} Fibra = ${currentTot} uds | ${pctAdv}% conseguido)
+   - Penetración Seguros: ${a.seguros}% | Contratos Energía: ${a.energia} | Estado: ${a.state}`;
+      }).join('\n\n');
+
+      if (bodyInput) {
+        bodyInput.value = `Hola equipo de ${st.name},
+
+Os remito el DESPLIEGUE OFICIAL DE OBJETIVOS DEL MES para vuestro punto de venta, junto con el reparto individual de cuotas y las directivas de actuación que debemos aplicar en cada turno.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📊 ESTADO DE OBJETIVOS DE LA TIENDA (${st.name.toUpperCase()}):
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+• 📱 LÍNEAS MÓVILES (Altas/Portas): ${st.realMovil} / ${st.objMovil} (${pctM}% conseguido | Faltan ${gapM} líneas)
+• 🌐 FIBRA & CONVERGENCIA: ${st.realFibra} / ${st.objFibra} (${pctF}% conseguido | Faltan ${gapF} servicios)
+• 🛡️ PENETRACIÓN SEGUROS (SVA): ${st.segurosPct}% (Umbral mínimo: 35.0% | Meta recomendada: >= 40.0%)
+• ⚡ CONTRATOS ENERGÍA (LUZ): ${st.energia} contratos (Campaña Energy Days)
+• 💰 CONTROL DE GASTOS & CAJA: ${st.gastoReal}€ / Presupuesto: ${st.gastoPres}€ | Auditoría: ${st.audit}
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+👥 REPARTO INDIVIDUAL DE CUOTAS POR ASESOR:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+${advisorsText}
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🚀 PLAN DE ACCIÓN OPERATIVO: CÓMO APLICAR LOS OBJETIVOS EN TIENDA
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Para alcanzar y superar el 100% de la meta fijada para ${st.name}, aplicaremos los siguientes 4 focos diarios:
+
+1. PROACTIVIDAD EN PORTABILIDAD (VENTAS DE VALOR):
+   - Abordar a cada cliente de tienda revisando su tarifa móvil y fibra actual.
+   - Foco en captar segundas líneas y portabilidades familiares con terminal subvencionado.
+
+2. OFRECIMIENTO SISTEMÁTICO DE SEGUROS CHUBB:
+   - Todo terminal vendido (Samsung, Apple, Xiaomi) debe salir con propuesta formal de seguro en pantalla.
+   - Destacar la tranquilidad del primer mes sin compromiso y cobertura ante rotura accidental.
+
+3. ESTUDIO GRATUITO DE ENERGÍA (LUZ):
+   - Solicitar la factura eléctrica a los clientes de fibra para aplicar el descuento cruzado en la factura Orange.
+
+4. CUMPLIMIENTO ESTRICTO DE TURNOS Y HORARIOS:
+   - Respetar escrupulosamente los horarios de apertura y relevo de turnos (M/T/P).
+   - Dotación mínima obligatoria: ${st.staffMin} asesores en mostrador simultáneamente en horas punta.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+⏰ SEGUIMIENTO DIARIO:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+- Reporte intermedio de producción: 14:00 horas vía chat de zona.
+- Cierre diario y cuadre de caja: 21:00 horas mediante parte formal.
+
+Mucho ánimo con la recta final del mes. ¡Estoy a vuestra disposición para cualquier duda o apoyo comercial!
+
+Un saludo,
+Beatriz Sánchez Alonso
+Coordinadora de Zona | Grupo Promovil`;
+      }
+    }
+  }
+
+  transferirObjetivosACentroCorreos() {
+    const to = document.getElementById('objGenEmailTo')?.value || '';
+    const subj = document.getElementById('objGenEmailSubject')?.value || '';
+    const body = document.getElementById('objGenEmailBody')?.value || '';
+
+    const emailTo = document.getElementById('emailTo');
+    const emailSubj = document.getElementById('emailSubject');
+    const emailBody = document.getElementById('emailBody');
+    const emailTpl = document.getElementById('emailTplSelect');
+
+    if (emailTo) emailTo.value = to;
+    if (emailSubj) emailSubj.value = subj;
+    if (emailBody) emailBody.value = body;
+    if (emailTpl) emailTpl.value = 'plan_objetivos_tienda';
+
+    this.switchTab('emails');
+    this.toast('✉️ Informe transferido con éxito a Centro de Plantillas & Correos.');
+  }
+
+  copiarWhatsAppDesdeObjetivosView() {
+    const storeId = document.getElementById('objGenStoreSelect')?.value || '234-CC LA GAVIA';
+    this.copiarWhatsAppResumenTienda(storeId);
+  }
+
+  copiarTextoDesdeObjetivosView() {
+    const to = document.getElementById('objGenEmailTo')?.value || '';
+    const subj = document.getElementById('objGenEmailSubject')?.value || '';
+    const body = document.getElementById('objGenEmailBody')?.value || '';
+
+    const full = `Para: ${to}\nAsunto: ${subj}\n\n${body}`;
+    navigator.clipboard.writeText(full).then(() => {
+      this.toast('📋 ¡Informe copiado al portapapeles!');
+    }).catch(() => {
+      this.toast('Error al copiar');
     });
   }
 
@@ -1620,6 +1890,10 @@ class PromovilCockpit {
     if (tabId === 'comercial') {
       setTimeout(() => this.renderCharts(), 40);
     }
+    else if (tabId === 'objetivos') {
+      if (subtab) this.switchObjSubTab(subtab);
+      else this.switchObjSubTab(this.currentObjSubTab || 'estado');
+    }
     else if (tabId === 'estadisticas') {
       if (subtab) this.switchBiSubTab(subtab);
       else this.switchBiSubTab(this.currentBiSubTab || 'studio');
@@ -1658,6 +1932,7 @@ class PromovilCockpit {
     try { this.renderRanking(); } catch (e) { console.error('Error in renderRanking:', e); }
     try { this.renderCoverageGrid(); } catch (e) { console.error('Error in renderCoverageGrid:', e); }
     try { this.renderCuadranteSemanal(); } catch (e) { console.error('Error in renderCuadranteSemanal:', e); }
+    try { this.renderObjetivosStoresTable(); } catch (e) { console.error('Error in renderObjetivosStoresTable:', e); }
     try { this.renderStock(); } catch (e) { console.error('Error in renderStock:', e); }
     try { this.renderComisiones(); } catch (e) { console.error('Error in renderComisiones:', e); }
     try { this.renderVacaciones(); } catch (e) { console.error('Error in renderVacaciones:', e); }
