@@ -7,7 +7,7 @@
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
   <title>PROMOVIL OPS - Cockpit de Control con Desglose y Trazabilidad Documental</title>
-  <link rel="stylesheet" href="css/styles.css?v=2.6.0">
+  <link rel="stylesheet" href="css/styles.css?v=2.6.1">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -368,42 +368,54 @@
             </div>
           </div>
 
-          <!-- 4 KPIs Ejecutivos de Analítica -->
-          <div class="kpi-grid" style="grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); margin-bottom:1.25rem;">
-            <div class="metric-card">
+          <!-- 4 KPIs Ejecutivos de Analítica con Trazabilidad -->
+          <div class="kpi-grid" style="grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); margin-bottom:1.25rem;">
+            <div class="metric-card" title="Calculado: 470 ventas (342 móvil + 128 fibra) / 48 asesores en activo">
               <div class="metric-head">
                 <span class="metric-title">⚡ Productividad de Zona</span>
                 <span class="metric-icon">⏱️</span>
               </div>
-              <div class="metric-val" id="biKpiProductividad">1.38 <small style="font-size:0.85rem; font-weight:500;">v/h</small></div>
-              <div class="metric-sub text-success">▲ +0.18 vs. media histórica</div>
+              <div class="metric-val" id="biKpiProductividad">1.38 <small style="font-size:0.85rem; font-weight:500;">v/asesor/día</small></div>
+              <div class="metric-sub text-success">▲ +0.18 vs. estándar | 470 ventas / 48 asesores</div>
+              <div style="font-size:0.7rem; color:var(--text-muted); margin-top:0.35rem; border-top:1px solid #f1f5f9; padding-top:0.25rem;">
+                📄 Fuente: <a href="javascript:void(0)" onclick="cockpit.openDocViewer('DOC-01')" style="color:var(--orange); text-decoration:none;">TMT Consolidado</a>
+              </div>
             </div>
 
-            <div class="metric-card">
+            <div class="metric-card" title="Calculado: 8 CC (108.4% de run-rate) vs 3 Urbanas (96.2% de run-rate)">
               <div class="metric-head">
                 <span class="metric-title">🎯 Rendimiento CC vs. Urbana</span>
                 <span class="metric-icon">🏬</span>
               </div>
-              <div class="metric-val">108% <span style="font-size:0.9rem; color:var(--text-muted); font-weight:400;">/ 96%</span></div>
-              <div class="metric-sub text-muted">8 CC (108.4%) | 3 Urbanas (96.2%)</div>
+              <div class="metric-val">108.4% <span style="font-size:0.85rem; color:var(--text-muted); font-weight:400;">/ 96.2%</span></div>
+              <div class="metric-sub text-muted">8 CC (388 ventas) | 3 Urbanas (82 ventas)</div>
+              <div style="font-size:0.7rem; color:var(--text-muted); margin-top:0.35rem; border-top:1px solid #f1f5f9; padding-top:0.25rem;">
+                📄 Comparativa Canales: 11 Tiendas Oficiales
+              </div>
             </div>
 
-            <div class="metric-card">
+            <div class="metric-card" title="Calculado: Media ponderada de penetración de seguros en terminales vendidos">
               <div class="metric-head">
                 <span class="metric-title">🛡️ Calidad de Cartera & SVA</span>
                 <span class="metric-icon">💎</span>
               </div>
               <div class="metric-val text-success">42.6% <small style="font-size:0.85rem; font-weight:500;">Seguros</small></div>
-              <div class="metric-sub text-success">▲ +7.6% sobre umbral mínimo (35%)</div>
+              <div class="metric-sub text-success">▲ +7.6% sobre umbral mínimo Orange (35%)</div>
+              <div style="font-size:0.7rem; color:var(--text-muted); margin-top:0.35rem; border-top:1px solid #f1f5f9; padding-top:0.25rem;">
+                📄 Tramo Máximo de Incentivos (+120%)
+              </div>
             </div>
 
-            <div class="metric-card">
+            <div class="metric-card" title="Calculado: Suma de faltantes de stock y descuadres en auditorías de tienda">
               <div class="metric-head">
                 <span class="metric-title">⚖️ Tasa de Descuadre / Riesgo</span>
                 <span class="metric-icon">🔍</span>
               </div>
-              <div class="metric-val" style="color:var(--orange);">0.21%</div>
-              <div class="metric-sub text-muted">-380€ faltante en 2 tiendas bajo plan</div>
+              <div class="metric-val" style="color:var(--orange);">0.21% <small style="font-size:0.85rem; font-weight:500;">(-380€)</small></div>
+              <div class="metric-sub text-muted">Vaguada (-180€) | Getafe (-200€)</div>
+              <div style="font-size:0.7rem; color:var(--text-muted); margin-top:0.35rem; border-top:1px solid #f1f5f9; padding-top:0.25rem;">
+                📄 Fuente: <a href="javascript:void(0)" onclick="cockpit.openDocViewer('DOC-06')" style="color:var(--orange); text-decoration:none;">Partes de Cierre & Auditoría</a>
+              </div>
             </div>
           </div>
 
@@ -1837,6 +1849,6 @@
 
   <div id="toastMessage" class="toast-popup"></div>
 
-  <script src="js/app.js?v=2.6.0"></script>
+  <script src="js/app.js?v=2.6.1"></script>
 </body>
 </html>
