@@ -4015,3 +4015,4 @@ ${t.description}
 }
 
 const cockpit = new PromovilCockpit();
+window.cockpit = cockpit;
