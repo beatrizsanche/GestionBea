@@ -137,6 +137,9 @@
           <button class="btn btn-secondary" onclick="cockpit.iniciarSincronizacionOnline()" title="Sincronizar con GitHub y desplegar en Vercel">
             ☁️ Sincronización Online (GitHub & Vercel)
           </button>
+          <button class="btn btn-outline" style="background:#fffbeb; color:#92400e; border-color:#fde68a;" onclick="cockpit.openFeedbackModal()" title="Sugerir ideas de mejora o notificar errores técnicos">
+            💡 Sugerencias & Errores
+          </button>
           <button class="btn btn-secondary" onclick="cockpit.switchTab('documentos')">
             📁 Documentos (15)
           </button>
@@ -944,6 +947,42 @@
               </table>
             </div>
           </div>
+
+          <!-- FILA 3: BUZÓN DE SUGERENCIAS DE MEJORA & NOTIFICACIÓN DE ERRORES -->
+          <div class="card-flat" style="margin-top: 1rem;">
+            <div class="card-flat-head" style="justify-content:space-between; flex-wrap:wrap; gap:0.5rem;">
+              <div>
+                <span class="card-title">📮 Buzón de Sugerencias de Mejora & Notificación de Errores</span>
+                <span style="font-size:0.75rem; color:var(--text-muted); margin-left:0.5rem;">Canal directo para optimizaciones y soporte técnico.</span>
+              </div>
+              <div style="display:flex; gap:0.4rem; align-items:center;">
+                <span class="chip-badge" id="badgeFbCount" style="background:#eff6ff; color:#1d4ed8;">6 Registros</span>
+                <button class="btn btn-primary" style="font-size:0.775rem;" onclick="cockpit.openFeedbackModal()">
+                  💡 + Nueva Sugerencia / Incidencia
+                </button>
+              </div>
+            </div>
+
+            <div class="table-container">
+              <table class="table-flat">
+                <thead>
+                  <tr>
+                    <th>Ref. Ticket</th>
+                    <th>Fecha & Hora</th>
+                    <th>Tipo</th>
+                    <th>Módulo Afectado</th>
+                    <th>Asunto / Título (Clic para Detalle)</th>
+                    <th>Prioridad</th>
+                    <th>Estado</th>
+                    <th>Acciones</th>
+                  </tr>
+                </thead>
+                <tbody id="feedbackHistoryTbody">
+                  <!-- Rellenado dinámicamente -->
+                </tbody>
+              </table>
+            </div>
+          </div>
         </section>
 
       </div>
@@ -1289,6 +1328,115 @@
         <button type="button" class="btn btn-primary" id="syncCloseBtn" onclick="cockpit.closeModal('modalSyncProgress')" disabled>
           Procesando...
         </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ======================================================== -->
+  <!-- MODAL: SUGERIR IDEAS DE MEJORA O NOTIFICAR ERRORES      -->
+  <!-- ======================================================== -->
+  <div id="modalFeedback" class="modal-backdrop">
+    <div class="modal-flat" style="max-width: 620px;">
+      <div class="modal-head">
+        <div style="display:flex; align-items:center; gap:0.6rem;">
+          <span id="feedbackModalIcon" style="font-size:1.4rem;">💡</span>
+          <div>
+            <h3 id="feedbackModalTitle">Sugerir Idea de Mejora o Notificar Error</h3>
+            <span style="font-size:0.75rem; color:var(--text-muted);">Canal directo de propuestas operativas y resolución técnica</span>
+          </div>
+        </div>
+        <button class="modal-close" onclick="cockpit.closeModal('modalFeedback')">&times;</button>
+      </div>
+
+      <div class="modal-body">
+        <!-- Selector de Tipo -->
+        <div class="feedback-type-selector">
+          <button type="button" class="feedback-type-btn active type-idea" id="fbTypeBtnIdea" onclick="cockpit.switchFeedbackType('idea')">
+            💡 Idea de Mejora
+          </button>
+          <button type="button" class="feedback-type-btn type-error" id="fbTypeBtnError" onclick="cockpit.switchFeedbackType('error')">
+            🐞 Notificar Error
+          </button>
+          <button type="button" class="feedback-type-btn type-feature" id="fbTypeBtnFeature" onclick="cockpit.switchFeedbackType('feature')">
+            🚀 Nueva Función
+          </button>
+        </div>
+
+        <form id="formFeedback" onsubmit="cockpit.submitFeedback(event)">
+          <input type="hidden" id="fbInputType" value="idea">
+
+          <div class="field-row">
+            <div class="field-block flex-1">
+              <label>Remitente / Autor:</label>
+              <input type="text" id="fbSender" class="input-flat" value="Beatriz Sánchez Alonso (Coordinadora Zona)" required>
+            </div>
+            <div class="field-block flex-1">
+              <label>Tienda o Ámbito Asociado:</label>
+              <select id="fbStore" class="select-flat full">
+                <option value="Toda la Zona Centro" selected>📍 Toda la Zona Centro (11 Tiendas)</option>
+                <option value="234-CC LA GAVIA">CC La Gavia</option>
+                <option value="238-TRES AGUAS">CC Tres Aguas</option>
+                <option value="226-CC LA VAGUADA 2">CC La Vaguada</option>
+                <option value="205-CC PRINCIPE PIO">CC Príncipe Pío</option>
+                <option value="208-CC LORANCA">CC Loranca</option>
+                <option value="209-CC PARLA">CC El Ferial (Parla)</option>
+                <option value="025-GRAN VIA HORTALEZA">Gran Vía Hortaleza</option>
+                <option value="030-PALACIO DE HIELO">Palacio de Hielo</option>
+                <option value="246-GETAFE">Getafe Urbana</option>
+                <option value="045-VILLAVICIOSA DE ODON">Villaviciosa de Odón</option>
+                <option value="245-PASEO EXTREMADURA">Paseo de Extremadura</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="field-row">
+            <div class="field-block flex-1">
+              <label>Módulo Afectado:</label>
+              <select id="fbModule" class="select-flat full" required>
+                <option value="Seguimiento TMT & Producción" selected>📊 Seguimiento TMT & Producción</option>
+                <option value="Cuadrantes & Dotación Mínima">📅 Cuadrantes & Dotación Mínima</option>
+                <option value="Documentos & Descargas">📁 Documentos & Descargas</option>
+                <option value="Comisiones & Gastos">💰 Comisiones & Gastos</option>
+                <option value="Vacaciones & Solicitudes">🏖️ Vacaciones & Solicitudes</option>
+                <option value="Sincronización & Backups">🔄 Sincronización & Backups</option>
+                <option value="General / Interfaz">🎨 General / Interfaz de Usuario</option>
+              </select>
+            </div>
+            <div class="field-block flex-1">
+              <label>Nivel de Prioridad:</label>
+              <select id="fbPriority" class="select-flat full" required>
+                <option value="Baja">Baja (Mejora estética o menor)</option>
+                <option value="Media" selected>Media (Optimización de flujo habitual)</option>
+                <option value="Alta">Alta (Impacta en cálculo comercial o cuadrante)</option>
+                <option value="Urgente">🚨 Urgente / Bloqueante (Fallo crítico)</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="field-block">
+            <label id="fbLabelTitle">Título de la Idea / Propuesta:</label>
+            <input type="text" id="fbTitle" class="input-flat" placeholder="Ej: Añadir filtro por asesor en el ranking comercial..." required>
+          </div>
+
+          <div class="field-block">
+            <label id="fbLabelDesc">Descripción Detallada / Pasos o Propuesta:</label>
+            <textarea id="fbDescription" class="textarea-flat" rows="3" placeholder="Explica con detalle qué se puede mejorar, o los pasos para reproducir el error..." required></textarea>
+          </div>
+
+          <div class="field-block">
+            <label>Referencia de Documento o Captura de Pantalla (Opcional):</label>
+            <input type="text" id="fbAttachmentRef" class="input-flat" placeholder="Ej: Captura_Error_TMT.jpg o DOC-01">
+          </div>
+
+          <div style="font-size:0.75rem; color:#1d4ed8; background:#eff6ff; padding:0.6rem 0.85rem; border-radius:var(--radius); border:1px solid #bfdbfe; margin-top:0.5rem;">
+            ℹ️ El ticket se registrará en el historial de soporte y pasará por el proceso de <strong>doble confirmación</strong> antes de guardarse.
+          </div>
+
+          <div class="modal-footer" style="padding:0.75rem 0 0; margin-top:1rem;">
+            <button type="button" class="btn btn-secondary" onclick="cockpit.closeModal('modalFeedback')">Cancelar</button>
+            <button type="submit" class="btn btn-primary" id="fbSubmitBtn">Proceder a Confirmar &rarr;</button>
+          </div>
+        </form>
       </div>
     </div>
   </div>
