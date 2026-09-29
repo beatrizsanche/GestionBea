@@ -2825,10 +2825,14 @@ Beatriz Sánchez`;
           ${email.subject}
         </div>
         <div class="inbox-msg">${email.preview}</div>
-        <div class="inbox-tags">
-          <span class="chip-badge success">${email.status}</span>
-          ${email.cc ? `<span class="chip-badge">CC: ${email.cc}</span>` : ''}
-          <span class="chip-badge info">De: ${email.from}</span>
+        <div class="inbox-tags" style="justify-content:space-between; align-items:center;">
+          <div style="display:flex; gap:0.25rem; flex-wrap:wrap;">
+            <span class="chip-badge ${email.status.includes('Entregado') ? 'success' : 'warning'}">${email.status}</span>
+            ${email.cc ? `<span class="chip-badge">CC: ${email.cc}</span>` : ''}
+          </div>
+          <button class="btn btn-outline" style="padding:0.2rem 0.5rem; font-size:0.7rem; background:#fff;" onclick="event.stopPropagation(); cockpit.cargarEmailEnRedactor('${email.id}')" title="Cargar este mensaje en el redactor para editarlo o reenviarlo">
+            ✏️ Editar / Reenviar
+          </button>
         </div>
       </div>
     `).join('');
@@ -2862,6 +2866,136 @@ Beatriz Sánchez`;
     if (modal) modal.classList.add('open');
   }
 
+  editarEnBandejaDeSalida() {
+    this.closeModal('modalConfirmEmail');
+    this.closeDrilldown();
+    this.switchTab('emails');
+
+    const badge = document.getElementById('editorStatusBadge');
+    if (badge) {
+      badge.className = 'chip-badge warning';
+      badge.textContent = '✏️ Editando en Bandeja de Salida';
+    }
+
+    const bodyEl = document.getElementById('emailBody');
+    if (bodyEl) {
+      bodyEl.focus();
+      bodyEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+
+    this.toast('📬 Abierto en la Bandeja de Salida. Puedes modificar el texto, asunto o destinatarios antes de enviar.');
+  }
+
+  guardarBorradorSalida() {
+    const to = document.getElementById('emailTo')?.value.trim() || 'Sin destinatario';
+    const subj = document.getElementById('emailSubject')?.value.trim() || 'Sin asunto';
+    const body = document.getElementById('emailBody')?.value.trim() || '';
+
+    const now = new Date();
+    const pad = n => String(n).padStart(2, '0');
+    const dateStr = `Hoy ${pad(now.getHours())}:${pad(now.getMinutes())}`;
+
+    const draftRecord = {
+      id: `DRAFT-${Date.now().toString().slice(-4)}`,
+      date: dateStr,
+      from: "beatriz.sanchez@promovil.es (Borrador)",
+      to: to,
+      cc: document.getElementById('emailCc')?.value.trim() || '',
+      subject: `[Borrador] ${subj}`,
+      preview: body.slice(0, 110) + (body.length > 110 ? '...' : ''),
+      body: body,
+      status: "🟡 Guardado en Bandeja de Salida",
+      sha: Math.random().toString(36).substring(2, 10)
+    };
+
+    this.sentEmailsHistory.unshift(draftRecord);
+    this.renderOutboxStream();
+    this.toast('💾 Borrador guardado correctamente en la Bandeja de Salida.');
+  }
+
+  cargarEmailEnRedactor(emailId) {
+    const email = this.sentEmailsHistory.find(e => e.id === emailId);
+    if (!email) return;
+
+    this.closeDrilldown();
+    this.switchTab('emails');
+
+    const elTo = document.getElementById('emailTo');
+    const elCc = document.getElementById('emailCc');
+    const elSubj = document.getElementById('emailSubject');
+    const elBody = document.getElementById('emailBody');
+
+    if (elTo) elTo.value = email.to;
+    if (elCc) elCc.value = email.cc || '';
+    if (elSubj) elSubj.value = email.subject.replace('[Borrador] ', '');
+    if (elBody) elBody.value = email.body;
+
+    const badge = document.getElementById('editorStatusBadge');
+    if (badge) {
+      badge.className = 'chip-badge warning';
+      badge.textContent = `✏️ Editando Copia: ${email.id}`;
+    }
+
+    if (elBody) {
+      elBody.focus();
+      elBody.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+
+    this.toast(`📬 Mensaje ${email.id} cargado en el editor de la Bandeja de Salida.`);
+  }
+
+  redactarCorreoParaAsesor(advisorName) {
+    this.closeDrilldown();
+    this.switchTab('emails');
+
+    const adv = this.advisors.find(a => a.name.toLowerCase().includes(advisorName.toLowerCase())) || { name: advisorName, center: "Zona Centro", movil: 10, fibra: 4, seguros: 40, energia: 2 };
+    
+    const slug = adv.name.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/\s+/g, '.');
+    const to = `${slug}@promovil.es`;
+    const subj = `Expediente Operativo & Resumen de Desempeño - ${adv.name}`;
+    const body = `Hola ${adv.name.split(' ')[0]},
+
+Te remito el resumen de tu expediente y objetivos correspondientes a tu actividad en ${adv.center}:
+
+📊 RESUMEN COMERCIAL:
+- Líneas Móviles: ${adv.movil}
+- Fibra / Conectividad: ${adv.fibra}
+- Penetración Seguros: ${adv.seguros}%
+- Captación Energía: ${adv.energia} contratos
+
+📅 RECORDATORIO DE PROCEDIMIENTO:
+Las solicitudes de vacaciones o permisos deben canalizarse a través de la herramienta de peticiones para validación previa por parte de Coordinación de Zona.
+
+Quedo a tu disposición para cualquier consulta.
+
+Un saludo cordial,
+Beatriz Sánchez Alonso
+Coordinadora de Zona | Grupo Promovil`;
+
+    const elTo = document.getElementById('emailTo');
+    const elCc = document.getElementById('emailCc');
+    const elSubj = document.getElementById('emailSubject');
+    const elBody = document.getElementById('emailBody');
+
+    if (elTo) elTo.value = to;
+    if (elCc) elCc.value = 'personal@promovil.es';
+    if (elSubj) elSubj.value = subj;
+    if (elBody) elBody.value = body;
+
+    const badge = document.getElementById('editorStatusBadge');
+    if (badge) {
+      badge.className = 'chip-badge warning';
+      badge.textContent = `✏️ Redactando para: ${adv.name.split(' ')[0]}`;
+    }
+
+    if (elBody) {
+      elBody.focus();
+      elBody.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+
+    this.toast(`📬 Plantilla cargada en la Bandeja de Salida para ${adv.name}. Puedes editarla antes de enviar.`);
+  }
+
   confirmAndDispatchEmail() {
     const to = document.getElementById('emailTo').value.trim();
     const cc = document.getElementById('emailCc').value.trim();
@@ -2887,6 +3021,12 @@ Beatriz Sánchez`;
 
     // Añadir al historial de salida (Memoria persistente de envíos)
     this.sentEmailsHistory.unshift(newRecord);
+
+    const badge = document.getElementById('editorStatusBadge');
+    if (badge) {
+      badge.className = 'chip-badge success';
+      badge.textContent = '🟢 Despachado vía Ionos Mail';
+    }
 
     this.toast(`🚀 Enviando correo oficial a ${to}...`);
     setTimeout(() => {
@@ -2926,7 +3066,11 @@ ${email.body}
       </div>
     `;
 
-    this.openDrilldown(`📤 Comprobante de Envío: ${email.subject}`, `Registro de entrega oficial y trazabilidad de salida`, html);
+    const actionHtml = `
+      <button class="btn btn-secondary" onclick="cockpit.cargarEmailEnRedactor('${email.id}')">✏️ Cargar en Redactor para Editar / Reenviar</button>
+    `;
+
+    this.openDrilldown(`📤 Comprobante de Envío: ${email.subject}`, `Registro de entrega oficial y trazabilidad de salida`, html, actionHtml);
   }
 
   loadInboxIntoDashboard(tiendaKey) {
