@@ -58,7 +58,7 @@
         </button>
         <button class="nav-tab" data-tab="vacaciones">
           <svg width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>
-          Plantilla & Vacaciones (48)
+          Plantilla & Solicitudes (48)
         </button>
 
         <div class="nav-section-title">TRAZABILIDAD & FUENTES</div>
@@ -611,25 +611,99 @@
 
 
         <!-- ======================================================== -->
-        <!-- MÓDULO 6: VACACIONES & EQUIPO                            -->
+        <!-- MÓDULO 6: VACACIONES & GESTIÓN DE SOLICITUDES             -->
         <!-- ======================================================== -->
         <section id="vacacionesView" class="view-panel">
           <div class="section-title-bar">
             <div>
               <div style="display:flex; align-items:center; gap:0.6rem; flex-wrap:wrap;">
-                <h2 class="view-h2">Plantilla Completa & Vacaciones (48 Asesores)</h2>
+                <h2 class="view-h2">Plantilla & Gestión de Solicitudes de Vacaciones</h2>
                 <span class="doc-source-tag" onclick="cockpit.openDocViewer('DOC-03')">
                   📄 Doc Fuente: Censo_Plantilla_Vacaciones_2026.xlsx 🔍
                 </span>
               </div>
-              <p class="view-sub">Haz clic en la tarjeta de cualquier comercial para ver su ficha completa, períodos disfrutados y pendientes.</p>
+              <p class="view-sub">Las vacaciones y permisos se gestionan a partir de la petición formal de cada trabajador y requieren validación en 2 pasos de la Coordinadora.</p>
             </div>
-            <button class="btn btn-primary" onclick="cockpit.openRegistrarVacacionModal()">
-              📅 Registrar Solicitud
+            <button class="btn btn-primary" onclick="cockpit.openNuevaSolicitudModal()">
+              ➕ Registrar Petición de Trabajador
             </button>
           </div>
 
-          <div class="vacations-deck" id="vacacionesDeck"></div>
+          <!-- Subnavegación de Vacaciones -->
+          <div class="vac-subnav-tabs">
+            <button class="vac-subnav-btn active" id="vacTabBtnSolicitudes" onclick="cockpit.switchVacSubTab('solicitudes')">
+              📥 Bandeja de Solicitudes de Trabajadores <span class="chip-badge warning" id="vacPendingBadge" style="margin-left:0.35rem;">3 Pendientes</span>
+            </button>
+            <button class="vac-subnav-btn" id="vacTabBtnCenso" onclick="cockpit.switchVacSubTab('censo')">
+              👥 Censo & Balances de Plantilla (48 Asesores)
+            </button>
+          </div>
+
+          <!-- SUBPANEL 1: BANDEJA DE SOLICITUDES DE TRABAJADORES -->
+          <div id="vacPanelSolicitudes">
+            <!-- KPIs de Solicitudes -->
+            <div class="vac-kpi-row">
+              <div class="vac-kpi-card">
+                <span class="num" id="kpiVacTotal" style="color:var(--text-primary);">12</span>
+                <span class="lbl">Total Solicitudes</span>
+              </div>
+              <div class="vac-kpi-card">
+                <span class="num" id="kpiVacPending" style="color:var(--amber);">3</span>
+                <span class="lbl">🟡 Pendientes de Revisión</span>
+              </div>
+              <div class="vac-kpi-card">
+                <span class="num" id="kpiVacValidated" style="color:var(--green);">8</span>
+                <span class="lbl">🟢 Validadas -> RRHH</span>
+              </div>
+              <div class="vac-kpi-card">
+                <span class="num" id="kpiVacRejected" style="color:var(--red);">1</span>
+                <span class="lbl">🔴 Denegadas / Ajuste</span>
+              </div>
+            </div>
+
+            <!-- Filtros de Bandeja -->
+            <div class="card-flat" style="margin-bottom: 1rem;">
+              <div class="card-flat-head" style="justify-content:space-between; flex-wrap:wrap; gap:0.5rem;">
+                <div style="display:flex; align-items:center; gap:0.5rem;">
+                  <span style="font-size:0.85rem; font-weight:700;">Filtrar Peticiones:</span>
+                  <select id="vacStatusFilter" class="select-flat" onchange="cockpit.filterVacationRequests()" style="min-width:200px;">
+                    <option value="all">Todas las Solicitudes</option>
+                    <option value="pendiente" selected>🟡 Pendientes de Revisión</option>
+                    <option value="validada">🟢 Validadas y Trasladadas a RRHH</option>
+                    <option value="denegada">🔴 Denegadas / Sin Autorizar</option>
+                  </select>
+                </div>
+                <div style="font-size:0.75rem; color:var(--text-muted);">
+                  ℹ️ Doble confirmación obligatoria al validar o denegar cualquier petición.
+                </div>
+              </div>
+
+              <div class="table-container">
+                <table class="table-flat">
+                  <thead>
+                    <tr>
+                      <th>Ref. Petición</th>
+                      <th>Fecha Solicitud</th>
+                      <th>Trabajador Solicitante</th>
+                      <th>Centro / Tienda</th>
+                      <th>Tipo de Permiso</th>
+                      <th>Período Solicitado</th>
+                      <th>Días</th>
+                      <th>Saldo Restante</th>
+                      <th>Estado</th>
+                      <th>Acción</th>
+                    </tr>
+                  </thead>
+                  <tbody id="vacSolicitudesTbody"></tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+          <!-- SUBPANEL 2: CENSO DE 48 ASESORES -->
+          <div id="vacPanelCenso" style="display:none;">
+            <div class="vacations-deck" id="vacacionesDeck"></div>
+          </div>
         </section>
 
 
@@ -809,12 +883,144 @@
             <label>Terminales Vendidos:</label>
             <input type="number" id="cierreTerm" class="input-flat" min="0" value="3" required>
           </div>
-        </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary" onclick="cockpit.closeModal('modalIngesta')">Cancelar</button>
           <button type="submit" class="btn btn-primary">Guardar e Integrar en Dashboard</button>
         </div>
       </form>
+    </div>
+  </div>
+
+  <!-- ======================================================== -->
+  <!-- MODAL: DOBLE CONFIRMACIÓN UNIVERSAL (PASO 2 DE 2)        -->
+  <!-- ======================================================== -->
+  <div id="modalActionConfirm" class="modal-backdrop">
+    <div class="modal-flat" style="max-width: 520px;">
+      <div class="modal-head">
+        <div style="display:flex; align-items:center; gap:0.6rem;">
+          <span id="confirmActionIcon" style="font-size:1.4rem;">⚠️</span>
+          <div>
+            <h3 id="confirmActionTitle">Confirmación de Acción Requerida</h3>
+            <span id="confirmActionSubtitle" style="font-size:0.75rem; color:var(--text-muted);">Paso 2 de 2 • Doble Comprobación Operativa</span>
+          </div>
+        </div>
+        <button class="modal-close" onclick="cockpit.closeModal('modalActionConfirm')">&times;</button>
+      </div>
+
+      <div class="modal-body">
+        <div id="confirmActionMessage" style="font-size:0.9rem; color:var(--text-primary); line-height:1.4; font-weight:600;"></div>
+        <div id="confirmActionDetails" class="confirm-action-card"></div>
+        <div class="confirm-warning-banner">
+          <span>🛡️</span>
+          <span><strong>Doble Comprobación Activa:</strong> Ninguna acción es directa. Verifica los datos antes de ejecutar el cambio.</span>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" onclick="cockpit.closeModal('modalActionConfirm')" id="confirmActionCancelBtn">❌ Cancelar Operación</button>
+        <button type="button" class="btn btn-primary" id="confirmActionSubmitBtn">✅ Confirmar y Ejecutar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ======================================================== -->
+  <!-- MODAL: REGISTRAR NUEVA PETICIÓN FORMAL DE TRABAJADOR     -->
+  <!-- ======================================================== -->
+  <div id="modalNuevaSolicitudVacacion" class="modal-backdrop">
+    <div class="modal-flat" style="max-width: 620px;">
+      <div class="modal-head">
+        <div style="display:flex; align-items:center; gap:0.6rem;">
+          <span style="font-size:1.4rem;">📝</span>
+          <div>
+            <h3>Registrar Petición de Vacaciones / Permiso</h3>
+            <span style="font-size:0.75rem; color:var(--text-muted);">Entrada de solicitud formal formulada por el empleado</span>
+          </div>
+        </div>
+        <button class="modal-close" onclick="cockpit.closeModal('modalNuevaSolicitudVacacion')">&times;</button>
+      </div>
+
+      <form onsubmit="cockpit.submitNuevaSolicitudVacacion(event)" class="modal-body">
+        <div class="field-block">
+          <label>Trabajador Solicitante (Plantilla Zona Centro):</label>
+          <select id="solicitudAsesorSelect" class="select-flat full" onchange="cockpit.onSolicitanteChange()" required></select>
+        </div>
+
+        <div class="field-row">
+          <div class="field-block flex-1">
+            <label>Tipo de Permiso / Ausencia:</label>
+            <select id="solicitudTipo" class="select-flat full" required>
+              <option value="Vacaciones Anuales">🏖️ Vacaciones Anuales (Convenio)</option>
+              <option value="Asuntos Propios">🎯 Días de Asuntos Propios</option>
+              <option value="Permiso Matrimonio / Pareja">💍 Permiso Matrimonio / Pareja Hecho (15d)</option>
+              <option value="Permiso Médico / Familiar">🏥 Permiso Deber Inexcusable / Familiar</option>
+              <option value="Permiso Examen Oficial">🎓 Permiso Exámenes Oficiales / Formación</option>
+              <option value="Permiso Traslado Domicilio">📦 Permiso Mudanza / Traslado (1d)</option>
+            </select>
+          </div>
+          <div class="field-block flex-1">
+            <label>Saldo Previo Disponible:</label>
+            <div id="solicitudSaldoPreview" style="padding:0.5rem 0.75rem; background:var(--bg-subtle); border:1px solid var(--border-color); border-radius:var(--radius); font-weight:700; color:var(--orange);">
+              23 días restantes
+            </div>
+          </div>
+        </div>
+
+        <div class="field-row">
+          <div class="field-block flex-1">
+            <label>Fecha Inicio:</label>
+            <input type="date" id="solicitudFechaInicio" class="input-flat" required onchange="cockpit.recalcDiasSolicitud()">
+          </div>
+          <div class="field-block flex-1">
+            <label>Fecha Fin:</label>
+            <input type="date" id="solicitudFechaFin" class="input-flat" required onchange="cockpit.recalcDiasSolicitud()">
+          </div>
+          <div class="field-block" style="width: 110px;">
+            <label>Total Días:</label>
+            <input type="number" id="solicitudDias" class="input-flat" min="1" max="30" value="5" required>
+          </div>
+        </div>
+
+        <div class="field-block">
+          <label>Motivo / Observaciones del Trabajador:</label>
+          <textarea id="solicitudMotivo" class="textarea-flat" rows="2" placeholder="Ej: Período ordinario de descanso estival convenido..." required></textarea>
+        </div>
+
+        <div class="field-block">
+          <label>Propuesta de Cobertura / Turno de Apoyo:</label>
+          <input type="text" id="solicitudCobertura" class="input-flat" placeholder="Ej: Cuadrante compensado con turno doblado / Cobertura correturnos" value="Turno coordinado con el equipo de tienda">
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" onclick="cockpit.closeModal('modalNuevaSolicitudVacacion')">Cancelar</button>
+          <button type="submit" class="btn btn-primary">Proceder a Doble Confirmación &rarr;</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ======================================================== -->
+  <!-- MODAL: REVISAR SOLICITUD DE TRABAJADOR & TRASLADAR A RRHH-->
+  <!-- ======================================================== -->
+  <div id="modalRevisarSolicitudVacacion" class="modal-backdrop">
+    <div class="modal-flat" style="max-width: 650px;">
+      <div class="modal-head">
+        <div style="display:flex; align-items:center; gap:0.6rem;">
+          <span style="font-size:1.4rem;">🔍</span>
+          <div>
+            <h3 id="revSolTitulo">Revisión de Solicitud de Trabajador</h3>
+            <span id="revSolSub" style="font-size:0.75rem; color:var(--text-muted);">Comprobación de saldo, dotación mínima de tienda y solapamientos</span>
+          </div>
+        </div>
+        <button class="modal-close" onclick="cockpit.closeModal('modalRevisarSolicitudVacacion')">&times;</button>
+      </div>
+
+      <div class="modal-body" id="revSolBody">
+        <!-- Rellenado dinámicamente con las 3 verificaciones automáticas -->
+      </div>
+
+      <div class="modal-footer" id="revSolFooter">
+        <!-- Botones con doble confirmación -->
+      </div>
     </div>
   </div>
 
