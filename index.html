@@ -64,7 +64,7 @@
         <div class="nav-section-title">TRAZABILIDAD & FUENTES</div>
         <button class="nav-tab" data-tab="documentos">
           <svg width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
-          Documentos & Fuentes (8)
+          Documentos & Descargas (15)
         </button>
       </nav>
 
@@ -721,16 +721,39 @@
         <section id="documentosView" class="view-panel">
           <div class="section-title-bar">
             <div>
-              <h2 class="view-h2">Repositorio de Documentos Fuente & Trazabilidad de Datos</h2>
-              <p class="view-sub">Todos los datos del cockpit proceden de estos 8 documentos maestros. Haz clic en cualquiera para visualizar su contenido en crudo.</p>
+              <h2 class="view-h2">Repositorio de Documentos, Fuentes & Descargas</h2>
+              <p class="view-sub">Visualiza los 8 documentos maestros del Mac y los archivos descargados o extraídos desde correos y WhatsApp.</p>
             </div>
-            <div class="cloud-badge">
-              <span class="status-dot green"></span>
-              <span>Integridad Verificada en Supabase (Solo Lectura)</span>
+            <div style="display:flex; gap:0.5rem; align-items:center; flex-wrap:wrap;">
+              <button class="btn btn-secondary" id="btnGoToDescargados" onclick="cockpit.switchDocSubTab('descargados')">
+                📥 Ver Documentos Descargados (7)
+              </button>
+              <div class="cloud-badge">
+                <span class="status-dot green"></span>
+                <span>Integridad Supabase (Solo Lectura)</span>
+              </div>
             </div>
           </div>
 
-          <div class="doc-repo-grid" id="docRepoContainer"></div>
+          <!-- Subnavegación de Documentos -->
+          <div class="vac-subnav-tabs">
+            <button class="vac-subnav-btn active" id="docTabBtnMaestros" onclick="cockpit.switchDocSubTab('maestros')">
+              📚 Documentos Maestros del Mac (8)
+            </button>
+            <button class="vac-subnav-btn" id="docTabBtnDescargados" onclick="cockpit.switchDocSubTab('descargados')">
+              📥 Documentos & Adjuntos Descargados <span class="chip-badge info" style="margin-left:0.35rem;">7 Archivos</span>
+            </button>
+          </div>
+
+          <!-- SUBPANEL 1: DOCUMENTOS MAESTROS DEL MAC -->
+          <div id="docPanelMaestros">
+            <div class="doc-repo-grid" id="docRepoContainer"></div>
+          </div>
+
+          <!-- SUBPANEL 2: ARCHIVOS & ADJUNTOS DESCARGADOS -->
+          <div id="docPanelDescargados" style="display:none;">
+            <div class="doc-repo-grid" id="docDescargadosContainer"></div>
+          </div>
         </section>
 
       </div>
