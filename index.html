@@ -7,7 +7,7 @@
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
   <title>PROMOVIL OPS - Cockpit de Control con Desglose y Trazabilidad Documental</title>
-  <link rel="stylesheet" href="css/styles.css?v=2.6.1">
+  <link rel="stylesheet" href="css/styles.css?v=2.7.0">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -760,6 +760,59 @@
             </div>
           </div>
 
+          <!-- GENERADOR RÁPIDO DE INFORMES DE OBJETIVOS & DIRECTIVAS PARA TIENDAS -->
+          <div class="flat-panel" style="margin-bottom:1.25rem; border-left:4px solid var(--orange); background:linear-gradient(to right, #ffffff, #fffaf5);">
+            <div class="panel-head" style="justify-content:space-between; align-items:center;">
+              <div style="display:flex; align-items:center; gap:0.5rem;">
+                <span style="font-size:1.2rem;">🎯</span>
+                <div>
+                  <h3 style="margin-bottom:0.15rem;">Generador de Informes de Objetivos & Plan de Acción para Tiendas</h3>
+                  <small style="color:var(--text-muted);">Genera automáticamente la directiva oficial con las metas del mes y las pautas operativas para el Responsable y equipo de tienda.</small>
+                </div>
+              </div>
+              <span class="chip-badge success">Datos Oficiales TMT</span>
+            </div>
+            <div class="panel-body" style="padding:1rem 1.25rem;">
+              <div style="display:grid; grid-template-columns: 1.2fr 1.2fr auto auto; gap:0.75rem; align-items:flex-end;">
+                <div>
+                  <label style="font-size:0.75rem; font-weight:700; color:var(--text-muted); display:block; margin-bottom:0.35rem;">1. SELECCIONA LA TIENDA DESTINO:</label>
+                  <select id="reportStoreSelect" class="select-flat full">
+                    <option value="all">🌐 Todas las Tiendas (Directiva Global Zona Centro)</option>
+                    <option value="234-CC LA GAVIA" selected>CC La Gavia (Erika Castillo)</option>
+                    <option value="238-TRES AGUAS">CC Tres Aguas (Arturo Villafranca)</option>
+                    <option value="226-CC LA VAGUADA 2">CC La Vaguada (Eduardo Mateos)</option>
+                    <option value="205-CC PRINCIPE PIO">CC Príncipe Pío (María Ysabel Vílchez)</option>
+                    <option value="208-CC LORANCA">CC Loranca (Alba López)</option>
+                    <option value="209-CC PARLA">CC El Ferial Parla (Jose Ángel Barriguete)</option>
+                    <option value="025-GRAN VIA HORTALEZA">Gran Vía Hortaleza (Jose Manuel Vigo)</option>
+                    <option value="030-PALACIO DE HIELO">Palacio de Hielo (David Crespo)</option>
+                    <option value="246-GETAFE">Getafe Urbana (Carlos Martínez)</option>
+                    <option value="045-VILLAVICIOSA DE ODON">Villaviciosa de Odón (Roberto Eusebio)</option>
+                    <option value="245-PASEO EXTREMADURA">Paseo de Extremadura (Daniel Domínguez)</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label style="font-size:0.75rem; font-weight:700; color:var(--text-muted); display:block; margin-bottom:0.35rem;">2. TIPO DE INFORME / PLAN DE ACCIÓN:</label>
+                  <select id="reportTypeSelect" class="select-flat full">
+                    <option value="despliegue_operativo" selected>📋 Plan de Objetivos & Pautas de Aplicación en Tienda</option>
+                    <option value="plan_choque_cierre">🚀 Plan de Choque: Aceleración de Cierre (Días 29-30)</option>
+                    <option value="reparto_cuotas">👥 Reparto Nominal de Cuotas por Asesor según Jornada</option>
+                    <option value="directiva_seguros_energia">🛡️ Directiva Foco: Seguros CHUBB & Campaña Energía</option>
+                  </select>
+                </div>
+
+                <button class="btn btn-primary" onclick="cockpit.generarInformeObjetivosTienda()" style="font-weight:700; white-space:nowrap;">
+                  ⚡ Cargar en Redactor
+                </button>
+
+                <button class="btn btn-secondary" onclick="cockpit.copiarWhatsAppResumenTienda()" style="font-weight:600; white-space:nowrap;" title="Copiar formato optimizado para WhatsApp">
+                  💬 Copiar WhatsApp
+                </button>
+              </div>
+            </div>
+          </div>
+
           <div class="email-layout-grid">
             <!-- Formulario Redactor -->
             <div class="flat-panel">
@@ -772,12 +825,14 @@
                   <label>Selecciona la Plantilla Oficial:</label>
                   <select id="emailTplSelect" class="select-flat full" onchange="cockpit.applyEmailTemplate()">
                     <option value="cierre_diario" selected>1. 📊 Reporte Diario de Cierre a Dirección Comercial</option>
-                    <option value="cuadrantes_rrhh">2. 📋 Envío de Cuadrante Mensual de Turnos y Festivos a RRHH</option>
-                    <option value="propuesta_objetivos">3. 🎯 Propuesta de Objetivos Mensuales a Dirección</option>
-                    <option value="liquidacion_gastos">4. 💰 Liquidación Mensual de Gastos de Tienda a Administración</option>
-                    <option value="reclamacion_comisiones">5. 💵 Validación y Precierre de Comisiones a Nóminas</option>
-                    <option value="aviso_correturnos">6. 🚨 Aviso Operativo: Asignación de Correturnos / Sustituto</option>
-                    <option value="aprobacion_vacaciones">7. 🏖️ Aprobación Formal de Vacaciones a Asesor</option>
+                    <option value="plan_objetivos_tienda">2. 🎯 Plan de Objetivos & Plan de Acción para Tienda</option>
+                    <option value="directiva_zona_objetivos">3. 🚀 Directiva de Zona: Aplicación de Objetivos y Focos Comerciales</option>
+                    <option value="cuadrantes_rrhh">4. 📋 Envío de Cuadrante Mensual de Turnos y Festivos a RRHH</option>
+                    <option value="propuesta_objetivos">5. 🎯 Propuesta de Objetivos Mensuales a Dirección</option>
+                    <option value="liquidacion_gastos">6. 💰 Liquidación Mensual de Gastos de Tienda a Administración</option>
+                    <option value="reclamacion_comisiones">7. 💵 Validación y Precierre de Comisiones a Nóminas</option>
+                    <option value="aviso_correturnos">8. 🚨 Aviso Operativo: Asignación de Correturnos / Sustituto</option>
+                    <option value="aprobacion_vacaciones">9. 🏖️ Aprobación Formal de Vacaciones a Asesor</option>
                   </select>
                 </div>
 
@@ -1849,6 +1904,6 @@
 
   <div id="toastMessage" class="toast-popup"></div>
 
-  <script src="js/app.js?v=2.6.1"></script>
+  <script src="js/app.js?v=2.7.0"></script>
 </body>
 </html>
