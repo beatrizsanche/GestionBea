@@ -235,6 +235,126 @@ const MASTER_DOCUMENTS = [
       ["principepio@promovil.es", "Parte de baja médica Cristina López", "28/09 19:40", "CC Príncipe Pío", "Baja_Medica_CL.pdf", "Baja médica estimada de 15 días. Solicitud de correturnos."],
       ["vaguada@promovil.es", "Auditoría mensual y gastos tienda", "28/09 14:10", "CC La Vaguada", "Ticket_Limpieza.jpg", "Faltante 1 terminal gama media (-180€). Ticket limpieza 35€."]
     ]
+// REPOSITORIO DE ARCHIVOS & ADJUNTOS DESCARGADOS (EMAIL, WHATSAPP, DESCARGAS MAC)
+const DOWNLOADED_DOCUMENTS = [
+  {
+    id: "DOC-DL-01",
+    name: "Baja_Medica_CL.pdf",
+    icon: "🏥",
+    tipo: "Parte Oficial de Baja Médica (PDF)",
+    tamano: "1.4 MB",
+    fecha: "28/09/2026 19:40",
+    origen: "✉️ Adjunto Email Ionos (principepio@promovil.es)",
+    origenTipo: "email",
+    sha256: "9a81c0192dfbc847291048192841920481029384019284019284019283748291",
+    descripcion: "Parte oficial de baja por incapacidad temporal de Cristina López Saiz (CC Príncipe Pío) con duración estimada de 15 días. Tramitado a RRHH Promovil.",
+    seccionesAsociadas: ["Cuadrante Semanal", "Bandeja Solicitudes", "Asignación Correturnos"],
+    previewHeaders: ["TRABAJADOR", "DNI", "TIENDA", "FECHA_BAJA", "DURACION_ESTIMADA", "COBERTURA_ASIGNADA", "ESTADO_RRHH"],
+    previewRows: [
+      ["Cristina López Saiz", "50819211C", "205-CC PRINCIPE PIO", "28/09/2026", "15 días naturales", "Andrea Cerdá (Correturnos)", "🟢 Tramitado a RRHH"]
+    ]
+  },
+  {
+    id: "DOC-DL-02",
+    name: "Cierre_TresAguas_2809.xlsx",
+    icon: "📥",
+    tipo: "Parte de Cierre Diario (.xlsx)",
+    tamano: "450 KB",
+    fecha: "28/09/2026 21:15",
+    origen: "✉️ Adjunto Email Ionos (tresaguas@promovil.es)",
+    origenTipo: "email",
+    sha256: "7b18920194820194820194820194820194820194820194820194820194820194",
+    descripcion: "Desglose de cierre comercial y arqueo de caja de la tienda CC Tres Aguas remitido por Arturo Villafranca. 6 móviles, 3 fibras, 2 seguros y 140€ en efectivo.",
+    seccionesAsociadas: ["Seguimiento TMT", "Ingesta de Cierre", "Caja Chica"],
+    previewHeaders: ["TIENDA", "FECHA", "ALTAS_MOVIL", "PORTAS_MOVIL", "FIBRA", "SEGUROS", "ARQUEO_CAJA", "ESTADO"],
+    previewRows: [
+      ["CC Tres Aguas", "28/09/2026", "3", "3", "3", "2", "140.00 € (Conforme)", "🟢 Integrado en TMT"]
+    ]
+  },
+  {
+    id: "DOC-DL-03",
+    name: "WhatsApp_Cierre_Gavia_2809.jpg",
+    icon: "💬",
+    tipo: "Captura de Pantalla TPV / Arqueo (JPEG)",
+    tamano: "820 KB",
+    fecha: "28/09/2026 21:30",
+    origen: "💬 Descarga WhatsApp Tiendas (Chat: Encargados Zona Centro)",
+    origenTipo: "whatsapp",
+    sha256: "3c84910294810294810294810294810294810294810294810294810294810294",
+    descripcion: "Fotografía del ticket de cierre datáfono y reporte resumen de CC La Gavia enviada por WhatsApp por Erika Alexandra Castillo a las 21:30.",
+    seccionesAsociadas: ["Cierre Diario", "Ingesta Rápida", "TMT La Gavia"],
+    previewHeaders: ["CANAL_ORIGEN", "REMITENTE", "TIENDA", "OPERACIONES_TPV", "TOTAL_FACTURADO", "CONFORMIDAD"],
+    previewRows: [
+      ["WhatsApp Desktop", "Erika Alexandra Castillo", "234-CC LA GAVIA", "24 Transacciones", "1.840,50 €", "🟢 Arqueo Cuadrado"]
+    ]
+  },
+  {
+    id: "DOC-DL-04",
+    name: "WhatsApp_Ticket_CajaChica_Getafe.jpg",
+    icon: "🧾",
+    tipo: "Comprobante de Gasto en Imagen (JPEG)",
+    tamano: "340 KB",
+    fecha: "27/09/2026 14:10",
+    origen: "💬 Descarga WhatsApp Tiendas (Chat: Gastos Tienda)",
+    origenTipo: "whatsapp",
+    sha256: "1f82930491820394810293840192830491820394810293840192830491820394",
+    descripcion: "Ticket escaneado de productos de limpieza y material de mostrador por valor de 45.00 € de la tienda Getafe Urbana. Liquidado en caja chica.",
+    seccionesAsociadas: ["Comisiones & Gastos", "DOC-06 Liquidación Gastos"],
+    previewHeaders: ["CONCEPTO", "TIENDA", "IMPORTE", "PROVEEDOR", "NUM_TICKET", "ESTADO_PAGO"],
+    previewRows: [
+      ["Productos Limpieza y Desinfección", "246-GETAFE", "45.00 €", "Mercadona S.A.", "TICK-2026-9810", "🟢 Liquidado Caja Chica"]
+    ]
+  },
+  {
+    id: "DOC-DL-05",
+    name: "Acta_Stock_LaVaguada_Firmada.pdf",
+    icon: "📑",
+    tipo: "Acta Oficial Certificada con Firma Digital (PDF)",
+    tamano: "2.1 MB",
+    fecha: "28/09/2026 20:00",
+    origen: "📥 Generado / Descargado Cockpit (Beatriz Sánchez)",
+    origenTipo: "drive",
+    sha256: "5d91820394810293840192830491820394810293840192830491820394810293",
+    descripcion: "Acta oficial de auditoría presencial de terminales e inventario físico de CC La Vaguada con desglose de faltante de 2 unidades (-180.00 €) y firma de la Coordinadora.",
+    seccionesAsociadas: ["Stock & Faltantes", "Auditoría IMEIs", "Liquidación"],
+    previewHeaders: ["TIENDA", "AUDITORA", "STOCK_FISICO", "DESCUADRE", "VALOR_EUR", "IMEI_INCIDENCIA", "FIRMA_ESTADO"],
+    previewRows: [
+      ["CC La Vaguada", "Beatriz Sánchez Alonso", "143 / 145 Uds", "-2 Uds", "-180.00 €", "354892110482910 (Galaxy A55)", "🟢 Firmada Digitalmente"]
+    ]
+  },
+  {
+    id: "DOC-DL-06",
+    name: "PreCierre_Nominas_Comisiones_Sep2026.xlsx",
+    icon: "📊",
+    tipo: "Archivo Consolidado Nóminas (.xlsx)",
+    tamano: "1.9 MB",
+    fecha: "28/09/2026 22:00",
+    origen: "📥 Generado / Descargado Cockpit",
+    origenTipo: "drive",
+    sha256: "8e19203948102938401928304918203948102938401928304918203948102938",
+    descripcion: "Precierre y liquidación consolidada de comisiones por ventas de líneas móviles, fibra, pólizas de seguros y contratos de energía para los 48 asesores comerciales.",
+    seccionesAsociadas: ["Comisiones & Gastos", "Dossier Asesor", "RRHH Promovil"],
+    previewHeaders: ["TOTAL_ASESORES", "TOTAL_MOVIL_EUR", "TOTAL_FIBRA_EUR", "TOTAL_SEGUROS_EUR", "TOTAL_ENERGIA_EUR", "TOTAL_DEVENGADO"],
+    previewRows: [
+      ["48 Asesores", "4.104,00 €", "2.304,00 €", "1.840,00 €", "960,00 €", "9.208,00 €"]
+    ]
+  },
+  {
+    id: "DOC-DL-07",
+    name: "Justificante_Examen_AndresGil.pdf",
+    icon: "🎓",
+    tipo: "Certificado de Exámenes Oficiales (PDF)",
+    tamano: "610 KB",
+    fecha: "24/09/2026 10:15",
+    origen: "✉️ Adjunto Email Ionos (palaciohielo@promovil.es)",
+    origenTipo: "email",
+    sha256: "2a91820394810293840192830491820394810293840192830491820394810293",
+    descripcion: "Certificado expedido por la Universidad Rey Juan Carlos acreditando la concurrencia a exámenes oficiales de Grado en ADE de Andrés Gil durante el período solicitado.",
+    seccionesAsociadas: ["Plantilla & Solicitudes", "SOL-2026-092", "Permiso Retribuido"],
+    previewHeaders: ["ALUMNO_TRABAJADOR", "UNIVERSIDAD", "GRADO", "FECHA_EXAMEN", "PERMISO_CONVENIO", "ESTADO_VALIDACION"],
+    previewRows: [
+      ["Andrés Gil Salmerón", "Univ. Rey Juan Carlos", "Grado ADE", "06/10/2026 - 09/10/2026", "4 días retribuidos (Art. 37 ET)", "🟢 Validada y Aprobada"]
+    ]
   }
 ];
 
@@ -243,9 +363,11 @@ class PromovilCockpit {
     this.stores = STORE_CONFIG;
     this.advisors = ADVISORS_DATA;
     this.documents = MASTER_DOCUMENTS;
+    this.downloadedDocs = DOWNLOADED_DOCUMENTS;
     this.vacaciones = [];
     this.currentDocViewed = null;
     this.currentVacSubTab = 'solicitudes';
+    this.currentDocSubTab = 'maestros';
 
     // Bandeja de Solicitudes de Vacaciones y Permisos solicitadas formalmente por los trabajadores
     this.solicitudesVacaciones = [
@@ -836,7 +958,7 @@ class PromovilCockpit {
     }
   }
 
-  switchTab(tabId) {
+  switchTab(tabId, subtab) {
     this.navTabs.forEach(t => t.classList.toggle('active', t.dataset.tab === tabId));
     this.viewPanels.forEach(p => p.classList.toggle('active', p.id === `${tabId}View`));
     
@@ -844,7 +966,12 @@ class PromovilCockpit {
       setTimeout(() => this.renderCharts(), 40);
     }
     else if (tabId === 'documentos') {
+      if (subtab) this.switchDocSubTab(subtab);
       this.renderDocRepo();
+    }
+    else if (tabId === 'vacaciones') {
+      if (subtab) this.switchVacSubTab(subtab);
+      this.renderSolicitudesVacaciones();
     }
   }
 
@@ -1529,50 +1656,132 @@ class PromovilCockpit {
   // ========================================================
   // REPOSITORIO DE DOCUMENTOS FUENTE & VISOR DOCUMENTAL
   // ========================================================
+  switchDocSubTab(tab) {
+    this.currentDocSubTab = tab;
+    const btnMae = document.getElementById('docTabBtnMaestros');
+    const btnDes = document.getElementById('docTabBtnDescargados');
+    const panelMae = document.getElementById('docPanelMaestros');
+    const panelDes = document.getElementById('docPanelDescargados');
+    const btnHeader = document.getElementById('btnGoToDescargados');
+
+    if (btnMae && btnDes && panelMae && panelDes) {
+      if (tab === 'descargados') {
+        btnDes.classList.add('active');
+        btnMae.classList.remove('active');
+        panelDes.style.display = 'block';
+        panelMae.style.display = 'none';
+        if (btnHeader) {
+          btnHeader.textContent = '📁 Ver Documentos Maestros (8)';
+          btnHeader.onclick = () => this.switchDocSubTab('maestros');
+        }
+      } else {
+        btnMae.classList.add('active');
+        btnDes.classList.remove('active');
+        panelMae.style.display = 'block';
+        panelDes.style.display = 'none';
+        if (btnHeader) {
+          btnHeader.textContent = '📥 Ver Documentos Descargados (7)';
+          btnHeader.onclick = () => this.switchDocSubTab('descargados');
+        }
+      }
+    }
+  }
+
   renderDocRepo() {
     const container = document.getElementById('docRepoContainer');
-    if (!container) return;
+    const containerDescargados = document.getElementById('docDescargadosContainer');
 
-    container.innerHTML = this.documents.map(doc => `
-      <div class="doc-file-card">
-        <div class="doc-file-head">
-          <div class="doc-icon-badge">${doc.icon}</div>
-          <div style="flex:1;">
-            <div class="doc-file-title">${doc.name}</div>
-            <div class="doc-file-sub">${doc.tipo} • ${doc.tamano}</div>
+    if (container) {
+      container.innerHTML = this.documents.map(doc => `
+        <div class="doc-file-card">
+          <div class="doc-file-head">
+            <div class="doc-icon-badge">${doc.icon}</div>
+            <div style="flex:1;">
+              <div class="doc-file-title">${doc.name}</div>
+              <div class="doc-file-sub">${doc.tipo} • ${doc.tamano}</div>
+            </div>
+          </div>
+
+          <p style="font-size:0.8rem; color:var(--text-secondary); line-height:1.4;">
+            ${doc.descripcion}
+          </p>
+
+          <div>
+            <span style="font-size:0.7rem; font-weight:700; color:var(--text-muted); text-transform:uppercase;">Secciones Vinculadas:</span>
+            <div style="display:flex; gap:0.35rem; flex-wrap:wrap; margin-top:0.25rem;">
+              ${doc.seccionesAsociadas.map(s => `<span class="chip-badge">${s}</span>`).join('')}
+            </div>
+          </div>
+
+          <div class="doc-meta-row">
+            <span>📅 ${doc.fecha}</span>
+            <span>🏛️ ${doc.origen}</span>
+          </div>
+
+          <div style="display:flex; gap:0.5rem; margin-top:0.35rem;">
+            <button class="btn btn-secondary flex-1" style="font-size:0.775rem; justify-content:center;" onclick="cockpit.openDocViewer('${doc.id}')">
+              🔍 Ver Contenido Original
+            </button>
+            <button class="btn btn-outline" style="font-size:0.775rem;" onclick="cockpit.descargarDoc('${doc.id}')" title="Descargar copia oficial">
+              📥
+            </button>
           </div>
         </div>
+      `).join('');
+    }
 
-        <p style="font-size:0.8rem; color:var(--text-secondary); line-height:1.4;">
-          ${doc.descripcion}
-        </p>
+    if (containerDescargados) {
+      containerDescargados.innerHTML = this.downloadedDocs.map(doc => {
+        let tagClass = 'drive';
+        if (doc.origenTipo === 'email') tagClass = 'email';
+        else if (doc.origenTipo === 'whatsapp') tagClass = 'whatsapp';
 
-        <div>
-          <span style="font-size:0.7rem; font-weight:700; color:var(--text-muted); text-transform:uppercase;">Secciones Vinculadas:</span>
-          <div style="display:flex; gap:0.35rem; flex-wrap:wrap; margin-top:0.25rem;">
-            ${doc.seccionesAsociadas.map(s => `<span class="chip-badge">${s}</span>`).join('')}
+        return `
+          <div class="doc-file-card" style="border-left: 3px solid var(--orange);">
+            <div class="doc-file-head">
+              <div class="doc-icon-badge">${doc.icon}</div>
+              <div style="flex:1;">
+                <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:0.4rem;">
+                  <div class="doc-file-title">${doc.name}</div>
+                  <span class="origin-tag ${tagClass}">${doc.origen.split('(')[0].trim()}</span>
+                </div>
+                <div class="doc-file-sub">${doc.tipo} • ${doc.tamano}</div>
+              </div>
+            </div>
+
+            <p style="font-size:0.8rem; color:var(--text-secondary); line-height:1.4;">
+              ${doc.descripcion}
+            </p>
+
+            <div>
+              <span style="font-size:0.7rem; font-weight:700; color:var(--text-muted); text-transform:uppercase;">Vínculos Operativos:</span>
+              <div style="display:flex; gap:0.35rem; flex-wrap:wrap; margin-top:0.25rem;">
+                ${doc.seccionesAsociadas.map(s => `<span class="chip-badge info">${s}</span>`).join('')}
+              </div>
+            </div>
+
+            <div class="doc-meta-row">
+              <span>📅 ${doc.fecha}</span>
+              <span style="max-width: 180px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${doc.origen}</span>
+            </div>
+
+            <div style="display:flex; gap:0.5rem; margin-top:0.35rem;">
+              <button class="btn btn-secondary flex-1" style="font-size:0.775rem; justify-content:center;" onclick="cockpit.openDocViewer('${doc.id}')">
+                🔍 Ver Contenido Extraído
+              </button>
+              <button class="btn btn-outline" style="font-size:0.775rem;" onclick="cockpit.descargarDoc('${doc.id}')" title="Descargar copia del adjunto">
+                📥
+              </button>
+            </div>
           </div>
-        </div>
-
-        <div class="doc-meta-row">
-          <span>📅 ${doc.fecha}</span>
-          <span>🏛️ ${doc.origen}</span>
-        </div>
-
-        <div style="display:flex; gap:0.5rem; margin-top:0.35rem;">
-          <button class="btn btn-secondary flex-1" style="font-size:0.775rem; justify-content:center;" onclick="cockpit.openDocViewer('${doc.id}')">
-            🔍 Ver Contenido Original
-          </button>
-          <button class="btn btn-outline" style="font-size:0.775rem;" onclick="cockpit.descargarDoc('${doc.id}')" title="Descargar copia oficial">
-            📥
-          </button>
-        </div>
-      </div>
-    `).join('');
+        `;
+      }).join('');
+    }
   }
 
   openDocViewer(docId) {
-    const doc = this.documents.find(d => d.id === docId || d.name.includes(docId)) || this.documents[0];
+    const allDocs = this.documents.concat(this.downloadedDocs);
+    const doc = allDocs.find(d => d.id === docId || d.name.includes(docId)) || this.documents[0];
     this.currentDocViewed = doc;
 
     const modal = document.getElementById('modalDocViewer');
