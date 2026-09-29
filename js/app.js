@@ -542,6 +542,100 @@ class PromovilCockpit {
       destZip: true
     };
 
+    // Buzón de Sugerencias de Mejora & Notificación de Errores
+    this.feedbackList = [
+      {
+        id: "TK-2026-001",
+        date: "26/09/2026 11:00",
+        type: "idea",
+        typeLabel: "💡 Idea de Mejora",
+        sender: "Beatriz Sánchez Alonso",
+        store: "Toda la Zona Centro",
+        module: "Comisiones & Gastos",
+        priority: "Media",
+        title: "Exportación directa a formato de nóminas de comisiones e incentivos",
+        description: "Añadir botón para generar y descargar fichero Excel estructurado por asesor con los importes devengados de móvil, fibra, seguros y bonus de energía para facilitar el envío a Recursos Humanos.",
+        attachment: "DOC-06",
+        status: "🟢 Implementada",
+        resolutionNote: "Implementada función de precierre con exportación a hoja de cálculo Excel."
+      },
+      {
+        id: "TK-2026-002",
+        date: "27/09/2026 16:30",
+        type: "error",
+        typeLabel: "🐞 Notificar Error",
+        sender: "Eduardo Mateos Díez (CC La Vaguada)",
+        store: "226-CC LA VAGUADA 2",
+        module: "Seguimiento TMT & Producción",
+        priority: "Alta",
+        title: "Descuadre en cálculo de porcentaje de penetración seguros en CC La Vaguada",
+        description: "El ratio de seguros mostraba 42.0% cuando en el informe TMT oficial de cierre de tienda aparecían 11 pólizas sobre 24 ventas totales (46.0%).",
+        attachment: "DOC-05",
+        status: "🟢 Resuelto",
+        resolutionNote: "Corregido cruce de pólizas CHUBB vinculadas a terminales de gama alta y media."
+      },
+      {
+        id: "TK-2026-003",
+        date: "27/09/2026 18:00",
+        type: "idea",
+        typeLabel: "💡 Idea de Mejora",
+        sender: "Beatriz Sánchez Alonso",
+        store: "Toda la Zona Centro",
+        module: "Cuadrantes & Dotación Mínima",
+        priority: "Alta",
+        title: "Alerta visual en semáforo de dotación cuando una tienda baje del staff mínimo",
+        description: "Poner un aviso en rojo y badge de advertencia cuando el personal presente sea inferior a la dotación mínima estipulada para la tienda.",
+        attachment: "DOC-02",
+        status: "🟢 Implementada",
+        resolutionNote: "Integrado semáforo condicional verde/ámbar/rojo con badge dinámico."
+      },
+      {
+        id: "TK-2026-004",
+        date: "28/09/2026 09:15",
+        type: "feature",
+        typeLabel: "🚀 Nueva Función",
+        sender: "Beatriz Sánchez Alonso",
+        store: "Toda la Zona Centro",
+        module: "Sincronización & Backups",
+        priority: "Alta",
+        title: "Copias de seguridad programadas con frecuencias automáticas y descarga JSON",
+        description: "Disponer de un panel técnico para programar backups diarios a las 22:00, cada 6h o semanales, con firma SHA-256 de verificación.",
+        attachment: "Config_Backups.json",
+        status: "🟢 Implementada",
+        resolutionNote: "Módulo de Configuración & Backups activo con snapshots y descarga JSON."
+      },
+      {
+        id: "TK-2026-005",
+        date: "28/09/2026 12:45",
+        type: "idea",
+        typeLabel: "💡 Idea de Mejora",
+        sender: "Arturo Villafranca Sánchez (CC Tres Aguas)",
+        store: "238-TRES AGUAS",
+        module: "Seguimiento TMT & Producción",
+        priority: "Media",
+        title: "Lectura consolidada de contratos Orange Energía con bonus de 15€",
+        description: "Computar los contratos de luz captados durante los Energy Days en las métricas de tienda y calcular el incentivo de 15€ por contrato en la ficha de cada asesor.",
+        attachment: "DOC-07",
+        status: "🟢 Implementada",
+        resolutionNote: "Añadida columna Orange Energía en TMT, radar de zona y precierre de comisiones."
+      },
+      {
+        id: "TK-2026-006",
+        date: "28/09/2026 20:30",
+        type: "error",
+        typeLabel: "🐞 Notificar Error",
+        sender: "Alba López Muñoz (CC Loranca)",
+        store: "208-CC LORANCA",
+        module: "Cuadrantes & Dotación Mínima",
+        priority: "Media",
+        title: "Revisión de turno partido en festivo comercial CC Loranca",
+        description: "Se requiere revisar la asignación de refuerzo de sábado tarde en CC Loranca para evitar que una misma persona doble turno completo de 10h seguidas.",
+        attachment: "Cuadrante_Loranca.xlsx",
+        status: "🔵 En Análisis",
+        resolutionNote: "En revisión por la Coordinadora Beatriz Sánchez para asignar apoyo de correturnos."
+      }
+    ];
+
     this.mainChartType = 'bar';
     this.mainChartMetric = 'total';
     this.mixChartType = 'doughnut';
@@ -1014,6 +1108,7 @@ class PromovilCockpit {
     }
     else if (tabId === 'configuracion') {
       this.renderBackupHistory();
+      this.renderFeedbackTable();
     }
   }
 
@@ -1043,6 +1138,7 @@ class PromovilCockpit {
     this.renderSolicitudesVacaciones();
     this.renderDocRepo();
     this.renderBackupHistory();
+    this.renderFeedbackTable();
   }
 
   renderMetrics() {
@@ -3485,6 +3581,283 @@ ${email.body}
     }, () => {
       this.render();
       this.toast(`✅ Estado del Cockpit restaurado con éxito desde el snapshot ${backup.id}.`);
+    });
+  }
+
+  // ========================================================
+  // SUGERENCIAS DE MEJORA & NOTIFICACIÓN DE ERRORES / FEEDBACK
+  // ========================================================
+  openFeedbackModal(defaultType = 'idea') {
+    this.switchFeedbackType(defaultType);
+    this.openModal('modalFeedback');
+  }
+
+  switchFeedbackType(type) {
+    const input = document.getElementById('fbInputType');
+    if (input) input.value = type;
+
+    const btnIdea = document.getElementById('fbTypeBtnIdea');
+    const btnError = document.getElementById('fbTypeBtnError');
+    const btnFeature = document.getElementById('fbTypeBtnFeature');
+
+    if (btnIdea) btnIdea.classList.toggle('active', type === 'idea');
+    if (btnError) btnError.classList.toggle('active', type === 'error');
+    if (btnFeature) btnFeature.classList.toggle('active', type === 'feature');
+
+    const iconEl = document.getElementById('feedbackModalIcon');
+    const titleEl = document.getElementById('feedbackModalTitle');
+    const labelTitle = document.getElementById('fbLabelTitle');
+    const labelDesc = document.getElementById('fbLabelDesc');
+    const inputTitle = document.getElementById('fbTitle');
+    const inputDesc = document.getElementById('fbDescription');
+
+    if (type === 'idea') {
+      if (iconEl) iconEl.textContent = '💡';
+      if (titleEl) titleEl.textContent = 'Sugerir Idea de Mejora Operativa';
+      if (labelTitle) labelTitle.textContent = 'Título de la Idea / Propuesta:';
+      if (labelDesc) labelDesc.textContent = 'Explicación Detallada de la Mejora:';
+      if (inputTitle) inputTitle.placeholder = 'Ej: Añadir filtro por asesor en el ranking comercial...';
+      if (inputDesc) inputDesc.placeholder = 'Describe los beneficios, qué problema resuelve y cómo facilitaría el trabajo de coordinación...';
+    } else if (type === 'error') {
+      if (iconEl) iconEl.textContent = '🐞';
+      if (titleEl) titleEl.textContent = 'Notificar Incidencia / Error Técnico';
+      if (labelTitle) labelTitle.textContent = 'Resumen del Error Detectado:';
+      if (labelDesc) labelDesc.textContent = 'Pasos para Reproducir y Comportamiento Esperado:';
+      if (inputTitle) inputTitle.placeholder = 'Ej: Descuadre en cálculo de porcentaje en CC La Vaguada...';
+      if (inputDesc) inputDesc.placeholder = 'Explica qué estabas haciendo, qué valor incorrecto aparece y cuál debería ser el valor correcto...';
+    } else if (type === 'feature') {
+      if (iconEl) iconEl.textContent = '🚀';
+      if (titleEl) titleEl.textContent = 'Petición de Nueva Funcionalidad';
+      if (labelTitle) labelTitle.textContent = 'Nombre de la Nueva Funcionalidad:';
+      if (labelDesc) labelDesc.textContent = 'Especificación y Casos de Uso:';
+      if (inputTitle) inputTitle.placeholder = 'Ej: Integración automática con portal de nóminas...';
+      if (inputDesc) inputDesc.placeholder = 'Detalla la función deseada, qué datos requiere y qué formato de salida esperas...';
+    }
+  }
+
+  submitFeedback(event) {
+    event.preventDefault();
+
+    const type = document.getElementById('fbInputType')?.value || 'idea';
+    const sender = document.getElementById('fbSender')?.value.trim() || 'Beatriz Sánchez Alonso';
+    const store = document.getElementById('fbStore')?.value || 'Toda la Zona Centro';
+    const module = document.getElementById('fbModule')?.value || 'General';
+    const priority = document.getElementById('fbPriority')?.value || 'Media';
+    const title = document.getElementById('fbTitle')?.value.trim();
+    const description = document.getElementById('fbDescription')?.value.trim();
+    const attachment = document.getElementById('fbAttachmentRef')?.value.trim() || '';
+
+    if (!title || !description) {
+      alert('Por favor, completa el título y la descripción.');
+      return;
+    }
+
+    const typeLabels = {
+      idea: '💡 Idea de Mejora',
+      error: '🐞 Notificar Error',
+      feature: '🚀 Nueva Función'
+    };
+
+    const typeIcons = {
+      idea: '💡',
+      error: '🐞',
+      feature: '🚀'
+    };
+
+    this.requestConfirmation({
+      title: `Registrar ${typeLabels[type]}`,
+      subtitle: "Paso 2 de 2 • Comprobación de Ticket de Feedback",
+      icon: typeIcons[type] || '📮',
+      message: `¿Deseas enviar y registrar este ticket para la Zona Centro?`,
+      detailsHtml: `
+        <div class="confirm-details-grid">
+          <div class="confirm-detail-item"><strong>📌 Tipo de Ticket:</strong> ${typeLabels[type]}</div>
+          <div class="confirm-detail-item"><strong>👤 Remitente:</strong> ${sender}</div>
+          <div class="confirm-detail-item"><strong>🏬 Ámbito / Tienda:</strong> ${store}</div>
+          <div class="confirm-detail-item"><strong>🧩 Módulo:</strong> ${module}</div>
+          <div class="confirm-detail-item"><strong>⚡ Prioridad:</strong> ${priority}</div>
+          <div class="confirm-detail-item"><strong>📋 Título:</strong> ${title}</div>
+          ${attachment ? `<div class="confirm-detail-item"><strong>📎 Adjunto/Ref:</strong> ${attachment}</div>` : ''}
+        </div>
+      `,
+      confirmText: "🚀 Confirmar y Registrar Ticket",
+      confirmClass: "btn-primary"
+    }, () => {
+      const nextNum = String(this.feedbackList.length + 1).padStart(3, '0');
+      const ticketId = `TK-2026-${nextNum}`;
+      const now = new Date();
+      const pad = n => String(n).padStart(2, '0');
+      const dateStr = `${pad(now.getDate())}/${pad(now.getMonth()+1)}/${now.getFullYear()} ${pad(now.getHours())}:${pad(now.getMinutes())}`;
+
+      const newTicket = {
+        id: ticketId,
+        date: dateStr,
+        type,
+        typeLabel: typeLabels[type],
+        sender,
+        store,
+        module,
+        priority,
+        title,
+        description,
+        attachment,
+        status: "🟡 Recibida / Pendiente",
+        resolutionNote: "Ticket recibido en el Cockpit de Coordinación. Pendiente de evaluación técnica."
+      };
+
+      this.feedbackList.unshift(newTicket);
+      this.closeModal('modalFeedback');
+      
+      // Clear form
+      document.getElementById('formFeedback')?.reset();
+
+      this.renderFeedbackTable();
+      this.toast(`🎉 Ticket ${ticketId} registrado con éxito. Se ha archivado en el buzón.`);
+    });
+  }
+
+  renderFeedbackTable() {
+    const tbody = document.getElementById('feedbackHistoryTbody');
+    const countBadge = document.getElementById('badgeFbCount');
+
+    if (countBadge) {
+      countBadge.textContent = `${this.feedbackList.length} Registros`;
+    }
+
+    if (!tbody) return;
+
+    if (!this.feedbackList || this.feedbackList.length === 0) {
+      tbody.innerHTML = `
+        <tr>
+          <td colspan="8" style="text-align:center; color:var(--text-muted); padding:1.5rem;">
+            No hay sugerencias ni errores notificados todavía.
+          </td>
+        </tr>
+      `;
+      return;
+    }
+
+    const priorityBadgeClass = {
+      'Baja': 'badge-prio-baja',
+      'Media': 'badge-prio-media',
+      'Alta': 'badge-prio-alta',
+      'Urgente': 'badge-prio-urgente'
+    };
+
+    tbody.innerHTML = this.feedbackList.map(t => {
+      const prioClass = priorityBadgeClass[t.priority] || 'badge-prio-media';
+      const statusClass = t.status.includes('Implementada') || t.status.includes('Resuelto') ? 'success' :
+                          t.status.includes('Análisis') ? 'info' : 'warning';
+
+      return `
+        <tr>
+          <td><code style="font-size:0.75rem; font-weight:700; color:var(--text-primary);">${t.id}</code></td>
+          <td style="font-size:0.78rem; font-weight:600;">${t.date}</td>
+          <td><span class="chip-badge" style="font-size:0.72rem;">${t.typeLabel}</span></td>
+          <td style="font-size:0.78rem;"><strong>${t.module}</strong><br><small style="color:var(--text-muted);">${t.store}</small></td>
+          <td>
+            <a href="javascript:void(0)" onclick="cockpit.verDetalleFeedback('${t.id}')" style="font-size:0.825rem; font-weight:600; color:var(--text-primary); text-decoration:none; display:inline-block; max-width:280px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;" title="${t.title}">
+              ${t.title}
+            </a>
+          </td>
+          <td><span class="chip-badge ${prioClass}" style="font-size:0.7rem;">${t.priority}</span></td>
+          <td><span class="chip-badge ${statusClass}" style="font-size:0.72rem;">${t.status}</span></td>
+          <td>
+            <div style="display:flex; gap:0.35rem;">
+              <button class="btn btn-outline" style="padding:0.25rem 0.5rem; font-size:0.72rem;" onclick="cockpit.verDetalleFeedback('${t.id}')" title="Ver Expediente Completo">
+                🔍 Ver
+              </button>
+              <button class="btn btn-secondary" style="padding:0.25rem 0.5rem; font-size:0.72rem;" onclick="cockpit.cambiarEstadoFeedback('${t.id}')" title="Actualizar Estado">
+                ✏️ Estado
+              </button>
+            </div>
+          </td>
+        </tr>
+      `;
+    }).join('');
+  }
+
+  verDetalleFeedback(ticketId) {
+    const t = this.feedbackList.find(item => item.id === ticketId);
+    if (!t) return;
+
+    let html = `
+      <div class="drilldown-kpi-grid">
+        <div class="drilldown-kpi-card">
+          <span class="lbl">Referencia</span>
+          <span class="val text-primary">${t.id}</span>
+          <span class="sub">${t.typeLabel}</span>
+        </div>
+        <div class="drilldown-kpi-card">
+          <span class="lbl">Estado Actual</span>
+          <span class="val text-success">${t.status}</span>
+          <span class="sub">Prioridad: ${t.priority}</span>
+        </div>
+        <div class="drilldown-kpi-card">
+          <span class="lbl">Módulo / Ámbito</span>
+          <span class="val" style="font-size:1.05rem;">${t.module}</span>
+          <span class="sub">${t.store}</span>
+        </div>
+      </div>
+
+      <div class="drilldown-section">
+        <h4>📋 Datos del Registro Oficial</h4>
+        <div style="font-size:0.8rem; display:flex; flex-direction:column; gap:0.35rem;">
+          <div><strong>Fecha y Hora de Entrada:</strong> ${t.date}</div>
+          <div><strong>Autor / Remitente:</strong> ${t.sender}</div>
+          <div><strong>Título:</strong> <strong>${t.title}</strong></div>
+          ${t.attachment ? `<div><strong>Referencia / Adjunto:</strong> <code>${t.attachment}</code></div>` : ''}
+        </div>
+      </div>
+
+      <div class="drilldown-section">
+        <h4>📝 Descripción y Argumentación</h4>
+        <div style="white-space:pre-wrap; font-family:inherit; font-size:0.825rem; line-height:1.5; color:var(--text-secondary); background:var(--bg-subtle); padding:1rem; border-radius:var(--radius);">
+${t.description}
+        </div>
+      </div>
+
+      <div class="drilldown-section">
+        <h4>🔍 Dictamen & Resolución Técnica</h4>
+        <div style="background:#f0fdf4; border:1px solid #bbf7d0; border-radius:var(--radius); padding:0.85rem; font-size:0.8rem; color:#166534;">
+          <strong>Notas de Coordinación / Soporte:</strong>
+          <p style="margin-top:0.35rem; line-height:1.4;">${t.resolutionNote}</p>
+        </div>
+      </div>
+    `;
+
+    const actionHtml = `
+      <button class="btn btn-secondary" onclick="cockpit.cambiarEstadoFeedback('${t.id}')">🔄 Modificar Estado</button>
+      <button class="btn btn-primary" onclick="cockpit.redactarCorreoParaAsesor('${t.sender}')">✉️ Responder al Autor</button>
+    `;
+
+    this.openDrilldown(`📮 Ticket: ${t.id} - ${t.title}`, `Expediente de feedback y resolución técnica`, html, actionHtml);
+  }
+
+  cambiarEstadoFeedback(ticketId) {
+    const t = this.feedbackList.find(item => item.id === ticketId);
+    if (!t) return;
+
+    this.requestConfirmation({
+      title: `Actualizar Estado de Ticket ${t.id}`,
+      subtitle: "Paso 2 de 2 • Gestión de Ciclo de Vida",
+      icon: "✏️",
+      message: `¿Deseas marcar el ticket "${t.title}" como implementado / resuelto?`,
+      detailsHtml: `
+        <div class="confirm-details-grid">
+          <div class="confirm-detail-item"><strong>Ticket:</strong> ${t.id} (${t.typeLabel})</div>
+          <div class="confirm-detail-item"><strong>Estado Actual:</strong> ${t.status}</div>
+          <div class="confirm-detail-item"><strong>Nuevo Estado:</strong> 🟢 Implementada / Resuelta con Éxito</div>
+          <div class="confirm-detail-item"><strong>Fecha:</strong> ${new Date().toLocaleString('es-ES')}</div>
+        </div>
+      `,
+      confirmText: "✅ Marcar como Resuelto",
+      confirmClass: "btn-primary"
+    }, () => {
+      t.status = "🟢 Implementada";
+      t.resolutionNote = `Resuelto y verificado por la Coordinadora Beatriz Sánchez el ${new Date().toLocaleDateString('es-ES')}.`;
+      this.renderFeedbackTable();
+      this.toast(`✅ Ticket ${t.id} actualizado a estado Resuelto.`);
     });
   }
 
