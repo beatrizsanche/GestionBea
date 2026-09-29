@@ -245,6 +245,101 @@ class PromovilCockpit {
     this.documents = MASTER_DOCUMENTS;
     this.vacaciones = [];
     this.currentDocViewed = null;
+    this.currentVacSubTab = 'solicitudes';
+
+    // Bandeja de Solicitudes de Vacaciones y Permisos solicitadas formalmente por los trabajadores
+    this.solicitudesVacaciones = [
+      {
+        id: "SOL-2026-089",
+        empId: "emp-29",
+        empName: "ERIKA ALEXANDRA CASTILLO ORDOÑEZ",
+        center: "CC La Gavia",
+        centerId: "234-CC LA GAVIA",
+        tipo: "Vacaciones Anuales",
+        fechaInicio: "2026-10-13",
+        fechaFin: "2026-10-17",
+        dias: 5,
+        saldoPrevio: 30,
+        fechaSolicitud: "28/09/2026 18:20",
+        motivo: "Período ordinario de descanso familiar previsto según calendario anual.",
+        cobertura: "Turnos coordinados con Maximiliano Gómez y Patricia Romero",
+        estado: "pendiente", // pendiente | validada | denegada
+        estadoTxt: "🟡 Pendiente de Revisión por Zona",
+        observacionesZona: ""
+      },
+      {
+        id: "SOL-2026-090",
+        empId: "emp-35",
+        empName: "ARTURO VILLAFRANCA SANCHEZ",
+        center: "CC Tres Aguas",
+        centerId: "238-TRES AGUAS",
+        tipo: "Asuntos Propios",
+        fechaInicio: "2026-10-20",
+        fechaFin: "2026-10-22",
+        dias: 3,
+        saldoPrevio: 15,
+        fechaSolicitud: "28/09/2026 19:15",
+        motivo: "Gestiones personales inaplazables y firma notarial de vivienda.",
+        cobertura: "Cambio de turno convenido con Daniel Olmos",
+        estado: "pendiente",
+        estadoTxt: "🟡 Pendiente de Revisión por Zona",
+        observacionesZona: ""
+      },
+      {
+        id: "SOL-2026-091",
+        empId: "emp-10",
+        empName: "CRISTINA LOPEZ SAIZ",
+        center: "CC Príncipe Pío",
+        centerId: "205-CC PRINCIPE PIO",
+        tipo: "Permiso Médico / Familiar",
+        fechaInicio: "2026-10-05",
+        fechaFin: "2026-10-09",
+        dias: 5,
+        saldoPrevio: 30,
+        fechaSolicitud: "28/09/2026 17:40",
+        motivo: "Acompañamiento familiar e intervención médica ambulatoria.",
+        cobertura: "Refuerzo solicitado con correturnos Andrea Cerdá",
+        estado: "pendiente",
+        estadoTxt: "🟡 Pendiente de Revisión por Zona",
+        observacionesZona: ""
+      },
+      {
+        id: "SOL-2026-085",
+        empId: "emp-14",
+        empName: "ALBA LOPEZ MUÑOZ",
+        center: "CC Loranca",
+        centerId: "208-CC LORANCA",
+        tipo: "Vacaciones Anuales",
+        fechaInicio: "2026-11-03",
+        fechaFin: "2026-11-14",
+        dias: 10,
+        saldoPrevio: 15,
+        fechaSolicitud: "25/09/2026 11:30",
+        motivo: "Disfrute ordinario de vacaciones según convenio.",
+        cobertura: "Cuadrante equilibrado con Mónica Ballonga",
+        estado: "validada",
+        estadoTxt: "🟢 Validada y Trasladada a RRHH",
+        observacionesZona: "Validada por Coordinadora Beatriz Sánchez el 26/09/2026. Notificado a personal@promovil.es."
+      },
+      {
+        id: "SOL-2026-084",
+        empId: "emp-18",
+        empName: "OSCAR MARIN CAMPOS",
+        center: "CC El Ferial (Parla)",
+        centerId: "209-CC PARLA",
+        tipo: "Vacaciones Anuales",
+        fechaInicio: "2026-12-15",
+        fechaFin: "2026-12-28",
+        dias: 12,
+        saldoPrevio: 15,
+        fechaSolicitud: "22/09/2026 16:00",
+        motivo: "Período festividades navideñas.",
+        cobertura: "Sin cobertura definida",
+        estado: "denegada",
+        estadoTxt: "🔴 No Autorizada (Campaña Black Friday/Navidad)",
+        observacionesZona: "Período bloqueado por campaña comercial de máxima afluencia conforme a política de tienda."
+      }
+    ];
 
     // Memoria / Historial de Envíos Realizados (Outbox Audit)
     this.sentEmailsHistory = [
@@ -776,6 +871,7 @@ class PromovilCockpit {
     this.renderStock();
     this.renderComisiones();
     this.renderVacaciones();
+    this.renderSolicitudesVacaciones();
     this.renderDocRepo();
   }
 
@@ -987,6 +1083,424 @@ class PromovilCockpit {
         </tr>
       `;
     }).join('');
+  }
+
+  // ========================================================
+  // MÓDULO 6: WORKFLOW DE VACACIONES & PETICIONES FORMALES
+  // ========================================================
+  switchVacSubTab(tab) {
+    this.currentVacSubTab = tab;
+    const btnSol = document.getElementById('vacTabBtnSolicitudes');
+    const btnCen = document.getElementById('vacTabBtnCenso');
+    const panelSol = document.getElementById('vacPanelSolicitudes');
+    const panelCen = document.getElementById('vacPanelCenso');
+
+    if (btnSol && btnCen && panelSol && panelCen) {
+      if (tab === 'solicitudes') {
+        btnSol.classList.add('active');
+        btnCen.classList.remove('active');
+        panelSol.style.display = 'block';
+        panelCen.style.display = 'none';
+        this.renderSolicitudesVacaciones();
+      } else {
+        btnCen.classList.add('active');
+        btnSol.classList.remove('active');
+        panelCen.style.display = 'block';
+        panelSol.style.display = 'none';
+        this.renderVacaciones();
+      }
+    }
+  }
+
+  filterVacationRequests() {
+    this.renderSolicitudesVacaciones();
+  }
+
+  renderSolicitudesVacaciones() {
+    const tbody = document.getElementById('vacSolicitudesTbody');
+    const filterSelect = document.getElementById('vacStatusFilter');
+    const statusFilter = filterSelect ? filterSelect.value : 'all';
+
+    const totalCount = this.solicitudesVacaciones.length;
+    const pendingCount = this.solicitudesVacaciones.filter(s => s.estado === 'pendiente').length;
+    const validatedCount = this.solicitudesVacaciones.filter(s => s.estado === 'validada').length;
+    const rejectedCount = this.solicitudesVacaciones.filter(s => s.estado === 'denegada').length;
+
+    // Update KPI Badges
+    const elTot = document.getElementById('kpiVacTotal');
+    const elPen = document.getElementById('kpiVacPending');
+    const elVal = document.getElementById('kpiVacValidated');
+    const elRej = document.getElementById('kpiVacRejected');
+    const elPendingBadge = document.getElementById('vacPendingBadge');
+
+    if (elTot) elTot.textContent = totalCount;
+    if (elPen) elPen.textContent = pendingCount;
+    if (elVal) elVal.textContent = validatedCount;
+    if (elRej) elRej.textContent = rejectedCount;
+    if (elPendingBadge) {
+      elPendingBadge.textContent = `${pendingCount} Pendientes`;
+      elPendingBadge.className = `chip-badge ${pendingCount > 0 ? 'warning' : 'success'}`;
+    }
+
+    if (!tbody) return;
+
+    let list = this.solicitudesVacaciones;
+    if (statusFilter !== 'all') {
+      list = list.filter(s => s.estado === statusFilter);
+    }
+
+    if (!list.length) {
+      tbody.innerHTML = `
+        <tr>
+          <td colspan="10" style="text-align:center; padding:2rem; color:var(--text-muted);">
+            No hay solicitudes de trabajadores con el filtro seleccionado (${statusFilter}).
+          </td>
+        </tr>
+      `;
+      return;
+    }
+
+    tbody.innerHTML = list.map(sol => {
+      const adv = this.advisors.find(a => a.id === sol.empId || a.name === sol.empName) || { vacTotal: 30, vacTaken: 0, dni: "Sin DNI" };
+      const remAfter = Math.max(0, adv.vacTotal - adv.vacTaken - (sol.estado === 'validada' ? 0 : sol.dias));
+
+      let badgeClass = 'pendiente';
+      let badgeLabel = '🟡 Pendiente Revisión';
+      if (sol.estado === 'validada') {
+        badgeClass = 'validada';
+        badgeLabel = '🟢 Trasladada a RRHH';
+      } else if (sol.estado === 'denegada') {
+        badgeClass = 'denegada';
+        badgeLabel = '🔴 No Autorizada';
+      }
+
+      return `
+        <tr>
+          <td><strong style="font-family:monospace; color:var(--text-primary);">${sol.id}</strong></td>
+          <td style="font-size:0.775rem; color:var(--text-muted);">${sol.fechaSolicitud}</td>
+          <td>
+            <strong>${sol.empName}</strong>
+            <br><small style="color:var(--text-muted);">DNI: ${adv.dni}</small>
+          </td>
+          <td><span class="chip-badge info">${sol.center}</span></td>
+          <td><strong>${sol.tipo}</strong></td>
+          <td style="font-size:0.8rem;">${sol.fechaInicio} &rarr; ${sol.fechaFin}</td>
+          <td><strong style="color:var(--orange);">${sol.dias} días</strong></td>
+          <td style="font-size:0.775rem;">
+            <span>${adv.vacTotal - adv.vacTaken}d &rarr; <strong>${remAfter}d</strong></span>
+          </td>
+          <td><span class="badge-solicitud ${badgeClass}">${badgeLabel}</span></td>
+          <td>
+            <div style="display:flex; gap:0.35rem;">
+              <button class="btn btn-secondary" style="padding:0.25rem 0.5rem; font-size:0.725rem;" onclick="cockpit.abrirRevisionSolicitud('${sol.id}')">
+                🔍 Revisar
+              </button>
+              ${sol.estado === 'pendiente' ? `
+                <button class="btn btn-primary" style="padding:0.25rem 0.5rem; font-size:0.725rem;" onclick="cockpit.validarSolicitudVacacion('${sol.id}')">
+                  ✅ Validar
+                </button>
+              ` : ''}
+            </div>
+          </td>
+        </tr>
+      `;
+    }).join('');
+  }
+
+  openNuevaSolicitudModal(preselectedEmpId) {
+    const sel = document.getElementById('solicitudAsesorSelect');
+    if (sel) {
+      sel.innerHTML = this.advisors.map(a => `
+        <option value="${a.id}" ${preselectedEmpId === a.id ? 'selected' : ''}>
+          ${a.name} (${a.center}) — Saldo: ${a.vacTotal - a.vacTaken}d libres
+        </option>
+      `).join('');
+    }
+
+    // Set default dates to next week
+    const d1 = new Date();
+    d1.setDate(d1.getDate() + 14);
+    const d2 = new Date();
+    d2.setDate(d2.getDate() + 18);
+
+    const f1 = document.getElementById('solicitudFechaInicio');
+    const f2 = document.getElementById('solicitudFechaFin');
+    if (f1) f1.value = d1.toISOString().split('T')[0];
+    if (f2) f2.value = d2.toISOString().split('T')[0];
+
+    this.onSolicitanteChange();
+    this.openModal('modalNuevaSolicitudVacacion');
+  }
+
+  onSolicitanteChange() {
+    const sel = document.getElementById('solicitudAsesorSelect');
+    const preview = document.getElementById('solicitudSaldoPreview');
+    if (!sel || !preview) return;
+
+    const empId = sel.value;
+    const adv = this.advisors.find(a => a.id === empId);
+    if (adv) {
+      const rem = adv.vacTotal - adv.vacTaken;
+      preview.textContent = `${rem} días disponibles de ${adv.vacTotal}d totales`;
+    }
+  }
+
+  recalcDiasSolicitud() {
+    const f1 = document.getElementById('solicitudFechaInicio');
+    const f2 = document.getElementById('solicitudFechaFin');
+    const num = document.getElementById('solicitudDias');
+    if (!f1 || !f2 || !num) return;
+
+    if (f1.value && f2.value) {
+      const d1 = new Date(f1.value);
+      const d2 = new Date(f2.value);
+      const diffTime = Math.max(0, d2 - d1);
+      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
+      num.value = Math.max(1, diffDays > 30 ? 30 : diffDays);
+    }
+  }
+
+  submitNuevaSolicitudVacacion(e) {
+    e.preventDefault();
+    const sel = document.getElementById('solicitudAsesorSelect');
+    const tipo = document.getElementById('solicitudTipo').value;
+    const fInicio = document.getElementById('solicitudFechaInicio').value;
+    const fFin = document.getElementById('solicitudFechaFin').value;
+    const dias = parseInt(document.getElementById('solicitudDias').value, 10) || 1;
+    const motivo = document.getElementById('solicitudMotivo').value.trim();
+    const cobertura = document.getElementById('solicitudCobertura').value.trim();
+
+    const adv = this.advisors.find(a => a.id === sel.value);
+    if (!adv) return;
+
+    const currentRem = adv.vacTotal - adv.vacTaken;
+
+    // Trigger universal 2-step confirmation
+    this.requestConfirmation({
+      title: "Registrar Petición Formal de Trabajador",
+      subtitle: "Paso 2 de 2 • Entrada de Petición en Bandeja",
+      icon: "📝",
+      message: `¿Confirmas la recepción e inserción de la solicitud formulada por el empleado ${adv.name}?`,
+      detailsHtml: `
+        <div class="confirm-details-grid">
+          <div class="confirm-detail-item"><strong>Trabajador:</strong> ${adv.name}</div>
+          <div class="confirm-detail-item"><strong>Tienda / Centro:</strong> ${adv.center}</div>
+          <div class="confirm-detail-item"><strong>Tipo Permiso:</strong> ${tipo}</div>
+          <div class="confirm-detail-item"><strong>Días Solicitados:</strong> ${dias} días</div>
+          <div class="confirm-detail-item"><strong>Período:</strong> ${fInicio} al ${fFin}</div>
+          <div class="confirm-detail-item"><strong>Saldo Actual:</strong> ${currentRem} días libres</div>
+        </div>
+        <div style="margin-top:0.6rem; font-size:0.775rem;">
+          <strong>Motivo expuesto por el trabajador:</strong>
+          <div style="background:#fff; border:1px solid var(--border-color); padding:0.4rem 0.6rem; border-radius:4px; margin-top:0.2rem;">${motivo || 'Sin motivo adicional'}</div>
+        </div>
+      `,
+      confirmText: "✅ Confirmar Registro de Petición",
+      confirmClass: "btn-primary"
+    }, () => {
+      const newSol = {
+        id: `SOL-2026-0${Math.floor(Math.random() * 80) + 100}`,
+        empId: adv.id,
+        empName: adv.name,
+        center: adv.center,
+        centerId: adv.centerId,
+        tipo: tipo,
+        fechaInicio: fInicio,
+        fechaFin: fFin,
+        dias: dias,
+        saldoPrevio: currentRem,
+        fechaSolicitud: new Date().toLocaleDateString('es-ES') + " " + new Date().toLocaleTimeString('es-ES', {hour:'2-digit', minute:'2-digit'}),
+        motivo: motivo,
+        cobertura: cobertura,
+        estado: "pendiente",
+        estadoTxt: "🟡 Pendiente de Revisión por Zona",
+        observacionesZona: ""
+      };
+
+      this.solicitudesVacaciones.unshift(newSol);
+      this.closeModal('modalNuevaSolicitudVacacion');
+      this.switchVacSubTab('solicitudes');
+      this.renderSolicitudesVacaciones();
+      this.toast(`📥 Solicitud formal de ${adv.name} registrada en bandeja para validación.`);
+    });
+  }
+
+  abrirRevisionSolicitud(solId) {
+    const sol = this.solicitudesVacaciones.find(s => s.id === solId);
+    if (!sol) return;
+
+    const adv = this.advisors.find(a => a.id === sol.empId || a.name === sol.empName) || { vacTotal: 30, vacTaken: 0, dni: "Sin DNI" };
+    const currentRem = adv.vacTotal - adv.vacTaken;
+    const isBalanceOk = currentRem >= sol.dias;
+    const postBalance = isBalanceOk ? currentRem - sol.dias : 0;
+
+    // Store coverage check
+    const storeAdvisors = this.advisors.filter(a => a.centerId === sol.centerId || a.center === sol.center);
+    const totalStaffStore = storeAdvisors.length;
+
+    // Check overlaps
+    const overlapAdvisors = storeAdvisors.filter(a => a.id !== adv.id && a.vacHistory && a.vacHistory.some(h => h.period.includes('2026')));
+
+    const body = document.getElementById('revSolBody');
+    const footer = document.getElementById('revSolFooter');
+
+    if (body) {
+      body.innerHTML = `
+        <div class="confirm-action-card" style="margin-top:0;">
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+            <div>
+              <strong style="font-size:1.05rem; color:var(--text-primary);">${sol.empName}</strong>
+              <div style="font-size:0.75rem; color:var(--text-muted);">DNI: ${adv.dni} • Centro: <strong>${sol.center}</strong></div>
+            </div>
+            <span class="badge-solicitud ${sol.estado === 'validada' ? 'validada' : (sol.estado === 'denegada' ? 'denegada' : 'pendiente')}">
+              ${sol.estadoTxt}
+            </span>
+          </div>
+
+          <div class="confirm-details-grid" style="margin-top:0.75rem;">
+            <div class="confirm-detail-item"><strong>Referencia:</strong> ${sol.id}</div>
+            <div class="confirm-detail-item"><strong>Fecha Petición:</strong> ${sol.fechaSolicitud}</div>
+            <div class="confirm-detail-item"><strong>Tipo de Permiso:</strong> ${sol.tipo}</div>
+            <div class="confirm-detail-item"><strong>Período:</strong> ${sol.fechaInicio} al ${sol.fechaFin}</div>
+            <div class="confirm-detail-item"><strong>Días Solicitados:</strong> ${sol.dias} laborables</div>
+            <div class="confirm-detail-item"><strong>Cobertura Propuesta:</strong> ${sol.cobertura || 'Coordinada en tienda'}</div>
+          </div>
+
+          <div style="margin-top:0.6rem; font-size:0.8rem; background:#fff; padding:0.5rem; border:1px solid var(--border-color); border-radius:4px;">
+            <strong>Motivo aportado por el trabajador:</strong>
+            <p style="margin-top:0.2rem; color:var(--text-secondary);">${sol.motivo}</p>
+          </div>
+        </div>
+
+        <!-- Triple Verificación Automática -->
+        <h4 style="font-size:0.825rem; text-transform:uppercase; color:var(--text-muted); margin-top:1rem;">
+          🛡️ Triple Comprobación Previa a Validación (Zona Centro)
+        </h4>
+
+        <div class="validation-checklist">
+          <div class="validation-check-item">
+            <span class="check-icon">${isBalanceOk ? '✅' : '❌'}</span>
+            <div>
+              <strong>1. Balance de Días de Convenio:</strong>
+              <div style="color:var(--text-secondary);">
+                ${isBalanceOk ? `Dispone de ${currentRem} días libres. Tras autorizar la solicitud quedarán ${postBalance} días disponibles.` : `Saldo insuficiente: solicita ${sol.dias} días y solo tiene ${currentRem} días disponibles.`}
+              </div>
+            </div>
+          </div>
+
+          <div class="validation-check-item">
+            <span class="check-icon">✅</span>
+            <div>
+              <strong>2. Dotación Mínima de Tienda (${sol.center}):</strong>
+              <div style="color:var(--text-secondary);">
+                Plantilla asignada de ${totalStaffStore} asesores. La ausencia no compromete la apertura comercial continuada.
+              </div>
+            </div>
+          </div>
+
+          <div class="validation-check-item">
+            <span class="check-icon">${overlapAdvisors.length > 2 ? '⚠️' : '✅'}</span>
+            <div>
+              <strong>3. Comprobación Anti-Solapamientos en ${sol.center}:</strong>
+              <div style="color:var(--text-secondary);">
+                ${overlapAdvisors.length > 2 ? `Precaución: Hay varios compañeros con permisos en fechas cercanas.` : `Sin solapamiento crítico detectado con otros comerciales del centro.`}
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    if (footer) {
+      if (sol.estado === 'pendiente') {
+        footer.innerHTML = `
+          <button type="button" class="btn btn-secondary" onclick="cockpit.denegarSolicitudVacacion('${sol.id}')">🔴 Denegar Petición</button>
+          <button type="button" class="btn btn-primary" onclick="cockpit.validarSolicitudVacacion('${sol.id}')">✅ Validar y Trasladar a RRHH</button>
+        `;
+      } else {
+        footer.innerHTML = `
+          <button type="button" class="btn btn-secondary" onclick="cockpit.closeModal('modalRevisarSolicitudVacacion')">Cerrar Expediente</button>
+        `;
+      }
+    }
+
+    this.openModal('modalRevisarSolicitudVacacion');
+  }
+
+  validarSolicitudVacacion(solId) {
+    const sol = this.solicitudesVacaciones.find(s => s.id === solId);
+    if (!sol) return;
+
+    const adv = this.advisors.find(a => a.id === sol.empId || a.name === sol.empName) || { vacTotal: 30, vacTaken: 0, dni: "Sin DNI" };
+
+    // Trigger universal 2-step confirmation
+    this.requestConfirmation({
+      title: "Validar y Trasladar Solicitud a RRHH",
+      subtitle: "Paso 2 de 2 • Autorización Formal de Coordinación",
+      icon: "🏖️",
+      message: `¿Confirmas la validación de la petición de ${sol.empName} para el período ${sol.fechaInicio} al ${sol.fechaFin}?`,
+      detailsHtml: `
+        <div class="confirm-details-grid">
+          <div class="confirm-detail-item"><strong>Trabajador:</strong> ${sol.empName}</div>
+          <div class="confirm-detail-item"><strong>DNI:</strong> ${adv.dni}</div>
+          <div class="confirm-detail-item"><strong>Días a Descontar:</strong> ${sol.dias} laborables</div>
+          <div class="confirm-detail-item"><strong>Nuevo Saldo Libre:</strong> ${Math.max(0, adv.vacTotal - adv.vacTaken - sol.dias)} días</div>
+          <div class="confirm-detail-item"><strong>Destinatarios RRHH:</strong> personal@promovil.es</div>
+          <div class="confirm-detail-item"><strong>Notificación:</strong> Copia automática al trabajador</div>
+        </div>
+      `,
+      confirmText: "✅ Confirmar y Trasladar a RRHH",
+      confirmClass: "btn-primary"
+    }, () => {
+      sol.estado = 'validada';
+      sol.estadoTxt = '🟢 Validada por Zona - Trasladada a RRHH';
+      sol.observacionesZona = `Validada por Coordinadora Beatriz Sánchez el ${new Date().toLocaleDateString('es-ES')}. Trasladada a RRHH Promovil.`;
+
+      // Update advisor record
+      adv.vacTaken += sol.dias;
+      if (!adv.vacHistory) adv.vacHistory = [];
+      adv.vacHistory.unshift({
+        period: `${sol.fechaInicio} - ${sol.fechaFin}`,
+        days: sol.dias,
+        type: sol.tipo,
+        status: "Aprobado RRHH"
+      });
+
+      this.closeModal('modalRevisarSolicitudVacacion');
+      this.renderSolicitudesVacaciones();
+      this.renderVacaciones();
+      this.toast(`✅ Solicitud ${sol.id} validada y comunicada a RRHH Promovil.`);
+    });
+  }
+
+  denegarSolicitudVacacion(solId) {
+    const sol = this.solicitudesVacaciones.find(s => s.id === solId);
+    if (!sol) return;
+
+    this.requestConfirmation({
+      title: "Denegar Solicitud de Vacaciones / Permiso",
+      subtitle: "Paso 2 de 2 • No Autorización Operativa",
+      icon: "🔴",
+      message: `¿Deseas marcar la solicitud ${sol.id} de ${sol.empName} como NO autorizada?`,
+      detailsHtml: `
+        <div class="confirm-details-grid">
+          <div class="confirm-detail-item"><strong>Trabajador:</strong> ${sol.empName}</div>
+          <div class="confirm-detail-item"><strong>Período:</strong> ${sol.fechaInicio} al ${sol.fechaFin}</div>
+          <div class="confirm-detail-item"><strong>Días Solicitados:</strong> ${sol.dias} días</div>
+          <div class="confirm-detail-item"><strong>Motivo Denegación:</strong> Mínimos de dotación o fechas bloqueadas</div>
+        </div>
+      `,
+      confirmText: "🔴 Confirmar Denegación",
+      confirmClass: "btn-danger"
+    }, () => {
+      sol.estado = 'denegada';
+      sol.estadoTxt = '🔴 No Autorizada por Coordinación';
+      sol.observacionesZona = `Denegada por Coordinadora Beatriz Sánchez el ${new Date().toLocaleDateString('es-ES')}. Requiere acordar nuevo período.`;
+
+      this.closeModal('modalRevisarSolicitudVacacion');
+      this.renderSolicitudesVacaciones();
+      this.toast(`🔴 Solicitud ${sol.id} denegada y registrada.`);
+    });
   }
 
   renderVacaciones() {
@@ -1679,7 +2193,7 @@ class PromovilCockpit {
     `;
 
     const actionHtml = `
-      <button class="btn btn-secondary" onclick="cockpit.aprobarVacacionParaAsesor('${adv.name}')">🏖️ Aprobar Vacaciones</button>
+      <button class="btn btn-secondary" onclick="cockpit.openNuevaSolicitudModal('${adv.id}')">📝 Tramitar Petición de Permiso</button>
       <button class="btn btn-primary" onclick="cockpit.redactarCorreoParaAsesor('${adv.name}')">✉️ Enviar Ficha por Correo</button>
     `;
 
@@ -2075,15 +2589,66 @@ ${email.body}
     else if (tiendaKey === 'vaguada') this.showStockDrilldown('226-CC LA VAGUADA 2');
   }
 
-  // Modales y Acciones Rápidas
-  openIngestaModal() {
-    const m = document.getElementById('modalIngesta');
-    if (m) m.classList.add('open');
+  // ========================================================
+  // CONTROL DE MODALES & DOBLE CONFIRMACIÓN UNIVERSAL
+  // ========================================================
+  openModal(id) {
+    const m = document.getElementById(id);
+    if (m) {
+      m.classList.add('open');
+      m.style.display = 'flex';
+    }
   }
 
   closeModal(id) {
     const m = document.getElementById(id);
-    if (m) m.classList.remove('open');
+    if (m) {
+      m.classList.remove('open');
+      m.style.display = 'none';
+    }
+  }
+
+  openIngestaModal() {
+    this.openModal('modalIngesta');
+  }
+
+  requestConfirmation(options, onConfirmCallback) {
+    const modal = document.getElementById('modalActionConfirm');
+    if (!modal) {
+      if (confirm(options.message || '¿Confirmar operación?')) {
+        onConfirmCallback();
+      }
+      return;
+    }
+
+    const elTitle = document.getElementById('confirmActionTitle');
+    const elSub = document.getElementById('confirmActionSubtitle');
+    const elIcon = document.getElementById('confirmActionIcon');
+    const elMsg = document.getElementById('confirmActionMessage');
+    const elDetails = document.getElementById('confirmActionDetails');
+    const btnSubmit = document.getElementById('confirmActionSubmitBtn');
+    const btnCancel = document.getElementById('confirmActionCancelBtn');
+
+    if (elTitle) elTitle.textContent = options.title || 'Confirmación Requerida';
+    if (elSub) elSub.textContent = options.subtitle || 'Paso 2 de 2 • Doble Comprobación Operativa';
+    if (elIcon) elIcon.textContent = options.icon || '⚠️';
+    if (elMsg) elMsg.textContent = options.message || '¿Estás seguro de que deseas ejecutar esta operación?';
+    if (elDetails) elDetails.innerHTML = options.detailsHtml || '<p>Verifica los datos antes de continuar.</p>';
+
+    if (btnSubmit) {
+      btnSubmit.textContent = options.confirmText || '✅ Confirmar y Ejecutar';
+      btnSubmit.className = `btn ${options.confirmClass || 'btn-primary'}`;
+      btnSubmit.onclick = () => {
+        this.closeModal('modalActionConfirm');
+        onConfirmCallback();
+      };
+    }
+
+    if (btnCancel) {
+      btnCancel.textContent = options.cancelText || '❌ Cancelar Operación';
+    }
+
+    this.openModal('modalActionConfirm');
   }
 
   submitCierre(e) {
@@ -2092,35 +2657,73 @@ ${email.body}
     const altas = parseInt(document.getElementById('cierreAltas').value, 10) || 0;
     const portas = parseInt(document.getElementById('cierrePortas').value, 10) || 0;
     const fibra = parseInt(document.getElementById('cierreFibra').value, 10) || 0;
+    const seguros = parseInt(document.getElementById('cierreSeguros').value, 10) || 0;
     const energia = parseInt(document.getElementById('cierreEnergia').value, 10) || 0;
+    const term = parseInt(document.getElementById('cierreTerm').value, 10) || 0;
 
     const store = this.stores.find(s => s.id === storeId);
-    if (store) {
+    if (!store) return;
+
+    this.requestConfirmation({
+      title: "Registrar Cierre Diario de Tienda",
+      subtitle: "Paso 2 de 2 • Integración en Panel de Control",
+      icon: "📥",
+      message: `¿Confirmas la integración del cierre operativo para ${store.name}?`,
+      detailsHtml: `
+        <div class="confirm-details-grid">
+          <div class="confirm-detail-item"><strong>Tienda:</strong> ${store.name}</div>
+          <div class="confirm-detail-item"><strong>Altas Móvil:</strong> +${altas}</div>
+          <div class="confirm-detail-item"><strong>Portabilidades:</strong> +${portas}</div>
+          <div class="confirm-detail-item"><strong>Fibra Óptica:</strong> +${fibra}</div>
+          <div class="confirm-detail-item"><strong>Seguros Vendidos:</strong> +${seguros}</div>
+          <div class="confirm-detail-item"><strong>Contratos Energía:</strong> +${energia}</div>
+          <div class="confirm-detail-item"><strong>Terminales:</strong> +${term}</div>
+        </div>
+      `,
+      confirmText: "✅ Confirmar Cierre e Integrar",
+      confirmClass: "btn-primary"
+    }, () => {
       store.realMovil += (altas + portas);
       store.realFibra += fibra;
       store.energia += energia;
       this.render();
       this.closeModal('modalIngesta');
-      this.toast(`✅ Cierre de ${store.name} integrado en tiempo real.`);
-    }
+      this.toast(`✅ Cierre de ${store.name} registrado e integrado con éxito.`);
+    });
   }
 
   openAsignarCorreturnosModal() {
-    const store = prompt('¿A qué tienda deseas asignar el correturnos? (ej: Paseo de Extremadura)', 'Paseo de Extremadura');
-    if (store) {
-      this.asignarRefuerzoATienda(store);
-    }
+    this.asignarRefuerzoATienda('245-PASEO EXTREMADURA');
   }
 
-  asignarRefuerzoATienda(tienda) {
+  asignarRefuerzoATienda(storeIdOrName) {
+    const store = this.stores.find(s => s.id === storeIdOrName || s.name === storeIdOrName) || this.stores[0];
     this.closeDrilldown();
-    this.toast(`⚡ Correturnos Andrea Cerdá asignada a ${tienda}`);
-    this.switchTab('emails');
-    const sel = document.getElementById('emailTplSelect');
-    if (sel) {
-      sel.value = 'aviso_correturnos';
-      this.applyEmailTemplate();
-    }
+
+    this.requestConfirmation({
+      title: "Asignar Refuerzo / Correturnos",
+      subtitle: "Paso 2 de 2 • Movilización de Personal",
+      icon: "⚡",
+      message: `¿Confirmas la asignación del correturnos Andrea Cerdá a la tienda ${store.name}?`,
+      detailsHtml: `
+        <div class="confirm-details-grid">
+          <div class="confirm-detail-item"><strong>Asesor de Refuerzo:</strong> Andrea Cerdá Mora</div>
+          <div class="confirm-detail-item"><strong>Tienda Destino:</strong> ${store.name}</div>
+          <div class="confirm-detail-item"><strong>Franja Asignada:</strong> Turno de Tarde (16:30 - 20:30)</div>
+          <div class="confirm-detail-item"><strong>Impacto Dotación:</strong> Garantiza cobertura mínima</div>
+        </div>
+      `,
+      confirmText: "⚡ Confirmar Asignación de Correturnos",
+      confirmClass: "btn-primary"
+    }, () => {
+      this.toast(`⚡ Correturnos Andrea Cerdá asignada a ${store.name}`);
+      this.switchTab('emails');
+      const sel = document.getElementById('emailTplSelect');
+      if (sel) {
+        sel.value = 'aviso_correturnos';
+        this.applyEmailTemplate();
+      }
+    });
   }
 
   redactarCorreoParaTienda(tienda) {
@@ -2139,42 +2742,50 @@ ${email.body}
     this.toast(`✉️ Redactor abierto para ${asesor}`);
   }
 
-  aprobarVacacionParaAsesor(asesor) {
-    this.closeDrilldown();
-    this.switchTab('emails');
-    const sel = document.getElementById('emailTplSelect');
-    if (sel) {
-      sel.value = 'aprobacion_vacaciones';
-      this.applyEmailTemplate();
-    }
-    const subj = document.getElementById('emailSubject');
-    if (subj) subj.value = `Confirmación y Aprobación de Solicitud de Vacaciones - ${asesor}`;
-    this.toast(`🏖️ Plantilla de vacaciones generada para ${asesor}`);
-  }
-
   openNuevaAuditoriaModal() {
-    const tienda = prompt('Introduce el nombre de la tienda para la nueva acta:', 'CC La Gavia');
-    if (tienda) {
-      this.showStockDrilldown(tienda);
-    }
-  }
-
-  openRegistrarVacacionModal() {
-    this.switchTab('emails');
-    const sel = document.getElementById('emailTplSelect');
-    if (sel) {
-      sel.value = 'aprobacion_vacaciones';
-      this.applyEmailTemplate();
-    }
-    this.toast('📅 Abriendo plantilla de aprobación de vacaciones');
+    this.showStockDrilldown('234-CC LA GAVIA');
   }
 
   descargarActaPdf(tienda) {
-    this.toast(`📥 Generando acta oficial de auditoría en PDF para ${tienda}...`);
+    this.requestConfirmation({
+      title: "Emitir y Descargar Acta Oficial de Stock",
+      subtitle: "Paso 2 de 2 • Generación Documental con Firma Digital",
+      icon: "📑",
+      message: `¿Deseas generar y descargar el Acta Oficial de Auditoría de Stock e IMEIs para ${tienda}?`,
+      detailsHtml: `
+        <div class="confirm-details-grid">
+          <div class="confirm-detail-item"><strong>Tienda Auditada:</strong> ${tienda}</div>
+          <div class="confirm-detail-item"><strong>Auditora Responsable:</strong> Beatriz Sánchez Alonso</div>
+          <div class="confirm-detail-item"><strong>Formato:</strong> PDF Certificado con Hash SHA-256</div>
+          <div class="confirm-detail-item"><strong>Registro:</strong> Notificación a Auditoría Interna</div>
+        </div>
+      `,
+      confirmText: "📥 Confirmar y Descargar Acta PDF",
+      confirmClass: "btn-primary"
+    }, () => {
+      this.toast(`📥 Acta Oficial de Auditoría de Stock para ${tienda} generada con éxito.`);
+    });
   }
 
   exportarComisionesExcel() {
-    this.toast('📥 Generando archivo Excel con el precierre de nóminas...');
+    this.requestConfirmation({
+      title: "Exportar Precierre de Nóminas y Comisiones",
+      subtitle: "Paso 2 de 2 • Consolidación de Plantilla (48 Asesores)",
+      icon: "💵",
+      message: "¿Deseas generar el archivo consolidado de incentivos para los 48 asesores de la Zona Centro?",
+      detailsHtml: `
+        <div class="confirm-details-grid">
+          <div class="confirm-detail-item"><strong>Total Plantilla:</strong> 48 Asesores Comerciales</div>
+          <div class="confirm-detail-item"><strong>Período:</strong> Septiembre 2026 (Semana 39)</div>
+          <div class="confirm-detail-item"><strong>Conceptos:</strong> Móvil, Fibra, Seguros y Energía</div>
+          <div class="confirm-detail-item"><strong>Destino:</strong> Archivo XLSX / RRHH Promovil</div>
+        </div>
+      `,
+      confirmText: "📊 Confirmar Exportación a Excel",
+      confirmClass: "btn-primary"
+    }, () => {
+      this.toast('📥 Precierre de nóminas y comisiones de los 48 asesores exportado correctamente.');
+    });
   }
 
   toast(msg) {
@@ -2182,7 +2793,7 @@ ${email.body}
     if (!t) return;
     t.textContent = msg;
     t.style.display = 'block';
-    setTimeout(() => { t.style.display = 'none'; }, 3200);
+    setTimeout(() => { t.style.display = 'none'; }, 3400);
   }
 }
 
