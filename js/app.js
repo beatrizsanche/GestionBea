@@ -3307,7 +3307,7 @@ ${email.body}
   }
 
   async ejecutarSincronizacionEnVivo() {
-    const btnSync = document.getElementById('masterSyncBtn');
+    const btnSync = document.getElementById('sidebarMasterSyncBtn') || document.getElementById('masterSyncBtn');
     if (btnSync) btnSync.classList.add('spinning');
 
     const modal = document.getElementById('modalSyncProgress');
