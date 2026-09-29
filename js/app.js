@@ -1,355 +1,2189 @@
-// GestionBea - Lógica de la aplicación
+// PROMOVIL OPS - Cockpit Operativo de Coordinación & Trazabilidad Documental
+// Zona Centro | Franquicias Orange (11 Puntos de Venta)
 
-const STORAGE_KEYS = {
-  TASKS: 'gestionbea_tasks',
-  NOTES: 'gestionbea_notes'
-};
-
-// Datos de ejemplo iniciales
-const INITIAL_TASKS = [
-  { id: '1', title: 'Configurar entorno y sincronizar con GitHub', priority: 'high', category: 'Proyecto', completed: true, createdAt: new Date().toISOString() },
-  { id: '2', title: 'Diseñar la estructura del panel de gestión', priority: 'high', category: 'Diseño', completed: true, createdAt: new Date().toISOString() },
-  { id: '3', title: 'Añadir nuevas tareas y objetivos del mes', priority: 'medium', category: 'Organización', completed: false, createdAt: new Date().toISOString() }
+const STORE_CONFIG = [
+  { id: "234-CC LA GAVIA", name: "CC La Gavia", canal: "cc", objMovil: 45, realMovil: 42, objFibra: 16, realFibra: 18, energia: 10, segurosPct: 44.5, staffMin: 4, staffPres: 4, status: "green", audit: "CORRECTO", faltante: 0, gastoPres: 400, gastoReal: 260 },
+  { id: "238-TRES AGUAS", name: "CC Tres Aguas", canal: "cc", objMovil: 40, realMovil: 38, objFibra: 14, realFibra: 13, energia: 8, segurosPct: 41.2, staffMin: 3, staffPres: 3, status: "green", audit: "CORRECTO", faltante: 0, gastoPres: 350, gastoReal: 190 },
+  { id: "226-CC LA VAGUADA 2", name: "CC La Vaguada", canal: "cc", objMovil: 48, realMovil: 46, objFibra: 18, realFibra: 17, energia: 11, segurosPct: 46.0, staffMin: 4, staffPres: 3, status: "amber", audit: "CON DESCUADRE", faltante: -180, gastoPres: 450, gastoReal: 320 },
+  { id: "205-CC PRINCIPE PIO", name: "CC Príncipe Pío", canal: "cc", objMovil: 35, realMovil: 30, objFibra: 12, realFibra: 11, energia: 4, segurosPct: 38.0, staffMin: 3, staffPres: 2, status: "red", audit: "CORRECTO", faltante: 0, gastoPres: 300, gastoReal: 210 },
+  { id: "208-CC LORANCA", name: "CC Loranca", canal: "cc", objMovil: 32, realMovil: 29, objFibra: 11, realFibra: 10, energia: 6, segurosPct: 39.5, staffMin: 3, staffPres: 3, status: "green", audit: "CORRECTO", faltante: 0, gastoPres: 280, gastoReal: 180 },
+  { id: "209-CC PARLA", name: "CC El Ferial (Parla)", canal: "cc", objMovil: 34, realMovil: 31, objFibra: 12, realFibra: 12, energia: 7, segurosPct: 43.0, staffMin: 3, staffPres: 3, status: "green", audit: "CORRECTO", faltante: 0, gastoPres: 290, gastoReal: 175 },
+  { id: "025-GRAN VIA HORTALEZA", name: "Gran Vía Hortaleza", canal: "cc", objMovil: 36, realMovil: 34, objFibra: 13, realFibra: 12, energia: 5, segurosPct: 40.0, staffMin: 3, staffPres: 3, status: "green", audit: "CORRECTO", faltante: 0, gastoPres: 300, gastoReal: 240 },
+  { id: "030-PALACIO DE HIELO", name: "Palacio de Hielo", canal: "cc", objMovil: 30, realMovil: 26, objFibra: 10, realFibra: 9, energia: 4, segurosPct: 36.5, staffMin: 3, staffPres: 2, status: "amber", audit: "CORRECTO", faltante: 0, gastoPres: 270, gastoReal: 160 },
+  { id: "246-GETAFE", name: "Getafe Urbana", canal: "urbana", objMovil: 28, realMovil: 25, objFibra: 10, realFibra: 9, energia: 4, segurosPct: 42.0, staffMin: 2, staffPres: 2, status: "green", audit: "CON DESCUADRE", faltante: -200, gastoPres: 250, gastoReal: 140 },
+  { id: "045-VILLAVICIOSA DE ODON", name: "Villaviciosa de Odón", canal: "urbana", objMovil: 24, realMovil: 21, objFibra: 8, realFibra: 8, energia: 3, segurosPct: 45.0, staffMin: 2, staffPres: 2, status: "green", audit: "CORRECTO", faltante: 0, gastoPres: 220, gastoReal: 110 },
+  { id: "245-PASEO EXTREMADURA", name: "Paseo de Extremadura", canal: "urbana", objMovil: 24, realMovil: 20, objFibra: 9, realFibra: 7, energia: 2, segurosPct: 37.0, staffMin: 2, staffPres: 1, status: "red", audit: "CORRECTO", faltante: 0, gastoPres: 220, gastoReal: 95 }
 ];
 
-const INITIAL_NOTES = [
-  { id: '1', title: '¡Bienvenida a GestionBea!', content: 'Esta aplicación te ayuda a mantener el control de tus tareas y notas directamente en tu navegador con guardado automático.', color: 'purple', createdAt: new Date().toLocaleDateString('es-ES') },
-  { id: '2', title: 'Recordatorio GitHub', content: 'Recuerda hacer commits periódicos para mantener tus cambios a salvo en la nube.', color: 'blue', createdAt: new Date().toLocaleDateString('es-ES') }
+// 48 Asesores Reales con Ficha Completa, DNI, Turnos y Vacaciones
+const ADVISORS_DATA = [
+  // CC LA GAVIA
+  { id: "emp-29", name: "ERIKA ALEXANDRA CASTILLO ORDOÑEZ", dni: "53892104E", centerId: "234-CC LA GAVIA", center: "CC La Gavia", role: "Responsable de Tienda", jornada: "40h", state: "🟢 En Tienda", movil: 16, fibra: 7, seguros: 48, energia: 4, term: 10, obj: 25, vacTotal: 30, vacTaken: 0, vacHistory: [{ period: "15/10/2026 - 30/10/2026", days: 15, type: "Turno Otoño", status: "Planificado" }], shifts: { L: "M (10:00-16:30)", M: "M (10:00-16:30)", X: "M (10:00-16:30)", J: "M (10:00-16:30)", V: "M (10:00-16:30)", S: "P (10-14/17-21)", D: "L (Libre)" } },
+  { id: "emp-31", name: "MAXIMILIANO GOMEZ CURIA", dni: "05489211M", centerId: "234-CC LA GAVIA", center: "CC La Gavia", role: "Segundo Responsable", jornada: "40h", state: "🟢 En Tienda", movil: 14, fibra: 6, seguros: 45, energia: 3, term: 8, obj: 23, vacTotal: 30, vacTaken: 15, vacHistory: [{ period: "01/08/2026 - 15/08/2026", days: 15, type: "Verano", status: "Disfrutado" }], shifts: { L: "T (14:30-21:00)", M: "T (14:30-21:00)", X: "T (14:30-21:00)", J: "T (14:30-21:00)", V: "T (14:30-21:00)", S: "M (10:00-16:30)", D: "L (Libre)" } },
+  { id: "emp-32", name: "PATRICIA ROMERO MANQUILLO", dni: "50912448P", centerId: "234-CC LA GAVIA", center: "CC La Gavia", role: "Asesor Comercial Senior", jornada: "36h", state: "🟢 En Tienda", movil: 12, fibra: 5, seguros: 40, energia: 3, term: 7, obj: 22, vacTotal: 30, vacTaken: 15, vacHistory: [{ period: "16/07/2026 - 31/07/2026", days: 15, type: "Verano", status: "Disfrutado" }], shifts: { L: "P (10-14/17-21)", M: "P (10-14/17-21)", X: "T (14:30-21:00)", J: "T (14:30-21:00)", V: "M (10:00-16:30)", S: "T (14:30-21:00)", D: "L (Libre)" } },
+  { id: "emp-30", name: "Mª JESUS LOZANO GARCIA", dni: "02684912J", centerId: "234-CC LA GAVIA", center: "CC La Gavia", role: "Asesor Comercial", jornada: "36h", state: "🟢 En Tienda", movil: 10, fibra: 4, seguros: 42, energia: 2, term: 6, obj: 20, vacTotal: 30, vacTaken: 15, vacHistory: [{ period: "01/07/2026 - 15/07/2026", days: 15, type: "Verano", status: "Disfrutado" }], shifts: { L: "M (10:00-16:30)", M: "T (14:30-21:00)", X: "M (10:00-16:30)", J: "P (10-14/17-21)", V: "T (14:30-21:00)", S: "T (14:30-21:00)", D: "L (Libre)" } },
+  { id: "emp-33", name: "ROSA MARGARITA CAMPUSANO VALLEJO", dni: "51992014R", centerId: "234-CC LA GAVIA", center: "CC La Gavia", role: "Asesor Comercial", jornada: "30h", state: "🟢 En Tienda", movil: 8, fibra: 3, seguros: 39, energia: 1, term: 5, obj: 18, vacTotal: 30, vacTaken: 15, vacHistory: [{ period: "15/08/2026 - 30/08/2026", days: 15, type: "Verano", status: "Disfrutado" }], shifts: { L: "T (16:00-21:00)", M: "T (16:00-21:00)", X: "T (16:00-21:00)", J: "T (16:00-21:00)", V: "T (16:00-21:00)", S: "M (10:00-15:00)", D: "L (Libre)" } },
+  { id: "emp-34", name: "DIANA QUIROZ AMAYA", dni: "54819033D", centerId: "234-CC LA GAVIA", center: "CC La Gavia", role: "Asesor Comercial", jornada: "20h", state: "🟢 En Tienda", movil: 6, fibra: 2, seguros: 38, energia: 1, term: 4, obj: 15, vacTotal: 30, vacTaken: 0, vacHistory: [], shifts: { L: "L (Libre)", M: "L (Libre)", X: "L (Libre)", J: "M (10:00-15:00)", V: "M (10:00-15:00)", S: "P (10-14/17-21)", D: "L (Libre)" } },
+  { id: "emp-44", name: "EDUARDO ENCINAS GALAN", dni: "03918233E", centerId: "234-CC LA GAVIA", center: "CC La Gavia", role: "Refuerzo / Fin de Semana", jornada: "20h", state: "🟢 En Tienda", movil: 5, fibra: 2, seguros: 40, energia: 1, term: 3, obj: 12, vacTotal: 30, vacTaken: 15, vacHistory: [{ period: "01/08/2026 - 15/08/2026", days: 15, type: "Verano", status: "Disfrutado" }], shifts: { L: "L (Libre)", M: "L (Libre)", X: "L (Libre)", J: "L (Libre)", V: "T (16:00-21:00)", S: "P (10-14/17-21)", D: "T (12:00-19:00)" } },
+
+  // CC TRES AGUAS
+  { id: "emp-35", name: "ARTURO VILLAFRANCA SANCHEZ", dni: "51892019A", centerId: "238-TRES AGUAS", center: "CC Tres Aguas", role: "Responsable de Tienda", jornada: "40h", state: "🟢 En Tienda", movil: 15, fibra: 6, seguros: 44, energia: 3, term: 9, obj: 24, vacTotal: 30, vacTaken: 15, vacHistory: [{ period: "01/07/2026 - 15/07/2026", days: 15, type: "Verano", status: "Disfrutado" }], shifts: { L: "M (10:00-16:30)", M: "M (10:00-16:30)", X: "M (10:00-16:30)", J: "M (10:00-16:30)", V: "M (10:00-16:30)", S: "P (10-14/17-21)", D: "L (Libre)" } },
+  { id: "emp-38", name: "SARA GARCIA MARCHAL", dni: "04918204S", centerId: "238-TRES AGUAS", center: "CC Tres Aguas", role: "Segundo Responsable", jornada: "40h", state: "🟢 En Tienda", movil: 13, fibra: 4, seguros: 42, energia: 3, term: 8, obj: 21, vacTotal: 30, vacTaken: 15, vacHistory: [{ period: "16/08/2026 - 31/08/2026", days: 15, type: "Verano", status: "Disfrutado" }], shifts: { L: "T (14:30-21:00)", M: "T (14:30-21:00)", X: "T (14:30-21:00)", J: "T (14:30-21:00)", V: "T (14:30-21:00)", S: "M (10:00-16:30)", D: "L (Libre)" } },
+  { id: "emp-36", name: "DANIEL OLMOS ARRANZ", dni: "52819200D", centerId: "238-TRES AGUAS", center: "CC Tres Aguas", role: "Asesor Comercial Senior", jornada: "36h", state: "🟢 En Tienda", movil: 10, fibra: 3, seguros: 38, energia: 2, term: 6, obj: 19, vacTotal: 30, vacTaken: 15, vacHistory: [{ period: "01/08/2026 - 15/08/2026", days: 15, type: "Verano", status: "Disfrutado" }], shifts: { L: "P (10-14/17-21)", M: "P (10-14/17-21)", X: "P (10-14/17-21)", J: "P (10-14/17-21)", V: "T (14:30-21:00)", S: "T (14:30-21:00)", D: "L (Libre)" } },
+  { id: "emp-37", name: "JULIA ELISABETH SILLA MOSCOSO", dni: "53991823J", centerId: "238-TRES AGUAS", center: "CC Tres Aguas", role: "Asesor Comercial", jornada: "30h", state: "🟢 En Tienda", movil: 8, fibra: 2, seguros: 39, energia: 1, term: 5, obj: 16, vacTotal: 30, vacTaken: 15, vacHistory: [{ period: "15/07/2026 - 30/07/2026", days: 15, type: "Verano", status: "Disfrutado" }], shifts: { L: "M (10:00-15:00)", M: "T (16:00-21:00)", X: "M (10:00-15:00)", J: "T (16:00-21:00)", V: "P (10-14/17-21)", S: "T (14:30-21:00)", D: "L (Libre)" } },
+  { id: "emp-39", name: "JOSE MANUEL MARTIN FERNANDEZ", dni: "03819244M", centerId: "238-TRES AGUAS", center: "CC Tres Aguas", role: "Asesor Comercial", jornada: "20h", state: "🟢 En Tienda", movil: 4, fibra: 1, seguros: 35, energia: 1, term: 3, obj: 10, vacTotal: 30, vacTaken: 0, vacHistory: [], shifts: { L: "L (Libre)", M: "L (Libre)", X: "L (Libre)", J: "L (Libre)", V: "T (16:00-21:00)", S: "P (10-14/17-21)", D: "T (12:00-19:00)" } },
+
+  // CC LA VAGUADA
+  { id: "emp-21", name: "EDUARDO MATEOS DIEZ", dni: "50819204E", centerId: "226-CC LA VAGUADA 2", center: "CC La Vaguada", role: "Responsable de Tienda", jornada: "40h", state: "🟢 En Tienda", movil: 17, fibra: 7, seguros: 47, energia: 4, term: 11, obj: 26, vacTotal: 30, vacTaken: 15, vacHistory: [{ period: "01/07/2026 - 15/07/2026", days: 15, type: "Verano", status: "Disfrutado" }], shifts: { L: "M (10:00-16:30)", M: "M (10:00-16:30)", X: "M (10:00-16:30)", J: "M (10:00-16:30)", V: "M (10:00-16:30)", S: "P (10-14/17-21)", D: "L (Libre)" } },
+  { id: "emp-22", name: "EVELYN VELASQUEZ GALLARDO", dni: "53918204V", centerId: "226-CC LA VAGUADA 2", center: "CC La Vaguada", role: "Segundo Responsable", jornada: "40h", state: "🟢 En Tienda", movil: 15, fibra: 5, seguros: 46, energia: 4, term: 9, obj: 23, vacTotal: 30, vacTaken: 15, vacHistory: [{ period: "16/08/2026 - 31/08/2026", days: 15, type: "Verano", status: "Disfrutado" }], shifts: { L: "T (14:30-21:00)", M: "T (14:30-21:00)", X: "T (14:30-21:00)", J: "T (14:30-21:00)", V: "T (14:30-21:00)", S: "M (10:00-16:30)", D: "L (Libre)" } },
+  { id: "emp-23", name: "MARIA BELEN GIAGNONI", dni: "54819244B", centerId: "226-CC LA VAGUADA 2", center: "CC La Vaguada", role: "Asesor Comercial Senior", jornada: "36h", state: "🟢 En Tienda", movil: 11, fibra: 4, seguros: 44, energia: 2, term: 7, obj: 20, vacTotal: 30, vacTaken: 15, vacHistory: [{ period: "01/08/2026 - 15/08/2026", days: 15, type: "Verano", status: "Disfrutado" }], shifts: { L: "P (10-14/17-21)", M: "P (10-14/17-21)", X: "P (10-14/17-21)", J: "T (14:30-21:00)", V: "M (10:00-16:30)", S: "T (14:30-21:00)", D: "L (Libre)" } },
+  { id: "emp-24", name: "MARIA RODRIGUEZ LOPEZ", dni: "05819233R", centerId: "226-CC LA VAGUADA 2", center: "CC La Vaguada", role: "Asesor Comercial", jornada: "36h", state: "🏥 Baja Médica", movil: 3, fibra: 1, seguros: 30, energia: 1, term: 2, obj: 18, vacTotal: 30, vacTaken: 15, vacHistory: [{ period: "15/07/2026 - 30/07/2026", days: 15, type: "Verano", status: "Disfrutado" }], shifts: { L: "L (Baja)", M: "L (Baja)", X: "L (Baja)", J: "L (Baja)", V: "L (Baja)", S: "L (Baja)", D: "L (Libre)" } },
+  { id: "emp-25", name: "SARA ISABEL VELASQUEZ GALLARDO", dni: "53819200S", centerId: "226-CC LA VAGUADA 2", center: "CC La Vaguada", role: "Asesor Comercial", jornada: "30h", state: "🟢 En Tienda", movil: 8, fibra: 3, seguros: 41, energia: 1, term: 5, obj: 16, vacTotal: 30, vacTaken: 7, vacHistory: [{ period: "01/06/2026 - 07/06/2026", days: 7, type: "Primavera", status: "Disfrutado" }], shifts: { L: "M (10:00-15:00)", M: "T (16:00-21:00)", X: "M (10:00-15:00)", J: "P (10-14/17-21)", V: "T (14:30-21:00)", S: "T (14:30-21:00)", D: "L (Libre)" } },
+
+  // CC PRINCIPE PIO
+  { id: "emp-12", name: "MARÍA YSABEL VILCHEZ CARRION", dni: "52918233V", centerId: "205-CC PRINCIPE PIO", center: "CC Príncipe Pío", role: "Responsable de Tienda", jornada: "40h", state: "🟢 En Tienda", movil: 14, fibra: 6, seguros: 39, energia: 2, term: 8, obj: 22, vacTotal: 30, vacTaken: 0, vacHistory: [{ period: "01/11/2026 - 15/11/2026", days: 15, type: "Turno Noviembre", status: "Planificado" }], shifts: { L: "M (10:00-16:30)", M: "M (10:00-16:30)", X: "M (10:00-16:30)", J: "M (10:00-16:30)", V: "M (10:00-16:30)", S: "P (10-14/17-21)", D: "L (Libre)" } },
+  { id: "emp-10", name: "CRISTINA LOPEZ SAIZ", dni: "50819211C", centerId: "205-CC PRINCIPE PIO", center: "CC Príncipe Pío", role: "Segundo Responsable", jornada: "40h", state: "🏥 Baja Médica (15d)", movil: 5, fibra: 2, seguros: 35, energia: 1, term: 3, obj: 20, vacTotal: 30, vacTaken: 0, vacHistory: [], shifts: { L: "L (Baja)", M: "L (Baja)", X: "L (Baja)", J: "L (Baja)", V: "L (Baja)", S: "L (Baja)", D: "L (Libre)" } },
+  { id: "emp-11", name: "MARIA DOLORES CASTELLANO DE MIGUEL", dni: "04918233D", centerId: "205-CC PRINCIPE PIO", center: "CC Príncipe Pío", role: "Asesor Comercial Senior", jornada: "36h", state: "🟢 En Tienda", movil: 11, fibra: 3, seguros: 38, energia: 1, term: 6, obj: 18, vacTotal: 30, vacTaken: 7, vacHistory: [{ period: "10/06/2026 - 17/06/2026", days: 7, type: "Junio", status: "Disfrutado" }], shifts: { L: "T (14:30-21:00)", M: "T (14:30-21:00)", X: "P (10-14/17-21)", J: "P (10-14/17-21)", V: "T (14:30-21:00)", S: "T (14:30-21:00)", D: "L (Libre)" } },
+  { id: "emp-13", name: "MAYROBI S MARTINEZ GONZALEZ", dni: "53819277M", centerId: "205-CC PRINCIPE PIO", center: "CC Príncipe Pío", role: "Asesor Comercial", jornada: "30h", state: "🟢 En Tienda", movil: 7, fibra: 2, seguros: 36, energia: 1, term: 4, obj: 15, vacTotal: 30, vacTaken: 0, vacHistory: [], shifts: { L: "M (10:00-15:00)", M: "P (10-14/17-21)", X: "T (16:00-21:00)", J: "M (10:00-15:00)", V: "T (14:30-21:00)", S: "M (10:00-15:00)", D: "L (Libre)" } },
+
+  // CC LORANCA
+  { id: "emp-14", name: "ALBA LOPEZ MUÑOZ", dni: "53918244L", centerId: "208-CC LORANCA", center: "CC Loranca", role: "Responsable de Tienda", jornada: "40h", state: "🟢 En Tienda", movil: 15, fibra: 5, seguros: 41, energia: 3, term: 9, obj: 22, vacTotal: 30, vacTaken: 15, vacHistory: [{ period: "01/08/2026 - 15/08/2026", days: 15, type: "Verano", status: "Disfrutado" }], shifts: { L: "M (10:00-16:30)", M: "M (10:00-16:30)", X: "M (10:00-16:30)", J: "M (10:00-16:30)", V: "M (10:00-16:30)", S: "P (10-14/17-21)", D: "L (Libre)" } },
+  { id: "emp-15", name: "DAVID PENAGOS ESCOBAR", dni: "05819211P", centerId: "208-CC LORANCA", center: "CC Loranca", role: "Segundo Responsable", jornada: "40h", state: "🟢 En Tienda", movil: 12, fibra: 4, seguros: 39, energia: 2, term: 7, obj: 20, vacTotal: 30, vacTaken: 0, vacHistory: [{ period: "01/10/2026 - 15/10/2026", days: 15, type: "Otoño", status: "Planificado" }], shifts: { L: "T (14:30-21:00)", M: "T (14:30-21:00)", X: "T (14:30-21:00)", J: "T (14:30-21:00)", V: "T (14:30-21:00)", S: "M (10:00-16:30)", D: "L (Libre)" } },
+  { id: "emp-16", name: "MONICA BALLONGA LOPEZ", dni: "50819244B", centerId: "208-CC LORANCA", center: "CC Loranca", role: "Asesor Comercial", jornada: "36h", state: "🟢 En Tienda", movil: 9, fibra: 3, seguros: 38, energia: 1, term: 5, obj: 18, vacTotal: 30, vacTaken: 15, vacHistory: [{ period: "16/07/2026 - 31/07/2026", days: 15, type: "Verano", status: "Disfrutado" }], shifts: { L: "P (10-14/17-21)", M: "P (10-14/17-21)", X: "P (10-14/17-21)", J: "P (10-14/17-21)", V: "T (14:30-21:00)", S: "T (14:30-21:00)", D: "L (Libre)" } },
+
+  // CC EL FERIAL PARLA
+  { id: "emp-17", name: "JOSE ANGEL BARRIGUETE RUIZ", dni: "52819244B", centerId: "209-CC PARLA", center: "CC El Ferial (Parla)", role: "Responsable de Tienda", jornada: "40h", state: "🟢 En Tienda", movil: 16, fibra: 6, seguros: 44, energia: 4, term: 10, obj: 24, vacTotal: 30, vacTaken: 15, vacHistory: [{ period: "01/07/2026 - 15/07/2026", days: 15, type: "Verano", status: "Disfrutado" }], shifts: { L: "M (10:00-16:30)", M: "M (10:00-16:30)", X: "M (10:00-16:30)", J: "M (10:00-16:30)", V: "M (10:00-16:30)", S: "P (10-14/17-21)", D: "L (Libre)" } },
+  { id: "emp-18", name: "OSCAR MARIN CAMPOS", dni: "04819211M", centerId: "209-CC PARLA", center: "CC El Ferial (Parla)", role: "Segundo Responsable", jornada: "40h", state: "🟢 En Tienda", movil: 13, fibra: 4, seguros: 42, energia: 2, term: 8, obj: 21, vacTotal: 30, vacTaken: 15, vacHistory: [{ period: "16/08/2026 - 31/08/2026", days: 15, type: "Verano", status: "Disfrutado" }], shifts: { L: "T (14:30-21:00)", M: "T (14:30-21:00)", X: "T (14:30-21:00)", J: "T (14:30-21:00)", V: "T (14:30-21:00)", S: "M (10:00-16:30)", D: "L (Libre)" } },
+  { id: "emp-19", name: "SHEILA CALETRIO TRIGO", dni: "53918233C", centerId: "209-CC PARLA", center: "CC El Ferial (Parla)", role: "Asesor Comercial", jornada: "36h", state: "🟢 En Tienda", movil: 10, fibra: 3, seguros: 41, energia: 1, term: 6, obj: 18, vacTotal: 30, vacTaken: 15, vacHistory: [{ period: "01/08/2026 - 15/08/2026", days: 15, type: "Verano", status: "Disfrutado" }], shifts: { L: "P (10-14/17-21)", M: "P (10-14/17-21)", X: "P (10-14/17-21)", J: "P (10-14/17-21)", V: "T (14:30-21:00)", S: "T (14:30-21:00)", D: "L (Libre)" } },
+
+  // GRAN VIA HORTALEZA
+  { id: "emp-1", name: "JOSE MANUEL VIGO BERNAL", dni: "50918244V", centerId: "025-GRAN VIA HORTALEZA", center: "Gran Vía Hortaleza", role: "Responsable de Tienda", jornada: "40h", state: "🟢 En Tienda", movil: 14, fibra: 5, seguros: 40, energia: 3, term: 8, obj: 22, vacTotal: 30, vacTaken: 7, vacHistory: [{ period: "01/06/2026 - 07/06/2026", days: 7, type: "Junio", status: "Disfrutado" }], shifts: { L: "M (10:00-16:30)", M: "M (10:00-16:30)", X: "M (10:00-16:30)", J: "M (10:00-16:30)", V: "M (10:00-16:30)", S: "P (10-14/17-21)", D: "L (Libre)" } },
+  { id: "emp-4", name: "VERONICA DATO TAGLIERI", dni: "53819200D", centerId: "025-GRAN VIA HORTALEZA", center: "Gran Vía Hortaleza", role: "Segundo Responsable", jornada: "40h", state: "🟢 En Tienda", movil: 12, fibra: 4, seguros: 39, energia: 2, term: 7, obj: 20, vacTotal: 30, vacTaken: 7, vacHistory: [{ period: "15/06/2026 - 22/06/2026", days: 7, type: "Junio", status: "Disfrutado" }], shifts: { L: "T (14:30-21:00)", M: "T (14:30-21:00)", X: "T (14:30-21:00)", J: "T (14:30-21:00)", V: "T (14:30-21:00)", S: "M (10:00-16:30)", D: "L (Libre)" } },
+  { id: "emp-5", name: "PILAR SANCHEZ VILLA", dni: "05918233S", centerId: "025-GRAN VIA HORTALEZA", center: "Gran Vía Hortaleza", role: "Asesor Comercial", jornada: "36h", state: "🟢 En Tienda", movil: 10, fibra: 3, seguros: 41, energia: 1, term: 6, obj: 18, vacTotal: 30, vacTaken: 15, vacHistory: [{ period: "01/08/2026 - 15/08/2026", days: 15, type: "Verano", status: "Disfrutado" }], shifts: { L: "P (10-14/17-21)", M: "P (10-14/17-21)", X: "P (10-14/17-21)", J: "P (10-14/17-21)", V: "T (14:30-21:00)", S: "T (14:30-21:00)", D: "L (Libre)" } },
+
+  // PALACIO DE HIELO
+  { id: "emp-7", name: "DAVID CRESPO JIMENEZ", dni: "53819244C", centerId: "030-PALACIO DE HIELO", center: "Palacio de Hielo", role: "Responsable de Tienda", jornada: "40h", state: "🟢 En Tienda", movil: 13, fibra: 5, seguros: 37, energia: 2, term: 7, obj: 21, vacTotal: 30, vacTaken: 15, vacHistory: [{ period: "01/08/2026 - 15/08/2026", days: 15, type: "Verano", status: "Disfrutado" }], shifts: { L: "M (10:00-16:30)", M: "M (10:00-16:30)", X: "M (10:00-16:30)", J: "M (10:00-16:30)", V: "M (10:00-16:30)", S: "P (10-14/17-21)", D: "L (Libre)" } },
+  { id: "emp-8", name: "DAVID SALMERON TAPIA", dni: "04819277S", centerId: "030-PALACIO DE HIELO", center: "Palacio de Hielo", role: "Segundo Responsable", jornada: "40h", state: "🟢 En Tienda", movil: 11, fibra: 3, seguros: 36, energia: 2, term: 6, obj: 19, vacTotal: 30, vacTaken: 0, vacHistory: [{ period: "01/10/2026 - 15/10/2026", days: 15, type: "Otoño", status: "Planificado" }], shifts: { L: "T (14:30-21:00)", M: "T (14:30-21:00)", X: "T (14:30-21:00)", J: "T (14:30-21:00)", V: "T (14:30-21:00)", S: "M (10:00-16:30)", D: "L (Libre)" } },
+
+  // GETAFE URBANA
+  { id: "emp-42", name: "CARLOS MARTINEZ MARTIN", dni: "50918233M", centerId: "246-GETAFE", center: "Getafe Urbana", role: "Responsable de Tienda", jornada: "40h", state: "🟢 En Tienda", movil: 13, fibra: 5, seguros: 43, energia: 2, term: 7, obj: 20, vacTotal: 30, vacTaken: 15, vacHistory: [{ period: "01/07/2026 - 15/07/2026", days: 15, type: "Verano", status: "Disfrutado" }], shifts: { L: "M (10:00-14:00/17-20:30)", M: "M (10:00-14:00/17-20:30)", X: "M (10:00-14:00/17-20:30)", J: "M (10:00-14:00/17-20:30)", V: "M (10:00-14:00/17-20:30)", S: "M (10:00-14:00)", D: "L (Libre)" } },
+  { id: "emp-40", name: "MARIA DESIREE MATOS BOSOKA", dni: "53819211M", centerId: "246-GETAFE", center: "Getafe Urbana", role: "Segundo Responsable", jornada: "40h", state: "🟢 En Tienda", movil: 11, fibra: 4, seguros: 41, energia: 2, term: 6, obj: 18, vacTotal: 30, vacTaken: 7, vacHistory: [{ period: "15/06/2026 - 22/06/2026", days: 7, type: "Junio", status: "Disfrutado" }], shifts: { L: "T (10:00-14:00/17-20:30)", M: "T (10:00-14:00/17-20:30)", X: "T (10:00-14:00/17-20:30)", J: "T (10:00-14:00/17-20:30)", V: "T (10:00-14:00/17-20:30)", S: "M (10:00-14:00)", D: "L (Libre)" } },
+
+  // VILLAVICIOSA DE ODON
+  { id: "emp-9", name: "ROBERTO EUSEBIO LOPEZ OLMEDA", dni: "51918233L", centerId: "045-VILLAVICIOSA DE ODON", center: "Villaviciosa de Odón", role: "Responsable de Tienda", jornada: "40h", state: "🟢 En Tienda", movil: 12, fibra: 4, seguros: 46, energia: 2, term: 6, obj: 18, vacTotal: 30, vacTaken: 15, vacHistory: [{ period: "01/08/2026 - 15/08/2026", days: 15, type: "Verano", status: "Disfrutado" }], shifts: { L: "M (10:00-14:00/17-20:30)", M: "M (10:00-14:00/17-20:30)", X: "M (10:00-14:00/17-20:30)", J: "M (10:00-14:00/17-20:30)", V: "M (10:00-14:00/17-20:30)", S: "M (10:00-14:00)", D: "L (Libre)" } },
+  { id: "emp-49", name: "DANIEL SANZ ALONSO", dni: "50819277S", centerId: "045-VILLAVICIOSA DE ODON", center: "Villaviciosa de Odón", role: "Asesor Comercial", jornada: "36h", state: "🟢 En Tienda", movil: 9, fibra: 4, seguros: 44, energia: 1, term: 5, obj: 16, vacTotal: 30, vacTaken: 0, vacHistory: [{ period: "01/10/2026 - 15/10/2026", days: 15, type: "Otoño", status: "Planificado" }], shifts: { L: "T (10:00-14:00/17-20:30)", M: "T (10:00-14:00/17-20:30)", X: "T (10:00-14:00/17-20:30)", J: "T (10:00-14:00/17-20:30)", V: "T (10:00-14:00/17-20:30)", S: "L (Libre)", D: "L (Libre)" } },
+
+  // PASEO EXTREMADURA
+  { id: "emp-50", name: "DANIEL DOMINGUEZ RIVAS", dni: "53918299D", centerId: "245-PASEO EXTREMADURA", center: "Paseo de Extremadura", role: "Responsable de Tienda", jornada: "40h", state: "🟡 Permiso 29-30 Sep", movil: 11, fibra: 4, seguros: 38, energia: 1, term: 5, obj: 18, vacTotal: 30, vacTaken: 15, vacHistory: [{ period: "01/07/2026 - 15/07/2026", days: 15, type: "Verano", status: "Disfrutado" }], shifts: { L: "M (10:00-14:00)", M: "L (Permiso)", X: "L (Permiso)", J: "M (10:00-14:00/17-20:30)", V: "M (10:00-14:00/17-20:30)", S: "M (10:00-14:00)", D: "L (Libre)" } },
+  { id: "emp-51", name: "ANDREA CERDA MORA", dni: "05819288C", centerId: "245-PASEO EXTREMADURA", center: "Paseo de Extremadura", role: "Correturnos / Refuerzo Zona", jornada: "40h", state: "🟢 Asignada Hoy Tarde", movil: 9, fibra: 3, seguros: 36, energia: 1, term: 4, obj: 15, vacTotal: 30, vacTaken: 10, vacHistory: [{ period: "10/08/2026 - 20/08/2026", days: 10, type: "Agosto", status: "Disfrutado" }], shifts: { L: "L (Libre)", M: "T (16:30-20:30)", X: "T (16:30-20:30)", J: "T (16:30-20:30)", V: "T (16:30-20:30)", S: "M (10:00-14:00)", D: "L (Libre)" } }
 ];
 
-class GestionBeaApp {
+// REPOSITORIO DOCUMENTAL MAESTRO: 8 DOCUMENTOS FUENTE CON TRAZABILIDAD
+const MASTER_DOCUMENTS = [
+  {
+    id: "DOC-01",
+    name: "Informe_TMT_Consolidado_28-09-2026.xlsx",
+    icon: "📊",
+    tipo: "Hoja de Cálculo Excel (.xlsx)",
+    tamano: "2.4 MB",
+    fecha: "28/09/2026 22:15",
+    origen: "Portal Oficial TMT Orange Empresas & Franquicias",
+    sha256: "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    descripcion: "Exportación diaria consolidada de producción comercial TMT: Altas y Portabilidades Móviles (Orange/Jazztel), Fibra, Seguros y Terminales por Punto de Venta y por Asesor.",
+    seccionesAsociadas: ["Seguimiento TMT", "Ranking de Rendimiento", "Precierre de Comisiones"],
+    previewHeaders: ["PDV_CODIGO", "TIENDA_NOMBRE", "ASESOR_NOMBRE", "MOVIL_ALTAS", "MOVIL_PORTAS", "FIBRA_CONV", "SEGUROS_PCT", "ENERGIA_CTOS", "RUNRATE_PCT"],
+    previewRows: [
+      ["234-CC LA GAVIA", "CC La Gavia", "ERIKA ALEXANDRA CASTILLO", "8", "8", "7", "48.0%", "4", "112.5%"],
+      ["234-CC LA GAVIA", "CC La Gavia", "MAXIMILIANO GOMEZ CURIA", "7", "7", "6", "45.0%", "3", "108.0%"],
+      ["226-CC LA VAGUADA 2", "CC La Vaguada", "EDUARDO MATEOS DIEZ", "9", "8", "7", "47.0%", "4", "115.0%"],
+      ["238-TRES AGUAS", "CC Tres Aguas", "ARTURO VILLAFRANCA", "8", "7", "6", "44.0%", "3", "104.2%"],
+      ["205-CC PRINCIPE PIO", "CC Príncipe Pío", "MARÍA YSABEL VILCHEZ", "7", "7", "6", "39.0%", "2", "98.0%"]
+    ]
+  },
+  {
+    id: "DOC-02",
+    name: "Cuadrante_Turnos_ZonaCentro_Semana39.xlsx",
+    icon: "📋",
+    tipo: "Hoja de Cálculo Excel (.xlsx)",
+    tamano: "1.8 MB",
+    fecha: "26/09/2026 18:30",
+    origen: "Departamento de Planificación Operativa & Cuadrantes Promovil",
+    sha256: "8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92",
+    descripcion: "Cuadrante semanal de horarios oficiales, asignación de turnos M (10-16:30), T (14:30-21), P (Partido) y L (Libre), control de dotación mínima y domingos comerciales.",
+    seccionesAsociadas: ["Cuadrante Semanal", "Semáforos de Dotación", "Asignación de Correturnos"],
+    previewHeaders: ["TIENDA", "ASESOR", "JORNADA", "LUNES", "MARTES", "MIERCOLES", "JUEVES", "VIERNES", "SABADO", "DOMINGO", "HORAS_TOT"],
+    previewRows: [
+      ["CC La Gavia", "Erika Alexandra Castillo", "40h", "M (10-16:30)", "M (10-16:30)", "M (10-16:30)", "M (10-16:30)", "M (10-16:30)", "P (10-14/17-21)", "L", "40h"],
+      ["CC La Gavia", "Maximiliano Gomez Curia", "40h", "T (14:30-21)", "T (14:30-21)", "T (14:30-21)", "T (14:30-21)", "T (14:30-21)", "M (10-16:30)", "L", "40h"],
+      ["CC Príncipe Pío", "Cristina López Saiz", "40h", "BAJA MEDICA", "BAJA MEDICA", "BAJA MEDICA", "BAJA MEDICA", "BAJA MEDICA", "BAJA MEDICA", "L", "0h"],
+      ["Paseo Extremadura", "Daniel Domínguez", "40h", "M (10-14)", "PERMISO", "PERMISO", "M (10-14/17-20:30)", "M (10-14/17-20:30)", "M (10-14)", "L", "24h"],
+      ["Paseo Extremadura", "Andrea Cerdá (Refuerzo)", "40h", "L", "T (16:30-20:30)", "T (16:30-20:30)", "T (16:30-20:30)", "T (16:30-20:30)", "M (10-14)", "L", "20h"]
+    ]
+  },
+  {
+    id: "DOC-03",
+    name: "Censo_Plantilla_Vacaciones_2026.xlsx",
+    icon: "👥",
+    tipo: "Base de Datos de Personal (.xlsx / Supabase)",
+    tamano: "950 KB",
+    fecha: "25/09/2026 12:00",
+    origen: "RRHH Grupo Promovil / Tic Tac Móvil Franquicias",
+    sha256: "ca978112ca1bbdcafac231b39a23dc4da786eff8147c4e72b9807785afee48bb",
+    descripcion: "Registro nominal de los 48 trabajadores de la Zona Centro, DNI, centro de trabajo asignado, saldo anual de 30 días de vacaciones, días disfrutados y períodos aprobados.",
+    seccionesAsociadas: ["Plantilla & Vacaciones", "Ficha Individual Asesor", "Aprobación de Solicitudes"],
+    previewHeaders: ["ID_EMP", "NOMBRE_COMPLETO", "DNI", "CENTRO_TRABAJO", "VAC_TOTAL", "VAC_DISFRUTADAS", "VAC_PENDIENTES", "ESTADO_ACTUAL"],
+    previewRows: [
+      ["emp-29", "ERIKA ALEXANDRA CASTILLO ORDOÑEZ", "53892104E", "234-CC LA GAVIA", "30", "0", "30", "Activo / En Tienda"],
+      ["emp-31", "MAXIMILIANO GOMEZ CURIA", "05489211M", "234-CC LA GAVIA", "30", "15", "15", "Activo / En Tienda"],
+      ["emp-21", "EDUARDO MATEOS DIEZ", "50819204E", "226-CC LA VAGUADA 2", "30", "15", "15", "Activo / En Tienda"],
+      ["emp-10", "CRISTINA LOPEZ SAIZ", "50819211C", "205-CC PRINCIPE PIO", "30", "0", "30", "Baja Médica (15d)"],
+      ["emp-50", "DANIEL DOMINGUEZ RIVAS", "53918299D", "245-PASEO EXTREMADURA", "30", "15", "15", "Permiso Personal"]
+    ]
+  },
+  {
+    id: "DOC-04",
+    name: "Actas_Auditoria_Stock_IMEIs_Sep2026.pdf",
+    icon: "📦",
+    tipo: "Actas de Inspección Física (.pdf)",
+    tamano: "3.1 MB",
+    fecha: "28/09/2026 19:45",
+    origen: "Auditoría Presencial Beatriz Sánchez Alonso",
+    sha256: "fb8e20fc2e4c3f248c60c39bd652f3c1347298ab9e454c0099e3e1a976a1a2e4",
+    descripcion: "Actas oficiales de arqueo y recuento físico de terminales por número IMEI, comparación con stock teórico del ERP y liquidación de diferencias.",
+    seccionesAsociadas: ["Stock & Faltantes", "Auditoría IMEIs", "Mix de Terminales"],
+    previewHeaders: ["TIENDA", "FECHA_ACTA", "STOCK_TEORICO", "STOCK_FISICO", "DESCUADRE", "VALOR_EUR", "IMEI_DETECCION", "RESOLUCION"],
+    previewRows: [
+      ["CC La Vaguada", "28/09/2026", "145", "143", "-2 Uds", "-180.00 €", "IMEI 354892110482910 (Galaxy A55)", "Acta con Incidencia"],
+      ["Getafe Urbana", "28/09/2026", "98", "96", "-2 Uds", "-200.00 €", "IMEI 864192049182334 (Redmi 13C)", "Acta con Incidencia"],
+      ["CC La Gavia", "28/09/2026", "180", "180", "0 Uds", "0.00 €", "Sin incidencias", "Acta Conforme"],
+      ["CC Tres Aguas", "28/09/2026", "140", "140", "0 Uds", "0.00 €", "Sin incidencias", "Acta Conforme"]
+    ]
+  },
+  {
+    id: "DOC-05",
+    name: "Base_Polizas_Seguros_CHUBB_Sep2026.xlsx",
+    icon: "🛡️",
+    tipo: "Informe Aseguradora (.xlsx / .csv)",
+    tamano: "1.2 MB",
+    fecha: "28/09/2026 14:00",
+    origen: "CHUBB Insurance / Orange Care Seguros",
+    sha256: "5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8",
+    descripcion: "Listado de pólizas de seguro de pantalla y daño accidental suscritas en el acto de venta de terminales móviles, clasificado por gama de precio.",
+    seccionesAsociadas: ["Penetración Seguros", "Comisiones Asesores", "Desglose por Gama"],
+    previewHeaders: ["POLIZA_NUM", "TIENDA", "ASESOR", "TERMINAL_MODELO", "GAMA", "PRIMA_MENSUAL", "COMISION_ASESOR"],
+    previewRows: [
+      ["POL-2026-9481", "CC La Gavia", "Erika Alexandra Castillo", "iPhone 16 Pro 128GB", "Premium", "14.99 €", "20.00 €"],
+      ["POL-2026-9482", "CC La Vaguada", "Eduardo Mateos Diez", "Samsung Galaxy S24", "Premium", "12.99 €", "20.00 €"],
+      ["POL-2026-9483", "CC Tres Aguas", "Arturo Villafranca", "Galaxy A55 5G", "Media", "8.99 €", "15.00 €"],
+      ["POL-2026-9484", "Gran Vía Hortaleza", "Jose Manuel Vigo", "Redmi Note 13", "Media", "6.99 €", "12.00 €"]
+    ]
+  },
+  {
+    id: "DOC-06",
+    name: "Liquidacion_CajaChica_Gastos_Tienda_Sep2026.xlsx",
+    icon: "💰",
+    tipo: "Hoja de Liquidación Contable (.xlsx)",
+    tamano: "820 KB",
+    fecha: "27/09/2026 17:15",
+    origen: "Administración & Tesorería Promovil",
+    sha256: "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+    descripcion: "Liquidación y justificación de tickets de gastos operativos de las 11 tiendas: productos de limpieza, material de oficina, caja chica y dietas autorizadas.",
+    seccionesAsociadas: ["Comisiones & Gastos", "Plantilla Correo Liquidación"],
+    previewHeaders: ["TIENDA", "PRESUPUESTO_MES", "GASTO_REAL", "TICKETS_LIMPIEZA", "CAJA_CHICA", "SALDO_RESTANTE", "ESTADO"],
+    previewRows: [
+      ["CC La Gavia", "400.00 €", "260.00 €", "45.00 €", "215.00 €", "140.00 €", "Liquidado"],
+      ["CC Tres Aguas", "350.00 €", "190.00 €", "35.00 €", "155.00 €", "160.00 €", "Liquidado"],
+      ["CC La Vaguada", "450.00 €", "320.00 €", "60.00 €", "260.00 €", "130.00 €", "Liquidado"],
+      ["Gran Vía Hortaleza", "300.00 €", "240.00 €", "40.00 €", "200.00 €", "60.00 €", "Liquidado"],
+      ["Paseo Extremadura", "220.00 €", "95.00 €", "25.00 €", "70.00 €", "125.00 €", "Liquidado"]
+    ]
+  },
+  {
+    id: "DOC-07",
+    name: "Contratos_Orange_Energia_Luz_Sep2026.xlsx",
+    icon: "⚡",
+    tipo: "Reporte de Activaciones Energía (.xlsx)",
+    tamano: "1.1 MB",
+    fecha: "28/09/2026 21:00",
+    origen: "Plataforma Orange Energía / Naturgy Partners",
+    sha256: "9b71d224bd62f3785d96d46ad3ea3d73319bfbc2890caadae2dff72519673ca7",
+    descripcion: "Registro de contratos de suministro eléctrico y gas captados en tienda durante la campaña comercial Energy Days, con el bonus asignado de 15€/contrato.",
+    seccionesAsociadas: ["Energía (Luz)", "Incentivos Comerciales"],
+    previewHeaders: ["CONTRATO_ID", "TIENDA", "ASESOR", "TARIFA_LUZ", "POTENCIA_KW", "BONUS_EUR", "ESTADO_ALTA"],
+    previewRows: [
+      ["ENE-2026-0811", "CC La Gavia", "Erika Alexandra Castillo", "Tarifa Plana Relax Luz", "4.4 kW", "15.00 €", "Activo Conectado"],
+      ["ENE-2026-0812", "CC La Vaguada", "Eduardo Mateos Diez", "Tarifa Noche Luz", "5.5 kW", "15.00 €", "Activo Conectado"],
+      ["ENE-2026-0813", "CC El Ferial Parla", "Jose Angel Barriguete", "Tarifa Negocio Pro", "9.2 kW", "15.00 €", "Activo Conectado"],
+      ["ENE-2026-0814", "CC Loranca", "Alba Lopez Muñoz", "Tarifa Plana Relax Luz", "3.3 kW", "15.00 €", "Activo Conectado"]
+    ]
+  },
+  {
+    id: "DOC-08",
+    name: "Bandeja_Correos_Partes_Cierre_Ionos.eml",
+    icon: "✉️",
+    tipo: "Buzón de Correo IMAP / EML (.eml)",
+    tamano: "4.5 MB",
+    fecha: "29/09/2026 05:00",
+    origen: "Ionos Mail: beatriz.sanchez@promovil.es & Gmail",
+    sha256: "b94d27b9934d3e08a52e52d7da7dabfac484efe37a5380ee9088f7ace2efcde9",
+    descripcion: "Recopilación de partes de cierre diarios, incidencias médicas, solicitudes de permiso y tickets de caja remitidos por los encargados de tienda por correo electrónico.",
+    seccionesAsociadas: ["Centro de Correos", "Partes Recibidos de Tiendas", "Ingesta Diaria"],
+    previewHeaders: ["DE_REMITENTE", "ASUNTO", "FECHA_RECEPCION", "TIENDA", "ADJUNTOS", "RESUMEN_PARTE"],
+    previewRows: [
+      ["gavia@promovil.es", "Cierre Diario 28/09 - CC La Gavia", "28/09 21:30", "CC La Gavia", "Cierre_Gavia.xlsx", "16 Móviles, 7 Fibras, 4 Seguros. Caja 140€ sin descuadre."],
+      ["extremadura@promovil.es", "Permiso personal Daniel Domínguez 29-30", "28/09 20:15", "Paseo Extremadura", "Justificante.pdf", "Solicitud de cobertura de tarde para los días 29 y 30."],
+      ["principepio@promovil.es", "Parte de baja médica Cristina López", "28/09 19:40", "CC Príncipe Pío", "Baja_Medica_CL.pdf", "Baja médica estimada de 15 días. Solicitud de correturnos."],
+      ["vaguada@promovil.es", "Auditoría mensual y gastos tienda", "28/09 14:10", "CC La Vaguada", "Ticket_Limpieza.jpg", "Faltante 1 terminal gama media (-180€). Ticket limpieza 35€."]
+    ]
+  }
+];
+
+class PromovilCockpit {
   constructor() {
-    this.tasks = this.loadData(STORAGE_KEYS.TASKS, INITIAL_TASKS);
-    this.notes = this.loadData(STORAGE_KEYS.NOTES, INITIAL_NOTES);
-    this.currentFilter = 'all';
-    this.priorityFilter = 'all';
-    this.searchQuery = '';
+    this.stores = STORE_CONFIG;
+    this.advisors = ADVISORS_DATA;
+    this.documents = MASTER_DOCUMENTS;
+    this.vacaciones = [];
+    this.currentDocViewed = null;
 
-    this.initElements();
-    this.initEventListeners();
+    // Memoria / Historial de Envíos Realizados (Outbox Audit)
+    this.sentEmailsHistory = [
+      {
+        id: "SENT-01",
+        date: "28/09/2026 21:45",
+        from: "beatriz.sanchez@promovil.es (Ionos Oficial)",
+        to: "direccion.comercial@promovil.es",
+        cc: "central@promovil.es",
+        subject: "Reporte Cierre Diario y Seguimiento TMT 28/09/2026",
+        preview: "Resumen consolidado: 342 Móviles (90%), 128 Fibras (94.8%), 64 Energía. Run-rate 108.4%...",
+        body: "Buenos días,\n\nAdjunto el resumen consolidado de producción y seguimiento de la Zona Centro:\n- Móviles: 342\n- Fibra: 128\n- Energía: 64\n\nBeatriz Sánchez",
+        status: "🟢 Entregado vía Ionos Mail",
+        sha: "a49f71bc99201"
+      },
+      {
+        id: "SENT-02",
+        date: "27/09/2026 19:30",
+        from: "beatriz.sanchez@promovil.es (Ionos Oficial)",
+        to: "personal@promovil.es; cuadrantes@promovil.es",
+        cc: "",
+        subject: "Cuadrante Aprobado Semana 39 - Zona Centro",
+        preview: "Cuadrantes definitivos y aprobados correspondientes a la plantilla de las 11 tiendas de la Zona Centro...",
+        body: "Estimado equipo de RRHH / Personal,\n\nOs remito adjuntos los cuadrantes definitivos y aprobados...\n\nBeatriz Sánchez",
+        status: "🟢 Entregado vía Ionos Mail",
+        sha: "5e2b881a20993"
+      },
+      {
+        id: "SENT-03",
+        date: "27/09/2026 15:10",
+        from: "beatriz.sanchez@promovil.es (Ionos Oficial)",
+        to: "extremadura@promovil.es; correturnos@promovil.es",
+        cc: "",
+        subject: "Aviso Operativo: Asignación de Correturnos Andrea Cerdá",
+        preview: "Asignación al correturnos Andrea Cerdá para cubrir turno de tarde (16:30 a 20:30)...",
+        body: "Estimado equipo,\n\nOs informo de la asignación del correturnos Andrea Cerdá...\n\nBeatriz Sánchez",
+        status: "🟢 Entregado vía Ionos Mail",
+        sha: "d31a44f210081"
+      }
+    ];
+    
+    this.mainChartType = 'bar';
+    this.mainChartMetric = 'total';
+    this.mixChartType = 'doughnut';
+
+    this.chartTMT = null;
+    this.chartMix = null;
+    this.chartTrend = null;
+    this.chartRadarZona = null;
+
+    this.initDOMElements();
+    this.bindEvents();
+    this.loadVacationsData();
+    this.applyEmailTemplate();
     this.render();
+    this.renderOutboxStream();
   }
 
-  loadData(key, fallback) {
-    try {
-      const data = localStorage.getItem(key);
-      return data ? JSON.parse(data) : fallback;
-    } catch (e) {
-      console.error('Error cargando datos de localStorage', e);
-      return fallback;
-    }
-  }
-
-  saveData(key, data) {
-    try {
-      localStorage.setItem(key, JSON.stringify(data));
-    } catch (e) {
-      console.error('Error guardando en localStorage', e);
-    }
-  }
-
-  initElements() {
-    // Vistas y navegación
-    this.navButtons = document.querySelectorAll('.nav-item');
-    this.views = document.querySelectorAll('.view');
-
-    // Stats
-    this.statTotalTasks = document.getElementById('statTotalTasks');
-    this.statPendingTasks = document.getElementById('statPendingTasks');
-    this.statCompletedTasks = document.getElementById('statCompletedTasks');
-    this.statTotalNotes = document.getElementById('statTotalNotes');
-
-    // Listas
-    this.priorityTaskList = document.getElementById('priorityTaskList');
-    this.recentNotesList = document.getElementById('recentNotesList');
-    this.allTasksList = document.getElementById('allTasksList');
-    this.allNotesGrid = document.getElementById('allNotesGrid');
-
-    // Modales
-    this.taskModal = document.getElementById('taskModal');
-    this.noteModal = document.getElementById('noteModal');
-    this.taskForm = document.getElementById('taskForm');
-    this.noteForm = document.getElementById('noteForm');
-
-    // Filtros
-    this.filterChips = document.querySelectorAll('.filter-chip');
-    this.prioritySelect = document.getElementById('priorityFilter');
-    this.searchInput = document.getElementById('searchInput');
-
-    // Botones
-    this.openTaskModalBtn = document.getElementById('openTaskModalBtn');
-    this.closeTaskModal = document.getElementById('closeTaskModal');
-    this.cancelTaskModal = document.getElementById('cancelTaskModal');
-    this.openNoteModalBtn = document.getElementById('openNoteModalBtn');
-    this.closeNoteModal = document.getElementById('closeNoteModal');
-    this.cancelNoteModal = document.getElementById('cancelNoteModal');
-    this.exportBtn = document.getElementById('exportBtn');
-  }
-
-  initEventListeners() {
-    // Navegación
-    this.navButtons.forEach(btn => {
-      btn.addEventListener('click', () => {
-        this.switchTab(btn.dataset.tab);
+  // ========================================================
+  // CONTROLADORES DE VISUALIZACIÓN DE GRÁFICOS INTERACTIVOS
+  // ========================================================
+  changeMainChartType(type) {
+    this.mainChartType = type;
+    const group = document.getElementById('mainChartTypeGroup');
+    if (group) {
+      const btns = group.querySelectorAll('.btn-chart-pill');
+      btns.forEach(b => {
+        const text = b.textContent.toLowerCase();
+        const matches = (type === 'bar' && text.includes('barras')) ||
+                        (type === 'line' && text.includes('líneas')) ||
+                        (type === 'horizontalBar' && text.includes('ranking')) ||
+                        (type === 'stacked' && text.includes('apiladas')) ||
+                        (type === 'radar' && text.includes('radar'));
+        b.classList.toggle('active', matches);
       });
+    }
+    this.renderMainChart();
+  }
+
+  changeChartMetric(metric) {
+    this.mainChartMetric = metric;
+    const titles = {
+      total: 'Comparativa Comercial: Móvil + Fibra (Ventas vs. Objetivos)',
+      movil: 'Comparativa de Líneas Móviles por Tienda (Altas vs. Portabilidades)',
+      fibra: 'Comparativa de Fibra Óptica & Convergencia por Tienda',
+      seguros: 'Ranking de % Penetración Seguros y SVA por Tienda',
+      energia: 'Captación de Contratos Energía (Luz) por Tienda'
+    };
+    const t = document.getElementById('mainChartTitle');
+    if (t) t.textContent = titles[metric] || titles.total;
+    this.renderMainChart();
+  }
+
+  changeMixChartType(type) {
+    this.mixChartType = type;
+    const btnD = document.getElementById('btnMixDoughnut');
+    const btnP = document.getElementById('btnMixPolar');
+    const btnPie = document.getElementById('btnMixPie');
+    if (btnD) btnD.classList.toggle('active', type === 'doughnut');
+    if (btnP) btnP.classList.toggle('active', type === 'polarArea');
+    if (btnPie) btnPie.classList.toggle('active', type === 'pie');
+    this.renderMixChart();
+  }
+
+  renderCharts() {
+    this.renderMainChart();
+    this.renderMixChart();
+    this.renderTrendChart();
+    this.renderRadarZonaChart();
+  }
+
+  renderMainChart() {
+    const list = this.getFilteredStores();
+    const ctx = document.getElementById('chartTMT');
+    if (!ctx) return;
+    if (this.chartTMT) this.chartTMT.destroy();
+
+    const metric = this.mainChartMetric;
+    const type = this.mainChartType;
+    const labels = list.map(s => s.name);
+
+    let chartType = type;
+    let isHorizontal = false;
+    let isStacked = false;
+
+    if (type === 'horizontalBar') {
+      chartType = 'bar';
+      isHorizontal = true;
+    } else if (type === 'stacked') {
+      chartType = 'bar';
+      isStacked = true;
+    }
+
+    let datasets = [];
+
+    if (isStacked) {
+      datasets = [
+        {
+          label: 'Altas Nuevas (Orange + Jazztel)',
+          data: list.map(s => Math.round(s.realMovil * 0.53)),
+          backgroundColor: '#ff7900',
+          stack: 'stack1'
+        },
+        {
+          label: 'Portabilidades (Orange + Jazztel)',
+          data: list.map(s => Math.round(s.realMovil * 0.47)),
+          backgroundColor: '#2563eb',
+          stack: 'stack1'
+        },
+        {
+          label: 'Objetivo Total',
+          data: list.map(s => s.objMovil),
+          backgroundColor: '#cbd5e1',
+          stack: 'stack2'
+        }
+      ];
+    }
+    else if (metric === 'movil') {
+      datasets = [
+        {
+          label: 'Móviles Reales',
+          data: list.map(s => s.realMovil),
+          backgroundColor: '#ff7900',
+          borderColor: '#ff7900',
+          fill: type === 'line' ? { target: 'origin', above: 'rgba(255, 121, 0, 0.08)' } : false,
+          tension: 0.35,
+          borderRadius: 4
+        },
+        {
+          label: 'Objetivo Móvil',
+          data: list.map(s => s.objMovil),
+          backgroundColor: '#cbd5e1',
+          borderColor: '#94a3b8',
+          borderDash: type === 'line' ? [5, 5] : [],
+          tension: 0.35,
+          borderRadius: 4
+        }
+      ];
+    }
+    else if (metric === 'fibra') {
+      datasets = [
+        {
+          label: 'Fibra Real',
+          data: list.map(s => s.realFibra),
+          backgroundColor: '#16a34a',
+          borderColor: '#16a34a',
+          fill: type === 'line' ? { target: 'origin', above: 'rgba(22, 163, 74, 0.08)' } : false,
+          tension: 0.35,
+          borderRadius: 4
+        },
+        {
+          label: 'Objetivo Fibra',
+          data: list.map(s => s.objFibra),
+          backgroundColor: '#cbd5e1',
+          borderColor: '#94a3b8',
+          borderDash: type === 'line' ? [5, 5] : [],
+          tension: 0.35,
+          borderRadius: 4
+        }
+      ];
+    }
+    else if (metric === 'seguros') {
+      datasets = [
+        {
+          label: '% Penetración Seguros Real',
+          data: list.map(s => s.segurosPct),
+          backgroundColor: '#2563eb',
+          borderColor: '#2563eb',
+          fill: type === 'line' ? { target: 'origin', above: 'rgba(37, 99, 235, 0.08)' } : false,
+          tension: 0.35,
+          borderRadius: 4
+        },
+        {
+          label: 'Umbral Mínimo Exigido (35.0%)',
+          data: list.map(() => 35),
+          backgroundColor: '#fca5a5',
+          borderColor: '#dc2626',
+          borderDash: [5, 5],
+          tension: 0,
+          borderRadius: 4
+        }
+      ];
+    }
+    else if (metric === 'energia') {
+      datasets = [
+        {
+          label: 'Contratos Energía Reales',
+          data: list.map(s => s.energia),
+          backgroundColor: '#d97706',
+          borderColor: '#d97706',
+          fill: type === 'line' ? { target: 'origin', above: 'rgba(217, 119, 6, 0.08)' } : false,
+          tension: 0.35,
+          borderRadius: 4
+        },
+        {
+          label: 'Objetivo Energía',
+          data: list.map(s => Math.round(s.objMovil * 0.2)),
+          backgroundColor: '#cbd5e1',
+          borderColor: '#94a3b8',
+          tension: 0.35,
+          borderRadius: 4
+        }
+      ];
+    }
+    else {
+      // Default: Total Móvil + Fibra
+      datasets = [
+        {
+          label: 'Real (Móvil + Fibra)',
+          data: list.map(s => s.realMovil + s.realFibra),
+          backgroundColor: '#ff7900',
+          borderColor: '#ff7900',
+          fill: type === 'line' ? { target: 'origin', above: 'rgba(255, 121, 0, 0.08)' } : false,
+          tension: 0.35,
+          borderRadius: 4
+        },
+        {
+          label: 'Objetivo Mensual',
+          data: list.map(s => s.objMovil + s.objFibra),
+          backgroundColor: '#cbd5e1',
+          borderColor: '#94a3b8',
+          borderDash: type === 'line' ? [5, 5] : [],
+          tension: 0.35,
+          borderRadius: 4
+        }
+      ];
+    }
+
+    this.chartTMT = new Chart(ctx, {
+      type: chartType,
+      data: { labels, datasets },
+      options: {
+        indexAxis: isHorizontal ? 'y' : 'x',
+        responsive: true,
+        maintainAspectRatio: false,
+        onClick: (e, items) => {
+          if (items && items.length > 0) {
+            const idx = items[0].index;
+            const st = list[idx];
+            if (st) this.showStoreSchedule(st.id);
+          }
+        },
+        plugins: {
+          legend: { position: 'top', labels: { boxWidth: 12, font: { family: 'Inter', size: 11 } } },
+          tooltip: {
+            callbacks: {
+              afterLabel: (ctxItem) => {
+                const st = list[ctxItem.dataIndex];
+                return st ? `📍 Tienda: ${st.name} (${st.canal === 'cc' ? 'Centro Comercial' : 'Urbana'})\n👉 Clic para abrir ficha completa` : '';
+              }
+            }
+          }
+        },
+        scales: chartType === 'radar' ? {
+          r: { angleLines: { color: '#e2e8f0' }, grid: { color: '#f1f5f9' }, ticks: { font: { size: 9 } } }
+        } : {
+          x: { grid: { display: false }, ticks: { font: { size: 10 } } },
+          y: { grid: { color: '#f1f5f9' }, ticks: { font: { size: 10 } } }
+        }
+      }
+    });
+  }
+
+  renderMixChart() {
+    const ctx = document.getElementById('chartMix');
+    if (!ctx) return;
+    if (this.chartMix) this.chartMix.destroy();
+
+    this.chartMix = new Chart(ctx, {
+      type: this.mixChartType,
+      data: {
+        labels: ['Samsung Galaxy (54%)', 'Apple iPhone (32%)', 'Xiaomi / Otros (14%)'],
+        datasets: [{
+          data: [54, 32, 14],
+          backgroundColor: ['#2563eb', '#16a34a', '#ff7900'],
+          borderWidth: 2,
+          borderColor: '#ffffff'
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        onClick: () => this.showDrilldown('terminales'),
+        plugins: { legend: { position: 'bottom', labels: { boxWidth: 12, font: { family: 'Inter', size: 11 } } } }
+      }
+    });
+  }
+
+  renderTrendChart() {
+    const ctx = document.getElementById('chartTrend');
+    if (!ctx) return;
+    if (this.chartTrend) this.chartTrend.destroy();
+
+    // Días 1 al 28 reales + días 29-30 proyectados
+    const days = Array.from({ length: 30 }, (_, i) => `Día ${i + 1}`);
+    const realCurve = [
+      12, 24, 38, 51, 65, 78, 92, 105, 118, 131, 144, 158, 171, 184, 198,
+      211, 224, 238, 251, 264, 278, 291, 304, 317, 329, 335, 340, 342,
+      null, null
+    ];
+    const projCurve = [
+      null, null, null, null, null, null, null, null, null, null, null, null, null, null, null,
+      null, null, null, null, null, null, null, null, null, null, null, null, 342,
+      366, 390
+    ];
+    const targetLine = days.map((_, i) => Math.round((380 / 30) * (i + 1)));
+
+    this.chartTrend = new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: days,
+        datasets: [
+          {
+            label: 'Ventas Acumuladas Reales',
+            data: realCurve,
+            borderColor: '#ff7900',
+            backgroundColor: 'rgba(255, 121, 0, 0.08)',
+            fill: true,
+            tension: 0.3,
+            pointRadius: 2
+          },
+          {
+            label: 'Proyección Run-Rate Fin de Mes (390)',
+            data: projCurve,
+            borderColor: '#16a34a',
+            borderDash: [5, 5],
+            pointRadius: 4,
+            pointBackgroundColor: '#16a34a',
+            tension: 0.3
+          },
+          {
+            label: 'Ritmo Objetivo Lineal (380)',
+            data: targetLine,
+            borderColor: '#94a3b8',
+            borderDash: [2, 2],
+            pointRadius: 0,
+            tension: 0
+          }
+        ]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        onClick: () => this.showDrilldown('runrate'),
+        plugins: {
+          legend: { position: 'bottom', labels: { boxWidth: 10, font: { size: 10 } } }
+        },
+        scales: {
+          x: { ticks: { maxTicksLimit: 10, font: { size: 9 } }, grid: { display: false } },
+          y: { ticks: { font: { size: 9 } }, grid: { color: '#f1f5f9' } }
+        }
+      }
+    });
+  }
+
+  renderRadarZonaChart() {
+    const ctx = document.getElementById('chartRadarZona');
+    if (!ctx) return;
+    if (this.chartRadarZona) this.chartRadarZona.destroy();
+
+    this.chartRadarZona = new Chart(ctx, {
+      type: 'radar',
+      data: {
+        labels: ['Móvil (90%)', 'Fibra (94.8%)', 'Seguros (121.7%)', 'Energía (106.7%)', 'Control Gastos (94%)'],
+        datasets: [
+          {
+            label: 'Rendimiento Zona Centro (%)',
+            data: [90.0, 94.8, 121.7, 106.7, 94.0],
+            backgroundColor: 'rgba(255, 121, 0, 0.2)',
+            borderColor: '#ff7900',
+            pointBackgroundColor: '#ff7900',
+            pointRadius: 3
+          },
+          {
+            label: 'Meta Mínima Exigida (100%)',
+            data: [100, 100, 100, 100, 100],
+            backgroundColor: 'transparent',
+            borderColor: '#94a3b8',
+            borderDash: [4, 4],
+            pointRadius: 0
+          }
+        ]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { position: 'bottom', labels: { boxWidth: 10, font: { size: 10 } } }
+        },
+        scales: {
+          r: {
+            suggestedMin: 50,
+            suggestedMax: 130,
+            angleLines: { color: '#e2e8f0' },
+            grid: { color: '#f1f5f9' },
+            ticks: { font: { size: 9 }, stepSize: 25 }
+          }
+        }
+      }
+    });
+  }
+
+  async loadVacationsData() {
+    try {
+      const resp = await fetch('data/vacations.json');
+      if (resp.ok) {
+        this.vacaciones = await resp.json();
+      }
+    } catch (e) {
+      console.warn('Dataset local fallback');
+    }
+  }
+
+  initDOMElements() {
+    this.navTabs = document.querySelectorAll('.nav-tab');
+    this.viewPanels = document.querySelectorAll('.view-panel');
+    this.filterStoreSelect = document.getElementById('filterStoreSelect');
+    this.filterCanalSelect = document.getElementById('filterCanalSelect');
+    this.globalSearchInput = document.getElementById('globalSearchInput');
+    this.rankingSearchInput = document.getElementById('rankingSearchInput');
+  }
+
+  bindEvents() {
+    this.navTabs.forEach(tab => {
+      tab.addEventListener('click', () => this.switchTab(tab.dataset.tab));
     });
 
-    // Modales
-    this.openTaskModalBtn.addEventListener('click', () => this.toggleModal(this.taskModal, true));
-    this.closeTaskModal.addEventListener('click', () => this.toggleModal(this.taskModal, false));
-    this.cancelTaskModal.addEventListener('click', () => this.toggleModal(this.taskModal, false));
-
-    this.openNoteModalBtn.addEventListener('click', () => this.toggleModal(this.noteModal, true));
-    this.closeNoteModal.addEventListener('click', () => this.toggleModal(this.noteModal, false));
-    this.cancelNoteModal.addEventListener('click', () => this.toggleModal(this.noteModal, false));
-
-    // Formularios
-    this.taskForm.addEventListener('submit', (e) => this.handleAddTask(e));
-    this.noteForm.addEventListener('submit', (e) => this.handleAddNote(e));
-
-    // Filtros
-    this.filterChips.forEach(chip => {
-      chip.addEventListener('click', () => {
-        this.filterChips.forEach(c => c.classList.remove('active'));
-        chip.classList.add('active');
-        this.currentFilter = chip.dataset.filter;
-        this.renderTasks();
+    if (this.filterStoreSelect) {
+      this.filterStoreSelect.addEventListener('change', () => this.render());
+    }
+    if (this.filterCanalSelect) {
+      this.filterCanalSelect.addEventListener('change', () => this.render());
+    }
+    if (this.rankingSearchInput) {
+      this.rankingSearchInput.addEventListener('input', () => this.renderRanking());
+    }
+    if (this.globalSearchInput) {
+      this.globalSearchInput.addEventListener('input', (e) => {
+        const q = e.target.value.toLowerCase().trim();
+        if (q) {
+          // If query matches a document, switch to documentos view
+          const matchDoc = this.documents.some(d => d.name.toLowerCase().includes(q) || d.descripcion.toLowerCase().includes(q));
+          if (matchDoc) {
+            this.switchTab('documentos');
+          } else {
+            this.switchTab('comercial');
+            if (this.rankingSearchInput) {
+              this.rankingSearchInput.value = q;
+              this.renderRanking();
+            }
+          }
+        }
       });
-    });
-
-    this.prioritySelect.addEventListener('change', (e) => {
-      this.priorityFilter = e.target.value;
-      this.renderTasks();
-    });
-
-    this.searchInput.addEventListener('input', (e) => {
-      this.searchQuery = e.target.value.toLowerCase().trim();
-      this.render();
-    });
-
-    // Exportar
-    this.exportBtn.addEventListener('click', () => this.exportBackup());
-  }
-
-  switchTab(tabName) {
-    this.navButtons.forEach(btn => {
-      btn.classList.toggle('active', btn.dataset.tab === tabName);
-    });
-    this.views.forEach(view => {
-      view.classList.toggle('active', view.id === `${tabName}View`);
-    });
-  }
-
-  toggleModal(modal, show) {
-    modal.classList.toggle('open', show);
-    if (!show) {
-      if (modal === this.taskModal) this.taskForm.reset();
-      if (modal === this.noteModal) this.noteForm.reset();
     }
   }
 
-  handleAddTask(e) {
-    e.preventDefault();
-    const title = document.getElementById('taskTitle').value.trim();
-    const priority = document.getElementById('taskPriority').value;
-    const category = document.getElementById('taskCategory').value.trim() || 'General';
-
-    if (!title) return;
-
-    const newTask = {
-      id: Date.now().toString(),
-      title,
-      priority,
-      category,
-      completed: false,
-      createdAt: new Date().toISOString()
-    };
-
-    this.tasks.unshift(newTask);
-    this.saveData(STORAGE_KEYS.TASKS, this.tasks);
-    this.toggleModal(this.taskModal, false);
-    this.render();
-  }
-
-  handleAddNote(e) {
-    e.preventDefault();
-    const title = document.getElementById('noteTitle').value.trim();
-    const content = document.getElementById('noteContent').value.trim();
-    const color = document.getElementById('noteColor').value;
-
-    if (!title || !content) return;
-
-    const newNote = {
-      id: Date.now().toString(),
-      title,
-      content,
-      color,
-      createdAt: new Date().toLocaleDateString('es-ES')
-    };
-
-    this.notes.unshift(newNote);
-    this.saveData(STORAGE_KEYS.NOTES, this.notes);
-    this.toggleModal(this.noteModal, false);
-    this.render();
-  }
-
-  toggleTaskComplete(id) {
-    const task = this.tasks.find(t => t.id === id);
-    if (task) {
-      task.completed = !task.completed;
-      this.saveData(STORAGE_KEYS.TASKS, this.tasks);
-      this.render();
+  switchTab(tabId) {
+    this.navTabs.forEach(t => t.classList.toggle('active', t.dataset.tab === tabId));
+    this.viewPanels.forEach(p => p.classList.toggle('active', p.id === `${tabId}View`));
+    
+    if (tabId === 'comercial') {
+      setTimeout(() => this.renderCharts(), 40);
+    }
+    else if (tabId === 'documentos') {
+      this.renderDocRepo();
     }
   }
 
-  deleteTask(id) {
-    this.tasks = this.tasks.filter(t => t.id !== id);
-    this.saveData(STORAGE_KEYS.TASKS, this.tasks);
-    this.render();
-  }
+  getFilteredStores() {
+    let list = this.stores;
+    const storeVal = this.filterStoreSelect ? this.filterStoreSelect.value : 'all';
+    const canalVal = this.filterCanalSelect ? this.filterCanalSelect.value : 'all';
 
-  deleteNote(id) {
-    this.notes = this.notes.filter(n => n.id !== id);
-    this.saveData(STORAGE_KEYS.NOTES, this.notes);
-    this.render();
-  }
-
-  exportBackup() {
-    const backup = {
-      tasks: this.tasks,
-      notes: this.notes,
-      exportDate: new Date().toISOString(),
-      appName: 'GestionBea'
-    };
-    const blob = new Blob([JSON.stringify(backup, null, 2)], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `gestionbea-backup-${new Date().toISOString().slice(0, 10)}.json`;
-    a.click();
-    URL.revokeObjectURL(url);
+    if (storeVal !== 'all') {
+      list = list.filter(s => s.id === storeVal);
+    }
+    if (canalVal !== 'all') {
+      list = list.filter(s => s.canal === canalVal);
+    }
+    return list;
   }
 
   render() {
-    this.renderStats();
-    this.renderDashboard();
-    this.renderTasks();
-    this.renderNotes();
+    this.renderMetrics();
+    this.renderCharts();
+    this.renderRanking();
+    this.renderCoverageGrid();
+    this.renderCuadranteSemanal();
+    this.renderStock();
+    this.renderComisiones();
+    this.renderVacaciones();
+    this.renderDocRepo();
   }
 
-  renderStats() {
-    const total = this.tasks.length;
-    const completed = this.tasks.filter(t => t.completed).length;
-    const pending = total - completed;
+  renderMetrics() {
+    const list = this.getFilteredStores();
+    const mov = list.reduce((a, b) => a + b.realMovil, 0);
+    const objM = list.reduce((a, b) => a + b.objMovil, 0);
+    const fib = list.reduce((a, b) => a + b.realFibra, 0);
+    const objF = list.reduce((a, b) => a + b.objFibra, 0);
+    const ene = list.reduce((a, b) => a + b.energia, 0);
+    const seg = list.length ? (list.reduce((a, b) => a + b.segurosPct, 0) / list.length).toFixed(1) : 0;
 
-    this.statTotalTasks.textContent = total;
-    this.statCompletedTasks.textContent = completed;
-    this.statPendingTasks.textContent = pending;
-    this.statTotalNotes.textContent = this.notes.length;
+    const elM = document.getElementById('tileMovil');
+    const elF = document.getElementById('tileFibra');
+    const elE = document.getElementById('tileEnergia');
+    const elS = document.getElementById('tileSeguros');
+    const elRR = document.getElementById('kpiRunRate');
+
+    if (elM) elM.textContent = mov;
+    if (elF) elF.textContent = fib;
+    if (elE) elE.textContent = ene;
+    if (elS) elS.textContent = `${seg}%`;
+
+    const pctGlobal = objM ? ((mov / objM) * 100) : 100;
+    if (elRR) elRR.textContent = `${(pctGlobal * 1.12).toFixed(1)}%`;
   }
 
-  renderDashboard() {
-    // Tareas prioritarias pendientes
-    const highPriority = this.tasks
-      .filter(t => !t.completed && t.priority === 'high')
-      .slice(0, 4);
-
-    if (highPriority.length === 0) {
-      this.priorityTaskList.innerHTML = '<li class="empty-state">🎉 ¡No hay tareas urgentes pendientes!</li>';
-    } else {
-      this.priorityTaskList.innerHTML = highPriority.map(t => this.createTaskHTML(t)).join('');
+  renderCharts() {
+    const list = this.getFilteredStores();
+    const ctxTMT = document.getElementById('chartTMT');
+    if (ctxTMT) {
+      if (this.chartTMT) this.chartTMT.destroy();
+      this.chartTMT = new Chart(ctxTMT, {
+        type: 'bar',
+        data: {
+          labels: list.map(s => s.name),
+          datasets: [
+            { label: 'Real (Móvil+Fibra)', data: list.map(s => s.realMovil + s.realFibra), backgroundColor: '#ff7900', borderRadius: 4 },
+            { label: 'Objetivo Mensual', data: list.map(s => s.objMovil + s.objFibra), backgroundColor: '#cbd5e1', borderRadius: 4 }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          onClick: (e, items) => {
+            if (items && items.length > 0) {
+              const idx = items[0].index;
+              const st = list[idx];
+              if (st) this.showStoreSchedule(st.id);
+            }
+          },
+          plugins: { legend: { position: 'top', labels: { boxWidth: 12, font: { family: 'Inter', size: 11 } } } },
+          scales: {
+            x: { grid: { display: false }, ticks: { font: { size: 10 } } },
+            y: { grid: { color: '#f1f5f9' }, ticks: { font: { size: 10 } } }
+          }
+        }
+      });
     }
 
-    // Últimas notas
-    const recentNotes = this.notes.slice(0, 3);
-    if (recentNotes.length === 0) {
-      this.recentNotesList.innerHTML = '<div class="empty-state">No hay notas guardadas aún.</div>';
-    } else {
-      this.recentNotesList.innerHTML = recentNotes.map(n => `
-        <div class="note-card color-${n.color}" style="min-height: auto; padding: 0.85rem;">
-          <h4 style="font-size: 0.95rem; font-weight: 600;">${this.escapeHTML(n.title)}</h4>
-          <p style="font-size: 0.825rem; color: var(--text-muted); margin-top: 0.25rem;">${this.escapeHTML(n.content.slice(0, 80))}${n.content.length > 80 ? '...' : ''}</p>
-        </div>
-      `).join('');
+    const ctxMix = document.getElementById('chartMix');
+    if (ctxMix) {
+      if (this.chartMix) this.chartMix.destroy();
+      this.chartMix = new Chart(ctxMix, {
+        type: 'doughnut',
+        data: {
+          labels: ['Samsung Galaxy (54%)', 'Apple iPhone (32%)', 'Xiaomi / Otros (14%)'],
+          datasets: [{
+            data: [54, 32, 14],
+            backgroundColor: ['#2563eb', '#16a34a', '#ff7900'],
+            borderWidth: 2,
+            borderColor: '#ffffff'
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          onClick: () => this.showDrilldown('terminales'),
+          plugins: { legend: { position: 'bottom', labels: { boxWidth: 12, font: { family: 'Inter', size: 11 } } } }
+        }
+      });
     }
   }
 
-  renderTasks() {
-    let filtered = this.tasks.filter(t => {
-      // Filtro de estado
-      if (this.currentFilter === 'pending' && t.completed) return false;
-      if (this.currentFilter === 'completed' && !t.completed) return false;
+  renderRanking() {
+    const tbody = document.getElementById('rankingTbody');
+    if (!tbody) return;
+    const q = (this.rankingSearchInput ? this.rankingSearchInput.value : '').toLowerCase();
+    const filtered = this.advisors.filter(c => c.name.toLowerCase().includes(q) || c.center.toLowerCase().includes(q));
 
-      // Filtro de prioridad
-      if (this.priorityFilter !== 'all' && t.priority !== this.priorityFilter) return false;
-
-      // Búsqueda
-      if (this.searchQuery && !t.title.toLowerCase().includes(this.searchQuery) && !t.category.toLowerCase().includes(this.searchQuery)) {
-        return false;
-      }
-
-      return true;
-    });
-
-    if (filtered.length === 0) {
-      this.allTasksList.innerHTML = '<li class="empty-state">No se encontraron tareas con estos filtros.</li>';
-    } else {
-      this.allTasksList.innerHTML = filtered.map(t => this.createTaskHTML(t)).join('');
-    }
+    tbody.innerHTML = filtered.map((c, i) => {
+      const tot = c.movil + c.fibra;
+      const pct = Math.round((tot / c.obj) * 100);
+      const tag = pct >= 95 ? '<span class="chip-badge success">Óptimo</span>' : (pct >= 85 ? '<span class="chip-badge warning">En curso</span>' : '<span class="chip-badge danger">Revisar</span>');
+      return `
+        <tr class="clickable" onclick="cockpit.showAdvisorDossier('${c.id}')" title="Clic para ver ficha completa y expediente">
+          <td><strong>${i + 1}</strong></td>
+          <td><strong style="color:var(--orange)">${c.name}</strong><br><small style="color:var(--text-muted);">${c.role} (${c.dni})</small></td>
+          <td>${c.center}</td>
+          <td>${c.movil}</td>
+          <td>${c.fibra}</td>
+          <td><strong class="${c.seguros >= 40 ? 'text-success' : 'text-warning'}">${c.seguros}%</strong></td>
+          <td>${c.energia}</td>
+          <td>${c.term}</td>
+          <td><strong>${pct}%</strong></td>
+          <td>${tag}</td>
+        </tr>
+      `;
+    }).join('');
   }
 
-  renderNotes() {
-    let filtered = this.notes.filter(n => {
-      if (!this.searchQuery) return true;
-      return n.title.toLowerCase().includes(this.searchQuery) || n.content.toLowerCase().includes(this.searchQuery);
-    });
-
-    if (filtered.length === 0) {
-      this.allNotesGrid.innerHTML = '<div class="empty-state" style="grid-column: 1/-1;">No se encontraron notas.</div>';
-    } else {
-      this.allNotesGrid.innerHTML = filtered.map(n => `
-        <div class="note-card color-${n.color}">
-          <div>
-            <div class="note-card-header">
-              <h3 class="note-title">${this.escapeHTML(n.title)}</h3>
-              <button class="note-delete-btn" onclick="app.deleteNote('${n.id}')" title="Eliminar nota">&times;</button>
-            </div>
-            <p class="note-content">${this.escapeHTML(n.content)}</p>
+  renderCoverageGrid() {
+    const grid = document.getElementById('coverageGridContainer');
+    if (!grid) return;
+    grid.innerHTML = this.stores.map(s => {
+      const isGreen = s.status === 'green';
+      const isAmber = s.status === 'amber';
+      return `
+        <div class="cov-item ${s.status} clickable" onclick="cockpit.showStoreSchedule('${s.id}')" title="Clic para ver cuadrante y asesores">
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+            <strong>${s.name}</strong>
+            <span class="chip-badge ${isGreen ? 'success' : (isAmber ? 'warning' : 'danger')}">
+              ${isGreen ? '🟢 Dotación Completa' : (isAmber ? '🟡 Ajustado' : '🔴 Bajo Mínimos')}
+            </span>
           </div>
-          <div class="note-date">Creado el ${n.createdAt}</div>
+          <div style="font-size:0.775rem; color:var(--text-muted); display:flex; justify-content:space-between; margin-top:0.25rem;">
+            <span>Presencia Hoy: <strong>${s.staffPres} / ${s.staffMin}</strong></span>
+            <span>${s.canal === 'cc' ? 'Centro Comercial' : 'Tienda Urbana'}</span>
+          </div>
+          <div style="font-size:0.725rem; color:var(--orange); font-weight:600; margin-top:0.15rem;">
+            🔍 Ver asesores y horarios de la semana &rarr;
+          </div>
         </div>
-      `).join('');
-    }
+      `;
+    }).join('');
   }
 
-  createTaskHTML(task) {
-    const priorityLabels = { high: 'Alta 🔴', medium: 'Media 🟡', low: 'Baja 🟢' };
-    return `
-      <li class="task-item ${task.completed ? 'completed' : ''}">
-        <div class="task-left">
-          <input type="checkbox" class="task-checkbox" ${task.completed ? 'checked' : ''} onchange="app.toggleTaskComplete('${task.id}')">
-          <span class="task-title">${this.escapeHTML(task.title)}</span>
+  renderCuadranteSemanal() {
+    const tbody = document.getElementById('cuadranteSemanalTbody');
+    if (!tbody) return;
+
+    tbody.innerHTML = this.stores.map(store => {
+      const storeAdvisors = this.advisors.filter(a => a.centerId === store.id || a.center === store.name);
+      
+      const getShiftTag = (dayCode) => {
+        const codes = storeAdvisors.map(a => a.shifts[dayCode] ? a.shifts[dayCode].charAt(0) : 'L');
+        return codes.map(c => `<span class="shift-tag ${c.toLowerCase()}">${c}</span>`).join('');
+      };
+
+      return `
+        <tr class="clickable" onclick="cockpit.showStoreSchedule('${store.id}')" title="Clic para ver detalle de horarios de ${store.name}">
+          <td>
+            <strong style="color:var(--orange)">${store.name}</strong>
+            <br><small style="color:var(--text-muted);">${storeAdvisors.length} Asesores asignados (Clic para detalle)</small>
+          </td>
+          <td>${getShiftTag('L')}</td>
+          <td>${getShiftTag('M')}</td>
+          <td>${getShiftTag('X')}</td>
+          <td>${getShiftTag('J')}</td>
+          <td>${getShiftTag('V')}</td>
+          <td>${getShiftTag('S')}</td>
+          <td>${getShiftTag('D')}</td>
+        </tr>
+      `;
+    }).join('');
+  }
+
+  renderStock() {
+    const tbody = document.getElementById('stockTbody');
+    if (!tbody) return;
+    tbody.innerHTML = this.stores.map(s => {
+      const isOk = s.audit === 'CORRECTO';
+      return `
+        <tr class="clickable" onclick="cockpit.showStockDrilldown('${s.id}')" title="Clic para ver acta y auditoría de IMEIs">
+          <td>28/09/2026</td>
+          <td><strong style="color:var(--orange)">${s.name}</strong></td>
+          <td>Terminales & Accesorios</td>
+          <td>145</td>
+          <td>${isOk ? '145' : '143'}</td>
+          <td><strong class="${isOk ? 'text-success' : 'text-danger'}">${isOk ? '0' : '-2'}</strong></td>
+          <td><strong class="${isOk ? 'text-success' : 'text-danger'}">${s.faltante === 0 ? '0.00 €' : `${s.faltante}.00 €`}</strong></td>
+          <td><span class="chip-badge ${isOk ? 'success' : 'danger'}">${s.audit}</span></td>
+          <td><button class="btn btn-secondary" style="padding:0.2rem 0.5rem; font-size:0.75rem;" onclick="event.stopPropagation(); cockpit.showStockDrilldown('${s.id}')">Ver Detalle 🔍</button></td>
+        </tr>
+      `;
+    }).join('');
+  }
+
+  renderComisiones() {
+    const tbody = document.getElementById('comisionesTbody');
+    if (!tbody) return;
+    tbody.innerHTML = this.advisors.map(c => {
+      const comMov = c.movil * 12;
+      const comFib = c.fibra * 18;
+      const comSeg = Math.round(c.seguros * 2.2);
+      const comEne = c.energia * 15;
+      const comTotal = comMov + comFib + comSeg + comEne;
+
+      return `
+        <tr class="clickable" onclick="cockpit.showAdvisorDossier('${c.id}')" title="Clic para ver desglose de incentivos">
+          <td><strong style="color:var(--orange)">${c.name}</strong><br><small style="color:var(--text-muted);">${c.role}</small></td>
+          <td>${c.center}</td>
+          <td>${comMov.toFixed(2)} €</td>
+          <td>${comFib.toFixed(2)} €</td>
+          <td>${comSeg.toFixed(2)} €</td>
+          <td>${comEne.toFixed(2)} €</td>
+          <td><strong style="color:var(--orange)">${comTotal}.00 €</strong></td>
+          <td><span class="chip-badge success">Validado</span></td>
+        </tr>
+      `;
+    }).join('');
+  }
+
+  renderVacaciones() {
+    const grid = document.getElementById('vacacionesDeck');
+    if (!grid) return;
+    grid.innerHTML = this.advisors.map(emp => {
+      const rem = Math.max(0, emp.vacTotal - emp.vacTaken);
+      return `
+        <div class="vac-tile clickable" onclick="cockpit.showAdvisorDossier('${emp.id}')" title="Clic para ver expediente de vacaciones y ausencias">
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+            <strong>${emp.name}</strong>
+            <span class="chip-badge info">${rem}d libres</span>
+          </div>
+          <div style="font-size:0.75rem; color:var(--text-muted); margin-top:0.25rem;">
+            📍 ${emp.center} | DNI: ${emp.dni}
+          </div>
+          <div style="font-size:0.725rem; color:var(--text-secondary); display:flex; justify-content:space-between; margin-top:0.25rem;">
+            <span>Consumidos: <strong>${emp.vacTaken} / ${emp.vacTotal}d</strong></span>
+            <span style="color:var(--orange); font-weight:600;">Ver Ficha 🔍</span>
+          </div>
         </div>
-        <div class="task-right">
-          ${task.category ? `<span class="badge badge-cat">${this.escapeHTML(task.category)}</span>` : ''}
-          <span class="badge badge-${task.priority}">${priorityLabels[task.priority] || task.priority}</span>
-          <button class="task-delete-btn" onclick="app.deleteTask('${task.id}')" title="Eliminar tarea">
-            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+      `;
+    }).join('');
+  }
+
+  // ========================================================
+  // REPOSITORIO DE DOCUMENTOS FUENTE & VISOR DOCUMENTAL
+  // ========================================================
+  renderDocRepo() {
+    const container = document.getElementById('docRepoContainer');
+    if (!container) return;
+
+    container.innerHTML = this.documents.map(doc => `
+      <div class="doc-file-card">
+        <div class="doc-file-head">
+          <div class="doc-icon-badge">${doc.icon}</div>
+          <div style="flex:1;">
+            <div class="doc-file-title">${doc.name}</div>
+            <div class="doc-file-sub">${doc.tipo} • ${doc.tamano}</div>
+          </div>
+        </div>
+
+        <p style="font-size:0.8rem; color:var(--text-secondary); line-height:1.4;">
+          ${doc.descripcion}
+        </p>
+
+        <div>
+          <span style="font-size:0.7rem; font-weight:700; color:var(--text-muted); text-transform:uppercase;">Secciones Vinculadas:</span>
+          <div style="display:flex; gap:0.35rem; flex-wrap:wrap; margin-top:0.25rem;">
+            ${doc.seccionesAsociadas.map(s => `<span class="chip-badge">${s}</span>`).join('')}
+          </div>
+        </div>
+
+        <div class="doc-meta-row">
+          <span>📅 ${doc.fecha}</span>
+          <span>🏛️ ${doc.origen}</span>
+        </div>
+
+        <div style="display:flex; gap:0.5rem; margin-top:0.35rem;">
+          <button class="btn btn-secondary flex-1" style="font-size:0.775rem; justify-content:center;" onclick="cockpit.openDocViewer('${doc.id}')">
+            🔍 Ver Contenido Original
+          </button>
+          <button class="btn btn-outline" style="font-size:0.775rem;" onclick="cockpit.descargarDoc('${doc.id}')" title="Descargar copia oficial">
+            📥
           </button>
         </div>
-      </li>
-    `;
+      </div>
+    `).join('');
   }
 
-  escapeHTML(str) {
-    return String(str)
-      .replace(/&/g, '&amp;')
-      .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;')
-      .replace(/"/g, '&quot;')
-      .replace(/'/g, '&#039;');
+  openDocViewer(docId) {
+    const doc = this.documents.find(d => d.id === docId || d.name.includes(docId)) || this.documents[0];
+    this.currentDocViewed = doc;
+
+    const modal = document.getElementById('modalDocViewer');
+    const icon = document.getElementById('docViewerIcon');
+    const title = document.getElementById('docViewerTitle');
+    const sub = document.getElementById('docViewerSub');
+    const body = document.getElementById('docViewerBody');
+
+    if (icon) icon.textContent = doc.icon;
+    if (title) title.textContent = doc.name;
+    if (sub) sub.textContent = `${doc.tipo} | ${doc.tamano} | Origen: ${doc.origen}`;
+
+    let html = `
+      <!-- Metadatos de Integridad y Trazabilidad -->
+      <div style="background:#f8fafc; border:1px solid var(--border-color); border-radius:var(--radius); padding:0.85rem; font-size:0.775rem; display:flex; flex-direction:column; gap:0.35rem;">
+        <div style="display:flex; justify-content:space-between; flex-wrap:wrap; gap:0.5rem;">
+          <span><strong>Fuente de Origen:</strong> ${doc.origen}</span>
+          <span><strong>Fecha de Sincronización:</strong> ${doc.fecha}</span>
+        </div>
+        <div style="display:flex; justify-content:space-between; flex-wrap:wrap; gap:0.5rem;">
+          <span><strong>Integridad SHA-256:</strong> <code style="font-size:0.7rem; color:var(--text-muted);">${doc.sha256.substring(0, 32)}...</code></span>
+          <span class="chip-badge success">🛡️ Almacenado en Supabase (Solo Lectura)</span>
+        </div>
+        <div style="color:var(--text-secondary); margin-top:0.25rem;">
+          <strong>Descripción del Documento:</strong> ${doc.descripcion}
+        </div>
+      </div>
+
+      <!-- Vista Previa de Datos Originales / Hojas de Cálculo -->
+      <div>
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.5rem;">
+          <h4 style="font-size:0.85rem; font-weight:700;">📄 Datos en Bruto Extraídos del Documento (${doc.previewRows.length} registros de muestra)</h4>
+          <span class="doc-source-tag">Filtro Activo: Vista Completa</span>
+        </div>
+        
+        <div class="doc-preview-box">
+          <table class="table-flat" style="font-size:0.775rem;">
+            <thead>
+              <tr>
+                ${doc.previewHeaders.map(h => `<th>${h}</th>`).join('')}
+              </tr>
+            </thead>
+            <tbody>
+              ${doc.previewRows.map(row => `
+                <tr>
+                  ${row.map(cell => `<td>${cell}</td>`).join('')}
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    `;
+
+    if (body) body.innerHTML = html;
+    if (modal) modal.classList.add('open');
+  }
+
+  descargarDocActual() {
+    if (this.currentDocViewed) {
+      this.descargarDoc(this.currentDocViewed.id);
+    }
+  }
+
+  descargarDoc(docId) {
+    const doc = this.documents.find(d => d.id === docId);
+    const name = doc ? doc.name : 'documento.xlsx';
+    this.toast(`📥 Descargando copia verificada de ${name}...`);
+  }
+
+  // ========================================================
+  // SISTEMA DE DESGLOSE INTERACTIVO (DRILLDOWN DRAWER)
+  // ========================================================
+
+  openDrilldown(title, subtitle, htmlContent, footerActionHtml = '') {
+    const drawer = document.getElementById('drilldownDrawer');
+    const t = document.getElementById('drawerTitle');
+    const s = document.getElementById('drawerSubtitle');
+    const c = document.getElementById('drawerContent');
+    const f = document.getElementById('drawerFooter');
+
+    if (t) t.innerHTML = title;
+    if (s) s.textContent = subtitle;
+    if (c) c.innerHTML = htmlContent;
+    if (f) {
+      f.innerHTML = `
+        ${footerActionHtml}
+        <button class="btn btn-secondary" onclick="cockpit.closeDrilldown()">Cerrar</button>
+      `;
+    }
+
+    if (drawer) drawer.classList.add('open');
+  }
+
+  closeDrilldown(e) {
+    if (e && e.target && e.target.closest('.drawer-flat') && !e.target.classList.contains('drawer-close')) {
+      return;
+    }
+    const drawer = document.getElementById('drilldownDrawer');
+    if (drawer) drawer.classList.remove('open');
+  }
+
+  // 1. DESGLOSE DE MÉTRICAS TMT (Móvil, Fibra, Seguros, Energía, Terminales, Run-rate)
+  showDrilldown(type) {
+    if (type === 'movil') {
+      const totalAltas = 182;
+      const totalPortas = 160;
+      const total = totalAltas + totalPortas;
+
+      let html = `
+        <div style="margin-bottom:0.75rem;">
+          <span class="doc-source-tag" onclick="cockpit.openDocViewer('DOC-01')">
+            📄 Doc Fuente: Informe_TMT_Consolidado_28-09-2026.xlsx 🔍
+          </span>
+        </div>
+
+        <div class="drilldown-kpi-grid">
+          <div class="drilldown-kpi-card">
+            <span class="lbl">Total Líneas Móvil</span>
+            <span class="val" style="color:var(--orange);">${total}</span>
+            <span class="sub">Objetivo: 380 (90.0%)</span>
+          </div>
+          <div class="drilldown-kpi-card">
+            <span class="lbl">Altas Nuevas</span>
+            <span class="val text-success">${totalAltas}</span>
+            <span class="sub">53.2% del volumen total</span>
+          </div>
+          <div class="drilldown-kpi-card">
+            <span class="lbl">Portabilidades</span>
+            <span class="val text-primary">${totalPortas}</span>
+            <span class="sub">46.8% del volumen total</span>
+          </div>
+        </div>
+
+        <div class="drilldown-section">
+          <h4>📱 Desglose por Tienda (Altas vs Portas)</h4>
+          <table class="table-flat">
+            <thead>
+              <tr>
+                <th>Tienda</th>
+                <th>Altas Orange</th>
+                <th>Portas Orange</th>
+                <th>Altas Jazztel</th>
+                <th>Portas Jazztel</th>
+                <th>Total</th>
+                <th>% Obj</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${this.stores.map(s => {
+                const altasO = Math.round(s.realMovil * 0.35);
+                const portasO = Math.round(s.realMovil * 0.35);
+                const altasJ = Math.round(s.realMovil * 0.18);
+                const portasJ = s.realMovil - (altasO + portasO + altasJ);
+                const pct = Math.round((s.realMovil / s.objMovil) * 100);
+                return `
+                  <tr class="clickable" onclick="cockpit.showStoreSchedule('${s.id}')">
+                    <td><strong>${s.name}</strong></td>
+                    <td>${altasO}</td>
+                    <td>${portasO}</td>
+                    <td>${altasJ}</td>
+                    <td>${portasJ}</td>
+                    <td><strong style="color:var(--orange)">${s.realMovil}</strong></td>
+                    <td><span class="chip-badge ${pct >= 90 ? 'success' : 'warning'}">${pct}%</span></td>
+                  </tr>
+                `;
+              }).join('')}
+            </tbody>
+          </table>
+        </div>
+
+        <div class="drilldown-section">
+          <h4>🏆 Top 5 Asesores Líderes en Venta Móvil</h4>
+          <div class="table-wrap">
+            <table class="table-flat">
+              <thead><tr><th>Asesor</th><th>Tienda</th><th>Líneas Móvil</th><th>Comisión (€)</th></tr></thead>
+              <tbody>
+                ${this.advisors.slice(0, 5).map(a => `
+                  <tr class="clickable" onclick="cockpit.showAdvisorDossier('${a.id}')">
+                    <td><strong style="color:var(--orange)">${a.name}</strong></td>
+                    <td>${a.center}</td>
+                    <td><strong>${a.movil}</strong></td>
+                    <td>${(a.movil * 12).toFixed(2)} €</td>
+                  </tr>
+                `).join('')}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      `;
+
+      this.openDrilldown('📱 Desglose Analítico: Líneas Móviles', 'Detalle de altas, portabilidades Orange/Jazztel y desglose por PDV', html);
+    }
+    else if (type === 'fibra') {
+      let html = `
+        <div style="margin-bottom:0.75rem;">
+          <span class="doc-source-tag" onclick="cockpit.openDocViewer('DOC-01')">
+            📄 Doc Fuente: Informe_TMT_Consolidado_28-09-2026.xlsx 🔍
+          </span>
+        </div>
+
+        <div class="drilldown-kpi-grid">
+          <div class="drilldown-kpi-card">
+            <span class="lbl">Total Fibra</span>
+            <span class="val text-success">128</span>
+            <span class="sub">Objetivo: 135 (94.8%)</span>
+          </div>
+          <div class="drilldown-kpi-card">
+            <span class="lbl">Instaladas Activas</span>
+            <span class="val text-success">114</span>
+            <span class="sub">Provisionadas con éxito</span>
+          </div>
+          <div class="drilldown-kpi-card">
+            <span class="lbl">Pendientes Técnico</span>
+            <span class="val text-warning">14</span>
+            <span class="sub">Cita agendada <48h</span>
+          </div>
+        </div>
+
+        <div class="drilldown-section">
+          <h4>🌐 Mix de Velocidades & Operador</h4>
+          <table class="table-flat">
+            <thead>
+              <tr><th>Modalidad Fibra</th><th>Ventas</th><th>Cuota (%)</th><th>ARPU Medio</th></tr>
+            </thead>
+            <tbody>
+              <tr><td><strong>Fibra 1 Gbps + TV Premium</strong></td><td>58</td><td>45.3%</td><td>68.00 €/mes</td></tr>
+              <tr><td><strong>Fibra 600 Mbps Convergente</strong></td><td>44</td><td>34.4%</td><td>54.00 €/mes</td></tr>
+              <tr><td><strong>Fibra 300 Mbps Jazztel</strong></td><td>20</td><td>15.6%</td><td>39.95 €/mes</td></tr>
+              <tr><td><strong>Fibra Pro Autónomos / Empresas</strong></td><td>6</td><td>4.7%</td><td>85.00 €/mes</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="drilldown-section">
+          <h4>🏬 Producción de Fibra por Tienda</h4>
+          <table class="table-flat">
+            <thead><tr><th>Tienda</th><th>Ventas Reales</th><th>Objetivo</th><th>Estado</th></tr></thead>
+            <tbody>
+              ${this.stores.map(s => `
+                <tr class="clickable" onclick="cockpit.showStoreSchedule('${s.id}')">
+                  <td><strong>${s.name}</strong></td>
+                  <td><strong style="color:var(--green)">${s.realFibra}</strong></td>
+                  <td>${s.objFibra}</td>
+                  <td><span class="chip-badge ${s.realFibra >= s.objFibra ? 'success' : 'warning'}">${s.realFibra >= s.objFibra ? 'Superado' : 'En progreso'}</span></td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+        </div>
+      `;
+      this.openDrilldown('🌐 Desglose Analítico: Fibra & Conectividad', 'Detalle de velocidades, provisión técnica y convergencia por tienda', html);
+    }
+    else if (type === 'seguros') {
+      let html = `
+        <div style="margin-bottom:0.75rem;">
+          <span class="doc-source-tag" onclick="cockpit.openDocViewer('DOC-05')">
+            📄 Doc Fuente: Base_Polizas_Seguros_CHUBB_Sep2026.xlsx 🔍
+          </span>
+        </div>
+
+        <div class="drilldown-kpi-grid">
+          <div class="drilldown-kpi-card">
+            <span class="lbl">Penetración Global</span>
+            <span class="val text-success">42.6%</span>
+            <span class="sub">Umbral Mínimo: 35.0%</span>
+          </div>
+          <div class="drilldown-kpi-card">
+            <span class="lbl">Pólizas Nuevas</span>
+            <span class="val text-primary">91</span>
+            <span class="sub">Protección Móvil Total</span>
+          </div>
+          <div class="drilldown-kpi-card">
+            <span class="lbl">Incentivos Devengados</span>
+            <span class="val" style="color:var(--orange)">1,820 €</span>
+            <span class="sub">Comisión 20€/póliza</span>
+          </div>
+        </div>
+
+        <div class="drilldown-section">
+          <h4>🛡️ Penetración por Gama de Terminal Vendido</h4>
+          <table class="table-flat">
+            <thead><tr><th>Gama Dispositivo</th><th>Terminales Vendidos</th><th>Seguros Adheridos</th><th>% Penetración</th></tr></thead>
+            <tbody>
+              <tr><td><strong>Gama Premium (>800€: iPhone 16 / S24)</strong></td><td>68</td><td>42</td><td><strong class="text-success">61.7%</strong></td></tr>
+              <tr><td><strong>Gama Media (300€ - 800€: Galaxy A55, Redmi Pro)</strong></td><td>95</td><td>38</td><td><strong class="text-success">40.0%</strong></td></tr>
+              <tr><td><strong>Gama Entrada (<300€)</strong></td><td>52</td><td>11</td><td><strong class="text-warning">21.1%</strong></td></tr>
+            </tbody>
+          </table>
+        </div>
+      `;
+      this.openDrilldown('🛡️ Desglose Analítico: Seguros y SVA', 'Rendimiento de seguros de protección, gamas y comisiones devengadas', html);
+    }
+    else if (type === 'energia') {
+      let html = `
+        <div style="margin-bottom:0.75rem;">
+          <span class="doc-source-tag" onclick="cockpit.openDocViewer('DOC-07')">
+            📄 Doc Fuente: Contratos_Orange_Energia_Luz_Sep2026.xlsx 🔍
+          </span>
+        </div>
+
+        <div class="drilldown-kpi-grid">
+          <div class="drilldown-kpi-card">
+            <span class="lbl">Contratos Energía</span>
+            <span class="val text-success">64</span>
+            <span class="sub">Obj. 60 (106.7%)</span>
+          </div>
+          <div class="drilldown-kpi-card">
+            <span class="lbl">Ahorro Medio Cliente</span>
+            <span class="val text-primary">18.4%</span>
+            <span class="sub">En factura de luz</span>
+          </div>
+          <div class="drilldown-kpi-card">
+            <span class="lbl">Incentivo Asesor</span>
+            <span class="val" style="color:var(--orange)">15.00 €</span>
+            <span class="sub">Por contrato activado</span>
+          </div>
+        </div>
+
+        <div class="drilldown-section">
+          <h4>⚡ Contratos por Tienda (Campaña Energy Days)</h4>
+          <table class="table-flat">
+            <thead><tr><th>Tienda</th><th>Contratos Luz</th><th>Objetivo</th><th>Consecución</th></tr></thead>
+            <tbody>
+              ${this.stores.map(s => `
+                <tr class="clickable" onclick="cockpit.showStoreSchedule('${s.id}')">
+                  <td><strong>${s.name}</strong></td>
+                  <td><strong>${s.energia}</strong></td>
+                  <td>${Math.round(s.objMovil * 0.2)}</td>
+                  <td><span class="chip-badge success">Óptimo</span></td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+        </div>
+      `;
+      this.openDrilldown('⚡ Desglose Analítico: Energía (Luz & Gas)', 'Evolución de contratos Orange Energía y bonificaciones comerciales', html);
+    }
+    else if (type === 'terminales') {
+      let html = `
+        <div style="margin-bottom:0.75rem;">
+          <span class="doc-source-tag" onclick="cockpit.openDocViewer('DOC-04')">
+            📄 Doc Fuente: Actas_Auditoria_Stock_IMEIs_Sep2026.pdf 🔍
+          </span>
+        </div>
+
+        <div class="drilldown-kpi-grid">
+          <div class="drilldown-kpi-card">
+            <span class="lbl">Terminales Vendidos</span>
+            <span class="val text-primary">215</span>
+            <span class="sub">Venta libre y renovaciones</span>
+          </div>
+          <div class="drilldown-kpi-card">
+            <span class="lbl">Financiados Orange</span>
+            <span class="val text-success">84.2%</span>
+            <span class="sub">A 24 / 30 / 36 plazos</span>
+          </div>
+          <div class="drilldown-kpi-card">
+            <span class="lbl">Ticket Medio</span>
+            <span class="val text-primary">485.00 €</span>
+            <span class="sub">Por dispositivo</span>
+          </div>
+        </div>
+
+        <div class="drilldown-section">
+          <h4>📦 Modelos Más Vendidos del Mes</h4>
+          <table class="table-flat">
+            <thead><tr><th>Modelo</th><th>Fabricante</th><th>Uds Vendidas</th><th>% Total</th></tr></thead>
+            <tbody>
+              <tr><td><strong>Samsung Galaxy A55 5G 128GB</strong></td><td>Samsung</td><td>48</td><td>22.3%</td></tr>
+              <tr><td><strong>Apple iPhone 16 Pro 128GB</strong></td><td>Apple</td><td>36</td><td>16.7%</td></tr>
+              <tr><td><strong>Samsung Galaxy S24 256GB</strong></td><td>Samsung</td><td>32</td><td>14.8%</td></tr>
+              <tr><td><strong>Xiaomi Redmi Note 13 Pro 5G</strong></td><td>Xiaomi</td><td>28</td><td>13.0%</td></tr>
+              <tr><td><strong>Apple iPhone 15 128GB</strong></td><td>Apple</td><td>24</td><td>11.1%</td></tr>
+              <tr><td><strong>Otros modelos / Accesorios</strong></td><td>Varios</td><td>47</td><td>21.9%</td></tr>
+            </tbody>
+          </table>
+        </div>
+      `;
+      this.openDrilldown('📦 Desglose Analítico: Terminales & Renoves', 'Mix de fabricantes, modelos destacados y porcentajes de financiación', html);
+    }
+    else if (type === 'runrate') {
+      let html = `
+        <div style="margin-bottom:0.75rem;">
+          <span class="doc-source-tag" onclick="cockpit.openDocViewer('DOC-01')">
+            📄 Doc Fuente: Informe_TMT_Consolidado_28-09-2026.xlsx 🔍
+          </span>
+        </div>
+
+        <div class="drilldown-kpi-grid">
+          <div class="drilldown-kpi-card">
+            <span class="lbl">Run-Rate Zona Centro</span>
+            <span class="val text-success">108.4%</span>
+            <span class="sub">Proyección a fin de mes</span>
+          </div>
+          <div class="drilldown-kpi-card">
+            <span class="lbl">Días Hábiles Restantes</span>
+            <span class="val text-primary">2</span>
+            <span class="sub">Hasta cierre del período</span>
+          </div>
+          <div class="drilldown-kpi-card">
+            <span class="lbl">Acelerador Extra</span>
+            <span class="val" style="color:var(--orange)">+15% Bonus</span>
+            <span class="sub">Si se supera el 115%</span>
+          </div>
+        </div>
+
+        <div class="drilldown-section">
+          <h4>📈 Proyección de Cierre por Tienda</h4>
+          <table class="table-flat">
+            <thead><tr><th>Tienda</th><th>Real Actual</th><th>Proyección Fin de Mes</th><th>Run-Rate</th></tr></thead>
+            <tbody>
+              ${this.stores.map(s => {
+                const tot = s.realMovil + s.realFibra;
+                const obj = s.objMovil + s.objFibra;
+                const proj = Math.round(tot * 1.08);
+                const rr = ((proj / obj) * 100).toFixed(1);
+                return `
+                  <tr class="clickable" onclick="cockpit.showStoreSchedule('${s.id}')">
+                    <td><strong>${s.name}</strong></td>
+                    <td>${tot}</td>
+                    <td><strong>${proj}</strong></td>
+                    <td><strong class="${rr >= 100 ? 'text-success' : 'text-warning'}">${rr}%</strong></td>
+                  </tr>
+                `;
+              }).join('')}
+            </tbody>
+          </table>
+        </div>
+      `;
+      this.openDrilldown('📈 Desglose Analítico: Run-Rate y Proyecciones', 'Velocidad de venta diaria y estimación de cierre sobre aceleradores', html);
+    }
+  }
+
+  // 2. DESGLOSE COMPLETO DE TIENDA Y CUADRANTE SEMANAL
+  showStoreSchedule(storeIdOrName) {
+    const store = this.stores.find(s => s.id === storeIdOrName || s.name === storeIdOrName) || this.stores[0];
+    const assignedStaff = this.advisors.filter(a => a.centerId === store.id || a.center === store.name);
+
+    let html = `
+      <div style="margin-bottom:0.75rem; display:flex; gap:0.5rem; flex-wrap:wrap;">
+        <span class="doc-source-tag" onclick="cockpit.openDocViewer('DOC-02')">
+          📄 Doc Fuente: Cuadrante_Turnos_ZonaCentro_Semana39.xlsx 🔍
+        </span>
+        <span class="doc-source-tag" onclick="cockpit.openDocViewer('DOC-03')">
+          📄 Doc Fuente: Censo_Plantilla_Vacaciones_2026.xlsx 🔍
+        </span>
+      </div>
+
+      <div class="drilldown-kpi-grid">
+        <div class="drilldown-kpi-card">
+          <span class="lbl">Dotación Hoy</span>
+          <span class="val ${store.staffPres >= store.staffMin ? 'text-success' : 'text-danger'}">${store.staffPres} / ${store.staffMin}</span>
+          <span class="sub">${store.staffPres >= store.staffMin ? 'Mínimo cubierto' : 'Bajo mínimos'}</span>
+        </div>
+        <div class="drilldown-kpi-card">
+          <span class="lbl">Ventas Móvil</span>
+          <span class="val" style="color:var(--orange)">${store.realMovil} / ${store.objMovil}</span>
+          <span class="sub">${Math.round((store.realMovil / store.objMovil) * 100)}% de consecución</span>
+        </div>
+        <div class="drilldown-kpi-card">
+          <span class="lbl">Fibra Real</span>
+          <span class="val text-success">${store.realFibra} / ${store.objFibra}</span>
+          <span class="sub">Convergencia activa</span>
+        </div>
+      </div>
+
+      <div class="drilldown-section">
+        <h4>👥 Asesores Asignados y Horarios de la Semana (Haz clic en un asesor para abrir su ficha)</h4>
+        <div>
+          ${assignedStaff.map(staff => {
+            return `
+              <div class="staff-shift-row clickable" onclick="cockpit.showAdvisorDossier('${staff.id}')" title="Clic para ver ficha completa de ${staff.name}">
+                <div class="staff-details">
+                  <span class="staff-name" style="color:var(--orange);">${staff.name}</span>
+                  <span class="staff-role">${staff.role} | DNI: ${staff.dni} | Contrato: ${staff.jornada} (${staff.state})</span>
+                </div>
+                <div class="shift-days-row">
+                  <div class="day-box"><span class="day-lbl">L</span><span class="day-shift-code ${staff.shifts.L.charAt(0).toLowerCase()}">${staff.shifts.L.charAt(0)}</span></div>
+                  <div class="day-box"><span class="day-lbl">M</span><span class="day-shift-code ${staff.shifts.M.charAt(0).toLowerCase()}">${staff.shifts.M.charAt(0)}</span></div>
+                  <div class="day-box"><span class="day-lbl">X</span><span class="day-shift-code ${staff.shifts.X.charAt(0).toLowerCase()}">${staff.shifts.X.charAt(0)}</span></div>
+                  <div class="day-box"><span class="day-lbl">J</span><span class="day-shift-code ${staff.shifts.J.charAt(0).toLowerCase()}">${staff.shifts.J.charAt(0)}</span></div>
+                  <div class="day-box"><span class="day-lbl">V</span><span class="day-shift-code ${staff.shifts.V.charAt(0).toLowerCase()}">${staff.shifts.V.charAt(0)}</span></div>
+                  <div class="day-box"><span class="day-lbl">S</span><span class="day-shift-code ${staff.shifts.S.charAt(0).toLowerCase()}">${staff.shifts.S.charAt(0)}</span></div>
+                  <div class="day-box"><span class="day-lbl">D</span><span class="day-shift-code ${staff.shifts.D.charAt(0).toLowerCase()}">${staff.shifts.D.charAt(0)}</span></div>
+                </div>
+              </div>
+            `;
+          }).join('')}
+        </div>
+      </div>
+
+      <div class="drilldown-section">
+        <h4>📋 Leyenda de Códigos de Turno de Tienda</h4>
+        <div style="display:grid; grid-template-columns:repeat(2, 1fr); gap:0.5rem; font-size:0.775rem;">
+          <div><span class="shift-tag m">M</span> <strong>Mañana:</strong> 10:00 - 16:30 (6.5h)</div>
+          <div><span class="shift-tag t">T</span> <strong>Tarde:</strong> 14:30 - 21:00 (6.5h)</div>
+          <div><span class="shift-tag p">P</span> <strong>Partido:</strong> 10:00-14:00 y 17:00-21:00 (8h)</div>
+          <div><span class="shift-tag l">L</span> <strong>Libre:</strong> Descanso semanal / Festivo</div>
+        </div>
+      </div>
+    `;
+
+    const actionHtml = `
+      <button class="btn btn-secondary" onclick="cockpit.asignarRefuerzoATienda('${store.name}')">⚡ Asignar Correturnos</button>
+      <button class="btn btn-primary" onclick="cockpit.redactarCorreoParaTienda('${store.name}')">✉️ Redactar Correo</button>
+    `;
+
+    this.openDrilldown(`🏬 Ficha de Tienda: ${store.name}`, `Detalle del cuadrante semanal, horarios, asesores asignados y rendimiento`, html, actionHtml);
+  }
+
+  // 3. DOSSIER INDIVIDUAL DE ASESOR COMERCIAL (Vacaciones, Comisiones, DNI, Horarios)
+  showAdvisorDossier(advisorIdOrName) {
+    const adv = this.advisors.find(a => a.id === advisorIdOrName || a.name.toLowerCase().includes(advisorIdOrName.toLowerCase())) || this.advisors[0];
+    const remVac = Math.max(0, adv.vacTotal - adv.vacTaken);
+
+    const comMov = adv.movil * 12;
+    const comFib = adv.fibra * 18;
+    const comSeg = Math.round(adv.seguros * 2.2);
+    const comEne = adv.energia * 15;
+    const comTotal = comMov + comFib + comSeg + comEne;
+
+    const initials = adv.name.split(' ').map(w => w[0]).slice(0, 2).join('');
+
+    let html = `
+      <div style="margin-bottom:0.75rem; display:flex; gap:0.5rem; flex-wrap:wrap;">
+        <span class="doc-source-tag" onclick="cockpit.openDocViewer('DOC-03')">
+          📄 Doc Fuente: Censo_Plantilla_Vacaciones_2026.xlsx 🔍
+        </span>
+        <span class="doc-source-tag" onclick="cockpit.openDocViewer('DOC-01')">
+          📄 Doc Fuente: Informe_TMT_Consolidado_28-09-2026.xlsx 🔍
+        </span>
+      </div>
+
+      <div class="dossier-header">
+        <div class="dossier-avatar">${initials}</div>
+        <div class="dossier-info">
+          <div class="dossier-name">${adv.name}</div>
+          <div class="dossier-sub">
+            <span><strong>DNI:</strong> ${adv.dni}</span>
+            <span>📍 <strong>Tienda:</strong> ${adv.center}</span>
+            <span>💼 <strong>Puesto:</strong> ${adv.role}</span>
+          </div>
+          <div style="margin-top:0.4rem; display:flex; gap:0.5rem; align-items:center;">
+            <span class="chip-badge info">Contrato ${adv.jornada}/semana</span>
+            <span class="chip-badge ${adv.state.includes('Baja') ? 'danger' : (adv.state.includes('Permiso') ? 'warning' : 'success')}">${adv.state}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Balance de Vacaciones -->
+      <div class="drilldown-section">
+        <h4>🏖️ Balance Anual de Vacaciones & Días de Asuntos Propios</h4>
+        <div class="vacation-pill-grid">
+          <div class="vac-pill tot">
+            <span class="vac-pill-num">${adv.vacTotal}</span>
+            <span class="vac-pill-lbl">Días Asignados</span>
+          </div>
+          <div class="vac-pill taken">
+            <span class="vac-pill-num">${adv.vacTaken}</span>
+            <span class="vac-pill-lbl">Disfrutados</span>
+          </div>
+          <div class="vac-pill rem">
+            <span class="vac-pill-num">${remVac}</span>
+            <span class="vac-pill-lbl">Días Pendientes</span>
+          </div>
+        </div>
+
+        <div style="margin-top: 1rem;">
+          <strong style="font-size:0.775rem; color:var(--text-muted); text-transform:uppercase;">Histórico de Períodos Registrados:</strong>
+          <div style="margin-top: 0.35rem; border: 1px solid var(--border-color); border-radius: 4px; overflow:hidden;">
+            ${adv.vacHistory.length ? adv.vacHistory.map(h => `
+              <div class="vac-history-item">
+                <div>
+                  <strong>${h.period}</strong> (${h.days} días)
+                  <br><small style="color:var(--text-muted);">${h.type}</small>
+                </div>
+                <span class="chip-badge ${h.status === 'Disfrutado' ? 'info' : 'success'}">${h.status}</span>
+              </div>
+            `).join('') : '<div style="padding:0.75rem; font-size:0.8rem; color:var(--text-muted);">No tiene solicitudes de vacaciones pendientes en este período.</div>'}
+          </div>
+        </div>
+      </div>
+
+      <!-- Desglose de Comisiones -->
+      <div class="drilldown-section">
+        <h4>💵 Precierre de Comisiones e Incentivos del Mes</h4>
+        <table class="table-flat">
+          <thead>
+            <tr><th>Concepto</th><th>Producción</th><th>Tarifa Unitaria</th><th>Total Devengado</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Líneas Móviles (Altas/Portas)</td><td>${adv.movil} líneas</td><td>12.00 € / ud</td><td><strong>${comMov.toFixed(2)} €</strong></td></tr>
+            <tr><td>Fibra Óptica / Convergencia</td><td>${adv.fibra} servicios</td><td>18.00 € / ud</td><td><strong>${comFib.toFixed(2)} €</strong></td></tr>
+            <tr><td>Seguros de Protección</td><td>${adv.seguros}% ratio</td><td>Bonus penetración</td><td><strong>${comSeg.toFixed(2)} €</strong></td></tr>
+            <tr><td>Contratos Energía</td><td>${adv.energia} activados</td><td>15.00 € / ud</td><td><strong>${comEne.toFixed(2)} €</strong></td></tr>
+            <tr style="background:#f8fafc; font-weight:700;">
+              <td colspan="3">TOTAL ESTIMADO DE COMISIONES:</td>
+              <td style="color:var(--orange); font-size:1.05rem;">${comTotal}.00 €</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Horarios de la Semana del Asesor -->
+      <div class="drilldown-section">
+        <h4>📅 Horario Asignado para la Semana en Curso</h4>
+        <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(80px, 1fr)); gap:0.4rem; text-align:center;">
+          <div class="day-box"><span class="day-lbl">Lunes</span><span style="font-size:0.75rem; font-weight:700;">${adv.shifts.L}</span></div>
+          <div class="day-box"><span class="day-lbl">Martes</span><span style="font-size:0.75rem; font-weight:700;">${adv.shifts.M}</span></div>
+          <div class="day-box"><span class="day-lbl">Miércoles</span><span style="font-size:0.75rem; font-weight:700;">${adv.shifts.X}</span></div>
+          <div class="day-box"><span class="day-lbl">Jueves</span><span style="font-size:0.75rem; font-weight:700;">${adv.shifts.J}</span></div>
+          <div class="day-box"><span class="day-lbl">Viernes</span><span style="font-size:0.75rem; font-weight:700;">${adv.shifts.V}</span></div>
+          <div class="day-box"><span class="day-lbl">Sábado</span><span style="font-size:0.75rem; font-weight:700;">${adv.shifts.S}</span></div>
+          <div class="day-box"><span class="day-lbl">Domingo</span><span style="font-size:0.75rem; font-weight:700;">${adv.shifts.D}</span></div>
+        </div>
+      </div>
+    `;
+
+    const actionHtml = `
+      <button class="btn btn-secondary" onclick="cockpit.aprobarVacacionParaAsesor('${adv.name}')">🏖️ Aprobar Vacaciones</button>
+      <button class="btn btn-primary" onclick="cockpit.redactarCorreoParaAsesor('${adv.name}')">✉️ Enviar Ficha por Correo</button>
+    `;
+
+    this.openDrilldown(`👤 Dossier: ${adv.name}`, `Expediente personal, DNI, vacaciones, comisiones calculadas y horarios semanales`, html, actionHtml);
+  }
+
+  // 4. DESGLOSE DE AUDITORÍA DE STOCK & IMEIS
+  showStockDrilldown(storeIdOrName) {
+    const store = this.stores.find(s => s.id === storeIdOrName || s.name === storeIdOrName) || this.stores[0];
+    const isOk = store.audit === 'CORRECTO';
+
+    let html = `
+      <div style="margin-bottom:0.75rem;">
+        <span class="doc-source-tag" onclick="cockpit.openDocViewer('DOC-04')">
+          📄 Doc Fuente: Actas_Auditoria_Stock_IMEIs_Sep2026.pdf 🔍
+        </span>
+      </div>
+
+      <div class="drilldown-kpi-grid">
+        <div class="drilldown-kpi-card">
+          <span class="lbl">Estado Auditoría</span>
+          <span class="val ${isOk ? 'text-success' : 'text-danger'}">${store.audit}</span>
+          <span class="sub">Inspector: Beatriz Sánchez</span>
+        </div>
+        <div class="drilldown-kpi-card">
+          <span class="lbl">Impacto Faltantes</span>
+          <span class="val ${isOk ? 'text-success' : 'text-danger'}">${store.faltante === 0 ? '0.00 €' : `${store.faltante}.00 €`}</span>
+          <span class="sub">${isOk ? 'Sin descuadre' : 'Diferencia a liquidar'}</span>
+        </div>
+        <div class="drilldown-kpi-card">
+          <span class="lbl">Stock Físico Auditado</span>
+          <span class="val text-primary">${isOk ? '145' : '143'} Uds</span>
+          <span class="sub">Teórico: 145 Uds</span>
+        </div>
+      </div>
+
+      <div class="drilldown-section">
+        <h4>📦 Inventario Físico vs Teórico por Familia</h4>
+        <table class="table-flat">
+          <thead>
+            <tr><th>Familia Producto</th><th>Teórico</th><th>Físico</th><th>Descuadre</th><th>Estado</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Terminales Gama Alta (iPhone/S24)</td><td>25</td><td>25</td><td>0</td><td><span class="chip-badge success">Correcto</span></td></tr>
+            <tr><td>Terminales Gama Media (Galaxy A / Redmi)</td><td>45</td><td>${isOk ? '45' : '44'}</td><td><strong class="${isOk ? 'text-success' : 'text-danger'}">${isOk ? '0' : '-1'}</strong></td><td><span class="chip-badge ${isOk ? 'success' : 'danger'}">${isOk ? 'Correcto' : 'Descuadre'}</span></td></tr>
+            <tr><td>Terminales Gama Entrada</td><td>30</td><td>${isOk ? '30' : '29'}</td><td><strong class="${isOk ? 'text-success' : 'text-danger'}">${isOk ? '0' : '-1'}</strong></td><td><span class="chip-badge ${isOk ? 'success' : 'danger'}">${isOk ? 'Correcto' : 'Descuadre'}</span></td></tr>
+            <tr><td>Accesorios Originales & Fundas</td><td>35</td><td>35</td><td>0</td><td><span class="chip-badge success">Correcto</span></td></tr>
+            <tr><td>Tarjetas SIM & Duplicados</td><td>10</td><td>10</td><td>0</td><td><span class="chip-badge success">Correcto</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      ${!isOk ? `
+        <div class="drilldown-section" style="border-left: 4px solid var(--red);">
+          <h4 style="color:var(--red);">🚨 Detalle de IMEIs Faltantes en Auditoría</h4>
+          <table class="table-flat">
+            <thead>
+              <tr><th>Modelo de Terminal</th><th>Código IMEI</th><th>Coste (€)</th><th>Acción Requerida</th></tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Samsung Galaxy A55 5G 128GB Azul</strong></td>
+                <td><code>354892110482910</code></td>
+                <td>-120.00 €</td>
+                <td><span class="chip-badge danger">Reclamar al Responsable</span></td>
+              </tr>
+              <tr>
+                <td><strong>Xiaomi Redmi 13C 128GB Negro</strong></td>
+                <td><code>864192049182334</code></td>
+                <td>-60.00 €</td>
+                <td><span class="chip-badge danger">Reclamar al Responsable</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      ` : ''}
+    `;
+
+    const actionHtml = `
+      <button class="btn btn-primary" onclick="cockpit.descargarActaPdf('${store.name}')">📄 Descargar Acta Oficial Firmada</button>
+    `;
+
+    this.openDrilldown(`📦 Auditoría de Stock: ${store.name}`, `Detalle del recuento físico, descuadres, números de serie e IMEIs`, html, actionHtml);
+  }
+
+  // ==========================================
+  // CENTRO DE CORREOS & PLANTILLAS
+  // ==========================================
+  applyEmailTemplate() {
+    const sel = document.getElementById('emailTplSelect');
+    if (!sel) return;
+    const val = sel.value;
+    const to = document.getElementById('emailTo');
+    const cc = document.getElementById('emailCc');
+    const subj = document.getElementById('emailSubject');
+    const body = document.getElementById('emailBody');
+
+    const totalM = this.stores.reduce((a, b) => a + b.realMovil, 0);
+    const totalF = this.stores.reduce((a, b) => a + b.realFibra, 0);
+    const avgSeg = (this.stores.reduce((a, b) => a + b.segurosPct, 0) / this.stores.length).toFixed(1);
+    const totalEne = this.stores.reduce((a, b) => a + b.energia, 0);
+
+    if (val === 'cierre_diario') {
+      to.value = 'direccion.comercial@promovil.es';
+      cc.value = 'central@promovil.es';
+      subj.value = `Reporte de Cierre y Producción TMT - Zona Centro - 29/09/2026`;
+      body.value = `Buenos días,
+
+Adjunto el resumen consolidado de producción y seguimiento de la Zona Centro:
+
+📊 RESUMEN GENERAL ZONA CENTRO:
+- Líneas Móviles (Altas + Portas): ${totalM} líneas (90.0% del objetivo mensual).
+- Fibra / Conectividad: ${totalF} ventas (94.8% del objetivo).
+- % Penetración Seguros y SVA: ${avgSeg}% (superando el umbral mínimo del 35%).
+- Captación Energía (Luz): ${totalEne} contratos (Campaña Energy Days).
+- Run-Rate Proyectado a Fin de Mes: 108.4% (ritmo óptimo).
+
+🏬 DESTACADOS POR TIENDA:
+- CC La Gavia y CC La Vaguada lideran en convergencia y seguros (>44%).
+- Getafe y CC Tres Aguas mantienen consecución por encima del 95%.
+- Cobertura: Paseo de Extremadura con refuerzo asignado para el turno de tarde.
+
+Quedo a vuestra disposición para cualquier aclaración.
+
+Un saludo,
+Beatriz Sánchez Alonso
+Coordinadora de Zona | Grupo Promovil`;
+    }
+    else if (val === 'cuadrantes_rrhh') {
+      to.value = 'personal@promovil.es; cuadrantes@promovil.es';
+      cc.value = '';
+      subj.value = `Cuadrantes Mensuales Aprobados - Zona Centro - Próximo Mes`;
+      body.value = `Estimado equipo de RRHH / Personal,
+
+Os remito adjuntos los cuadrantes definitivos y aprobados correspondientes a la plantilla de las 11 tiendas de la Zona Centro para el próximo mes.
+
+Aspectos clave considerados:
+1. Cobertura completa de aperturas y cierres conforme a los umbrales mínimos establecidos.
+2. Turnos de festivos y domingos comerciales asignados con rotación equitativa.
+3. Sustituciones y asignación de correturnos planificadas para las bajas médicas y vacaciones autorizadas.
+
+Cualquier ajuste sobrevenido os será notificado de inmediato.
+
+Un cordial saludo,
+Beatriz Sánchez Alonso
+Coordinadora de Zona | Grupo Promovil`;
+    }
+    else if (val === 'propuesta_objetivos') {
+      to.value = 'direccion.comercial@promovil.es';
+      cc.value = '';
+      subj.value = `Propuesta de Objetivos Comerciales y TMT - Próximo Mes - Beatriz Sánchez`;
+      body.value = `Hola,
+
+Adjunto el archivo con la propuesta detallada de objetivos comerciales por punto de venta y asesor para el próximo mes.
+
+Resumen de la propuesta:
+- Móvil: 390 líneas distribuidas entre las 11 tiendas.
+- Fibra: 140 servicios.
+- Energía: 65 contratos.
+- Seguros: 40% de ratio de penetración mínima sobre venta de terminales.
+
+Se ha ponderado el histórico de tráfico de cada centro comercial y tienda urbana para garantizar metas retadoras pero alcanzables.
+
+Quedo pendiente de vuestra validación.
+
+Beatriz Sánchez Alonso`;
+    }
+    else if (val === 'liquidacion_gastos') {
+      to.value = 'administracion@promovil.es; contabilidad@promovil.es';
+      cc.value = '';
+      subj.value = `Liquidación Mensual de Gastos de Tienda - Zona Centro - Beatriz Sánchez`;
+      body.value = `Estimado departamento de Administración,
+
+Adjunto la plantilla de liquidación de gastos operativos y caja chica de las tiendas de la Zona Centro correspondiente a este mes, junto con los comprobantes y tickets escaneados.
+
+Total liquidado: 2,145.00 € (dentro del presupuesto asignado de 3,310.00 €).
+Partidas principales:
+- Limpieza y suministros básicos: 480.00 €
+- Caja chica / dietas justificadas: 920.00 €
+- Mantenimiento y material de oficina: 745.00 €
+
+Ruego confirmación de recepción y tramitación.
+
+Muchas gracias,
+Beatriz Sánchez`;
+    }
+    else if (val === 'reclamacion_comisiones') {
+      to.value = 'nominas@promovil.es; personal@promovil.es';
+      cc.value = '';
+      subj.value = `Validación y Precierre de Comisiones Comerciales - Zona Centro`;
+      body.value = `Hola,
+
+Adjunto la revisión y precierre de comisiones de los 48 asesores comerciales de la Zona Centro.
+
+Todos los expedientes han sido cotejados con las actas de producción TMT y los contratos de energía y seguros efectivamente activados.
+
+Solicito confirmación antes de la emisión final de las nóminas del mes.
+
+Atentamente,
+Beatriz Sánchez Alonso`;
+    }
+    else if (val === 'aviso_correturnos') {
+      to.value = 'extremadura@promovil.es; correturnos@promovil.es';
+      cc.value = '';
+      subj.value = `Aviso Operativo: Asignación de Refuerzo / Correturnos para Turno de Tarde`;
+      body.value = `Estimado equipo,
+
+Os informo que debido al permiso de personal en la tienda, se ha asignado al correturnos Andrea Cerdá para cubrir el turno de tarde (16:30 a 20:30) y garantizar la dotación mínima requerida.
+
+Por favor, confirmar recepción en la apertura de turno.
+
+Beatriz Sánchez`;
+    }
+    else if (val === 'aprobacion_vacaciones') {
+      to.value = 'comercial@promovil.es; personal@promovil.es';
+      cc.value = '';
+      subj.value = `Confirmación y Aprobación de Solicitud de Vacaciones`;
+      body.value = `Hola,
+
+Te confirmo que tu solicitud de vacaciones para el período indicado ha sido revisada y aprobada. Los días han quedado descontados en tu balance anual y comunicados a RRHH.
+
+¡Que disfrutes de tus días de descanso!
+
+Beatriz Sánchez`;
+    }
+  }
+
+  copyEmail() {
+    const to = document.getElementById('emailTo').value;
+    const cc = document.getElementById('emailCc').value;
+    const subj = document.getElementById('emailSubject').value;
+    const body = document.getElementById('emailBody').value;
+
+    const full = `Para: ${to}\n${cc ? `CC: ${cc}\n` : ''}Asunto: ${subj}\n\n${body}`;
+    navigator.clipboard.writeText(full).then(() => {
+      this.toast('📋 ¡Correo copiado al portapapeles!');
+    }).catch(() => {
+      this.toast('Error al copiar texto');
+    });
+  }
+
+  // ========================================================
+  // ENVÍO CON DOBLE COMPROBACIÓN Y MEMORIA DE SALIDA (OUTBOX)
+  // ========================================================
+  switchEmailSubTab(subTab) {
+    const btnIn = document.getElementById('btnTabInbox');
+    const btnOut = document.getElementById('btnTabOutbox');
+    const cIn = document.getElementById('inboxStreamContainer');
+    const cOut = document.getElementById('outboxStreamContainer');
+
+    if (subTab === 'inbox') {
+      if (btnIn) btnIn.classList.add('active');
+      if (btnOut) btnOut.classList.remove('active');
+      if (cIn) cIn.style.display = 'flex';
+      if (cOut) cOut.style.display = 'none';
+    } else {
+      if (btnIn) btnIn.classList.remove('active');
+      if (btnOut) btnOut.classList.add('active');
+      if (cIn) cIn.style.display = 'none';
+      if (cOut) cOut.style.display = 'flex';
+      this.renderOutboxStream();
+    }
+  }
+
+  renderOutboxStream() {
+    const cOut = document.getElementById('outboxStreamContainer');
+    if (!cOut) return;
+
+    if (!this.sentEmailsHistory.length) {
+      cOut.innerHTML = `<div style="padding:1.5rem; text-align:center; color:var(--text-muted); font-size:0.85rem;">No hay correos registrados en el historial de salida todavía.</div>`;
+      return;
+    }
+
+    cOut.innerHTML = this.sentEmailsHistory.map(email => `
+      <div class="inbox-card" onclick="cockpit.verDetalleEmailEnviado('${email.id}')" title="Clic para ver comprobante y contenido enviado">
+        <div class="inbox-head">
+          <strong style="color:var(--orange);">📤 Para: ${email.to}</strong>
+          <span class="inbox-time">${email.date}</span>
+        </div>
+        <div style="font-size:0.775rem; font-weight:700; color:var(--text-primary); margin-bottom:0.25rem;">
+          ${email.subject}
+        </div>
+        <div class="inbox-msg">${email.preview}</div>
+        <div class="inbox-tags">
+          <span class="chip-badge success">${email.status}</span>
+          ${email.cc ? `<span class="chip-badge">CC: ${email.cc}</span>` : ''}
+          <span class="chip-badge info">De: ${email.from}</span>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  sendEmail() {
+    const to = document.getElementById('emailTo').value.trim();
+    const cc = document.getElementById('emailCc').value.trim();
+    const subj = document.getElementById('emailSubject').value.trim();
+    const body = document.getElementById('emailBody').value.trim();
+
+    if (!to) {
+      alert('⚠️ Por favor indica al menos un destinatario en el campo "Para".');
+      return;
+    }
+
+    // Doble Comprobación: Rellenar y abrir modal de confirmación
+    const confirmTo = document.getElementById('confirmTo');
+    const confirmCc = document.getElementById('confirmCc');
+    const confirmCcRow = document.getElementById('confirmCcRow');
+    const confirmSubject = document.getElementById('confirmSubject');
+    const confirmBodyPreview = document.getElementById('confirmBodyPreview');
+    const modal = document.getElementById('modalConfirmEmail');
+
+    if (confirmTo) confirmTo.textContent = to;
+    if (confirmCc) confirmCc.textContent = cc || '(Sin copia)';
+    if (confirmCcRow) confirmCcRow.style.display = cc ? 'flex' : 'none';
+    if (confirmSubject) confirmSubject.textContent = subj;
+    if (confirmBodyPreview) confirmBodyPreview.textContent = body;
+
+    if (modal) modal.classList.add('open');
+  }
+
+  confirmAndDispatchEmail() {
+    const to = document.getElementById('emailTo').value.trim();
+    const cc = document.getElementById('emailCc').value.trim();
+    const subj = document.getElementById('emailSubject').value.trim();
+    const body = document.getElementById('emailBody').value.trim();
+
+    this.closeModal('modalConfirmEmail');
+
+    const now = new Date();
+    const dateStr = `Hoy ${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
+    const newRecord = {
+      id: `SENT-${Date.now().toString().slice(-4)}`,
+      date: dateStr,
+      from: "beatriz.sanchez@promovil.es (Ionos Oficial)",
+      to: to,
+      cc: cc,
+      subject: subj,
+      preview: body.slice(0, 110) + (body.length > 110 ? '...' : ''),
+      body: body,
+      status: "🟢 Entregado vía Ionos Mail",
+      sha: Math.random().toString(36).substring(2, 10)
+    };
+
+    // Añadir al historial de salida (Memoria persistente de envíos)
+    this.sentEmailsHistory.unshift(newRecord);
+
+    this.toast(`🚀 Enviando correo oficial a ${to}...`);
+    setTimeout(() => {
+      this.toast(`✅ Correo enviado con éxito a ${to} y registrado en el historial de salida.`);
+      this.switchEmailSubTab('outbox');
+    }, 800);
+  }
+
+  verDetalleEmailEnviado(emailId) {
+    const email = this.sentEmailsHistory.find(e => e.id === emailId);
+    if (!email) return;
+
+    let html = `
+      <div style="background:#f0fdf4; border:1px solid #bbf7d0; border-radius:var(--radius); padding:0.85rem; font-size:0.8rem; display:flex; justify-content:space-between; align-items:center;">
+        <div>
+          <strong style="color:var(--green);">${email.status}</strong>
+          <br><small style="color:var(--text-muted);">Fecha y Hora: ${email.date} | Hash: ${email.sha}</small>
+        </div>
+        <span class="chip-badge success">Entrega Confirmada</span>
+      </div>
+
+      <div class="drilldown-section">
+        <h4>📋 Cabecera del Mensaje Oficial</h4>
+        <div style="font-size:0.8rem; display:flex; flex-direction:column; gap:0.35rem;">
+          <div><strong>De:</strong> ${email.from}</div>
+          <div><strong>Para:</strong> <span style="color:var(--orange); font-weight:700;">${email.to}</span></div>
+          ${email.cc ? `<div><strong>Con Copia (CC):</strong> ${email.cc}</div>` : ''}
+          <div><strong>Asunto:</strong> ${email.subject}</div>
+        </div>
+      </div>
+
+      <div class="drilldown-section">
+        <h4>📝 Contenido Íntegro Transmitido</h4>
+        <div style="white-space:pre-wrap; font-family:inherit; font-size:0.825rem; line-height:1.5; color:var(--text-secondary); background:var(--bg-subtle); padding:1rem; border-radius:var(--radius);">
+${email.body}
+        </div>
+      </div>
+    `;
+
+    this.openDrilldown(`📤 Comprobante de Envío: ${email.subject}`, `Registro de entrega oficial y trazabilidad de salida`, html);
+  }
+
+  loadInboxIntoDashboard(tiendaKey) {
+    this.toast(`📥 Abriendo expediente de correo de ${tiendaKey}...`);
+    if (tiendaKey === 'gavia') this.showStoreSchedule('234-CC LA GAVIA');
+    else if (tiendaKey === 'extremadura') this.showStoreSchedule('245-PASEO EXTREMADURA');
+    else if (tiendaKey === 'principe_pio') this.showStoreSchedule('205-CC PRINCIPE PIO');
+    else if (tiendaKey === 'vaguada') this.showStockDrilldown('226-CC LA VAGUADA 2');
+  }
+
+  // Modales y Acciones Rápidas
+  openIngestaModal() {
+    const m = document.getElementById('modalIngesta');
+    if (m) m.classList.add('open');
+  }
+
+  closeModal(id) {
+    const m = document.getElementById(id);
+    if (m) m.classList.remove('open');
+  }
+
+  submitCierre(e) {
+    e.preventDefault();
+    const storeId = document.getElementById('modalCierreStore').value;
+    const altas = parseInt(document.getElementById('cierreAltas').value, 10) || 0;
+    const portas = parseInt(document.getElementById('cierrePortas').value, 10) || 0;
+    const fibra = parseInt(document.getElementById('cierreFibra').value, 10) || 0;
+    const energia = parseInt(document.getElementById('cierreEnergia').value, 10) || 0;
+
+    const store = this.stores.find(s => s.id === storeId);
+    if (store) {
+      store.realMovil += (altas + portas);
+      store.realFibra += fibra;
+      store.energia += energia;
+      this.render();
+      this.closeModal('modalIngesta');
+      this.toast(`✅ Cierre de ${store.name} integrado en tiempo real.`);
+    }
+  }
+
+  openAsignarCorreturnosModal() {
+    const store = prompt('¿A qué tienda deseas asignar el correturnos? (ej: Paseo de Extremadura)', 'Paseo de Extremadura');
+    if (store) {
+      this.asignarRefuerzoATienda(store);
+    }
+  }
+
+  asignarRefuerzoATienda(tienda) {
+    this.closeDrilldown();
+    this.toast(`⚡ Correturnos Andrea Cerdá asignada a ${tienda}`);
+    this.switchTab('emails');
+    const sel = document.getElementById('emailTplSelect');
+    if (sel) {
+      sel.value = 'aviso_correturnos';
+      this.applyEmailTemplate();
+    }
+  }
+
+  redactarCorreoParaTienda(tienda) {
+    this.closeDrilldown();
+    this.switchTab('emails');
+    const subj = document.getElementById('emailSubject');
+    if (subj) subj.value = `Instrucciones Operativas y Seguimiento - Tienda ${tienda}`;
+    this.toast(`✉️ Redactor abierto para ${tienda}`);
+  }
+
+  redactarCorreoParaAsesor(asesor) {
+    this.closeDrilldown();
+    this.switchTab('emails');
+    const subj = document.getElementById('emailSubject');
+    if (subj) subj.value = `Ficha de Seguimiento y Balance de Comisiones - ${asesor}`;
+    this.toast(`✉️ Redactor abierto para ${asesor}`);
+  }
+
+  aprobarVacacionParaAsesor(asesor) {
+    this.closeDrilldown();
+    this.switchTab('emails');
+    const sel = document.getElementById('emailTplSelect');
+    if (sel) {
+      sel.value = 'aprobacion_vacaciones';
+      this.applyEmailTemplate();
+    }
+    const subj = document.getElementById('emailSubject');
+    if (subj) subj.value = `Confirmación y Aprobación de Solicitud de Vacaciones - ${asesor}`;
+    this.toast(`🏖️ Plantilla de vacaciones generada para ${asesor}`);
+  }
+
+  openNuevaAuditoriaModal() {
+    const tienda = prompt('Introduce el nombre de la tienda para la nueva acta:', 'CC La Gavia');
+    if (tienda) {
+      this.showStockDrilldown(tienda);
+    }
+  }
+
+  openRegistrarVacacionModal() {
+    this.switchTab('emails');
+    const sel = document.getElementById('emailTplSelect');
+    if (sel) {
+      sel.value = 'aprobacion_vacaciones';
+      this.applyEmailTemplate();
+    }
+    this.toast('📅 Abriendo plantilla de aprobación de vacaciones');
+  }
+
+  descargarActaPdf(tienda) {
+    this.toast(`📥 Generando acta oficial de auditoría en PDF para ${tienda}...`);
+  }
+
+  exportarComisionesExcel() {
+    this.toast('📥 Generando archivo Excel con el precierre de nóminas...');
+  }
+
+  toast(msg) {
+    const t = document.getElementById('toastMessage');
+    if (!t) return;
+    t.textContent = msg;
+    t.style.display = 'block';
+    setTimeout(() => { t.style.display = 'none'; }, 3200);
   }
 }
 
-// Inicialización global
-const app = new GestionBeaApp();
+const cockpit = new PromovilCockpit();
