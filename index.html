@@ -117,14 +117,22 @@
         </div>
 
         <div class="topbar-quick-btns">
+          <div class="sync-timestamp-badge" id="topbarSyncStatus" title="Última actualización de fuentes de datos">
+            <span class="status-dot green"></span>
+            <span id="topbarSyncTime">Sincronizado: Hoy 05:55</span>
+          </div>
+          <button class="btn-sync" id="masterSyncBtn" onclick="cockpit.iniciarSincronizacionIntegral()" title="Sincronizar emails, adjuntos, disco duro y WhatsApp">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21.5 2v6h-6M2.5 22v-6h6M2 11.5a10 10 0 0 1 18.8-4.3M22 12.5a10 10 0 0 1-18.8 4.3"/></svg>
+            <span>🔄 Sincronizar & Actualizar Todo</span>
+          </button>
           <button class="btn btn-secondary" onclick="cockpit.switchTab('documentos')">
-            📁 Repositorio Documental
+            📁 Documentos (8)
           </button>
           <button class="btn btn-secondary" onclick="cockpit.openIngestaModal()">
-            📥 Registrar Cierre
+            📥 Cierre Rápido
           </button>
           <button class="btn btn-primary" onclick="cockpit.switchTab('emails')">
-            ✉️ Redactar Correo
+            ✉️ Redactar
           </button>
         </div>
       </header>
@@ -1020,6 +1028,54 @@
 
       <div class="modal-footer" id="revSolFooter">
         <!-- Botones con doble confirmación -->
+      </div>
+    </div>
+  </div>
+
+  <!-- ======================================================== -->
+  <!-- MODAL: PROGRESO DE SINCRONIZACIÓN INTEGRAL EN VIVO       -->
+  <!-- ======================================================== -->
+  <div id="modalSyncProgress" class="modal-backdrop">
+    <div class="modal-flat" style="max-width: 640px;">
+      <div class="modal-head">
+        <div style="display:flex; align-items:center; gap:0.6rem;">
+          <span style="font-size:1.4rem;">🔄</span>
+          <div>
+            <h3>Sincronización & Ingesta Integral en Curso</h3>
+            <span style="font-size:0.75rem; color:var(--text-muted);">Emails, Adjuntos, Disco Duro Mac y WhatsApp</span>
+          </div>
+        </div>
+        <button class="modal-close" onclick="cockpit.closeModal('modalSyncProgress')">&times;</button>
+      </div>
+
+      <div class="modal-body">
+        <div class="sync-progress-box">
+          <div style="display:flex; justify-content:space-between; align-items:center; font-size:0.85rem; font-weight:700;">
+            <span id="syncCurrentStage">Iniciando escaneo de fuentes...</span>
+            <span id="syncPercentText" style="color:var(--orange);">0%</span>
+          </div>
+          <div class="sync-progress-bar-container">
+            <div class="sync-progress-bar-fill" id="syncProgressBar"></div>
+          </div>
+        </div>
+
+        <div style="margin-top: 1rem;">
+          <div style="font-size:0.75rem; font-weight:700; color:var(--text-muted); text-transform:uppercase; margin-bottom:0.35rem;">
+            Terminal de Sincronización en Tiempo Real:
+          </div>
+          <div class="sync-log-terminal" id="syncTerminalLog">
+            <!-- Log entries stream dynamically -->
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-footer" style="justify-content:space-between;">
+        <span style="font-size:0.75rem; color:var(--text-muted);">
+          🛡️ Sincronización en modo Solo Lectura (Archivos del Mac 100% seguros).
+        </span>
+        <button type="button" class="btn btn-primary" id="syncCloseBtn" onclick="cockpit.closeModal('modalSyncProgress')" disabled>
+          Procesando...
+        </button>
       </div>
     </div>
   </div>
