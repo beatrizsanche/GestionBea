@@ -7,7 +7,7 @@
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
   <title>PROMOVIL OPS - Cockpit de Control con Desglose y Trazabilidad Documental</title>
-  <link rel="stylesheet" href="css/styles.css?v=2.7.0">
+  <link rel="stylesheet" href="css/styles.css?v=2.8.0">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -46,6 +46,10 @@
         <button class="nav-tab active" data-tab="comercial">
           <svg width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M18 20V10M12 20V4M6 20v-6"/></svg>
           Seguimiento TMT & Ventas
+        </button>
+        <button class="nav-tab" data-tab="objetivos">
+          <svg width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>
+          Objetivos del Mes & Planes
         </button>
         <button class="nav-tab" data-tab="estadisticas">
           <svg width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 3v18h18"/><path d="M18 17V9"/><path d="M13 17V5"/><path d="M8 17v-3"/></svg>
@@ -341,6 +345,304 @@
                 </thead>
                 <tbody id="rankingTbody"></tbody>
               </table>
+            </div>
+          </div>
+        </section>
+
+
+        <!-- ======================================================== -->
+        <!-- MÓDULO: OBJETIVOS DEL MES & PLANES DE ACCIÓN OPERATIVO   -->
+        <!-- ======================================================== -->
+        <section id="objetivosView" class="view-panel">
+          <div class="section-title-bar">
+            <div>
+              <div style="display:flex; align-items:center; gap:0.6rem; flex-wrap:wrap;">
+                <h2 class="view-h2">🎯 Objetivos del Mes, Consecución & Planes de Acción</h2>
+                <span class="doc-source-tag" onclick="cockpit.openDocViewer('DOC-01')">
+                  📄 Doc Fuente: Informe_TMT_Consolidado_28-09-2026.xlsx 🔍
+                </span>
+              </div>
+              <p class="view-sub">Seguimiento en tiempo real de metas mensuales de empresa, control de brechas por tienda, directivas tácticas y generador de planes de actuación transferibles.</p>
+            </div>
+            <div class="header-actions">
+              <button class="btn btn-secondary" onclick="cockpit.copiarWhatsAppResumenTienda('all')">
+                💬 Directiva WhatsApp Zona
+              </button>
+              <button class="btn btn-primary" onclick="cockpit.switchTab('emails')">
+                ✉️ Ir a Centro de Plantillas & Correos
+              </button>
+            </div>
+          </div>
+
+          <!-- 4 KPIs Ejecutivos de Objetivos de Mes con Barras de Progreso -->
+          <div class="kpi-grid" style="grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); margin-bottom:1.25rem;">
+            <div class="metric-card">
+              <div class="metric-head">
+                <span class="metric-title">📱 LÍNEAS MÓVILES (A/P)</span>
+                <span class="metric-icon">📱</span>
+              </div>
+              <div class="metric-val">342 <span style="font-size:0.9rem; color:var(--text-muted); font-weight:500;">/ Obj. 380</span></div>
+              <div class="tile-progress" style="margin:0.4rem 0;">
+                <div class="bar" style="width: 90.0%; background:#ff7900;"></div>
+              </div>
+              <div style="display:flex; justify-content:space-between; font-size:0.75rem;">
+                <span class="text-success">90.0% conseguido</span>
+                <span style="color:var(--orange); font-weight:700;">Faltan 38 líneas</span>
+              </div>
+            </div>
+
+            <div class="metric-card">
+              <div class="metric-head">
+                <span class="metric-title">🌐 FIBRA & CONVERGENCIA</span>
+                <span class="metric-icon">🌐</span>
+              </div>
+              <div class="metric-val">128 <span style="font-size:0.9rem; color:var(--text-muted); font-weight:500;">/ Obj. 135</span></div>
+              <div class="tile-progress" style="margin:0.4rem 0;">
+                <div class="bar" style="width: 94.8%; background:#2563eb;"></div>
+              </div>
+              <div style="display:flex; justify-content:space-between; font-size:0.75rem;">
+                <span class="text-success">94.8% conseguido</span>
+                <span style="color:#2563eb; font-weight:700;">Faltan 7 fibras</span>
+              </div>
+            </div>
+
+            <div class="metric-card">
+              <div class="metric-head">
+                <span class="metric-title">🛡️ PENETRACIÓN SEGUROS</span>
+                <span class="metric-icon">💎</span>
+              </div>
+              <div class="metric-val text-success">42.6% <span style="font-size:0.85rem; color:var(--text-muted); font-weight:500;">/ Mín. 35.0%</span></div>
+              <div class="tile-progress" style="margin:0.4rem 0;">
+                <div class="bar" style="width: 100%; background:#16a34a;"></div>
+              </div>
+              <div style="display:flex; justify-content:space-between; font-size:0.75rem;">
+                <span class="text-success">▲ +7.6% sobre mínimo</span>
+                <span style="color:#16a34a; font-weight:700;">Tramo Máximo (+120%)</span>
+              </div>
+            </div>
+
+            <div class="metric-card">
+              <div class="metric-head">
+                <span class="metric-title">⚡ CONTRATOS ENERGÍA (LUZ)</span>
+                <span class="metric-icon">⚡</span>
+              </div>
+              <div class="metric-val text-success">64 <span style="font-size:0.85rem; color:var(--text-muted); font-weight:500;">/ Obj. 60</span></div>
+              <div class="tile-progress" style="margin:0.4rem 0;">
+                <div class="bar" style="width: 100%; background:#d97706;"></div>
+              </div>
+              <div style="display:flex; justify-content:space-between; font-size:0.75rem;">
+                <span class="text-success">106.7% (Superado)</span>
+                <span style="color:#d97706; font-weight:700;">+4 contratos extra</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Subpestañas del Módulo Objetivos -->
+          <div class="subtabs-bar" style="margin-bottom:1.25rem;">
+            <button class="subtab-btn active" id="btnObjSubEstado" onclick="cockpit.switchObjSubTab('estado')">
+              📊 Cómo Vamos: Brecha por Tienda (11 PDV)
+            </button>
+            <button class="subtab-btn" id="btnObjSubAcciones" onclick="cockpit.switchObjSubTab('acciones')">
+              🚀 Acciones a Tomar & 5 Focos Operativos
+            </button>
+            <button class="subtab-btn" id="btnObjSubGenerador" onclick="cockpit.switchObjSubTab('generador')">
+              📝 Generador & Editor de Informes para Tiendas
+            </button>
+          </div>
+
+          <!-- SUBTAB 1: CÓMO VAMOS (ESTADO POR TIENDA) -->
+          <div id="objSubEstado" class="obj-subtab-pane active">
+            <div class="flat-panel">
+              <div class="panel-head" style="justify-content:space-between; align-items:center;">
+                <div>
+                  <h3 style="margin-bottom:0.15rem;">🏪 Cuadro de Consecución y Faltante por Punto de Venta</h3>
+                  <small style="color:var(--text-muted);">Haz clic en "🎯 Generar Plan" en cualquier tienda para preparar el informe y enviarlo a Centro de Correos.</small>
+                </div>
+                <span class="chip-badge success">11 Tiendas Monitorizadas</span>
+              </div>
+              <div class="panel-body" style="padding:0;">
+                <div class="table-responsive">
+                  <table class="data-table">
+                    <thead>
+                      <tr>
+                        <th>Tienda (PDV)</th>
+                        <th>Canal</th>
+                        <th>Móvil (Real/Obj)</th>
+                        <th>Fibra (Real/Obj)</th>
+                        <th>% Seguros</th>
+                        <th>Energía</th>
+                        <th>Faltante (100%)</th>
+                        <th>Semáforo</th>
+                        <th>Acción Directa</th>
+                      </tr>
+                    </thead>
+                    <tbody id="objetivosStoresTbody"></tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- SUBTAB 2: ACCIONES A TOMAR & 5 FOCOS OPERATIVOS -->
+          <div id="objSubAcciones" class="obj-subtab-pane" style="display:none;">
+            <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap:1rem;">
+              <!-- Foco 1 -->
+              <div class="flat-panel" style="border-left:4px solid #ff7900;">
+                <div class="panel-head">
+                  <h3 style="color:#c2410c;">📱 Foco 1: Palanca de Portabilidades & Retención</h3>
+                </div>
+                <div class="panel-body" style="font-size:0.85rem; color:#334155; line-height:1.5;">
+                  <ul style="padding-left:1.1rem; margin:0 0 0.75rem 0;">
+                    <li><strong>Auditoría de Cuenta</strong>: Comprobar segundas líneas y tarifas familiares en cada trámite o consulta de mostrador.</li>
+                    <li><strong>Ofertas de Valor</strong>: Utilizar la subvención de terminales en portabilidades para cerrar ventas cruzadas.</li>
+                    <li><strong>Meta Diaria de Cierre</strong>: 19 portabilidades/día en la zona para superar las 380 líneas.</li>
+                  </ul>
+                  <div style="background:#fff7ed; padding:0.5rem 0.75rem; border-radius:var(--radius); font-size:0.75rem; color:#9a3412;">
+                    💡 <em>Pauta: Ningún cliente sale de tienda sin haber revisado su convergencia y opciones de ahorro Love.</em>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Foco 2 -->
+              <div class="flat-panel" style="border-left:4px solid #16a34a;">
+                <div class="panel-head">
+                  <h3 style="color:#15803d;">🛡️ Foco 2: Sistemática de Seguros CHUBB (Obligatorio)</h3>
+                </div>
+                <div class="panel-body" style="font-size:0.85rem; color:#334155; line-height:1.5;">
+                  <ul style="padding-left:1.1rem; margin:0 0 0.75rem 0;">
+                    <li><strong>Ofrecimiento en Pantalla</strong>: Presentar el seguro en el 100% de terminales libres y financiados.</li>
+                    <li><strong>Gama Premium y Media</strong>: Explicar cobertura total de daño accidental, rotura de pantalla y robo.</li>
+                    <li><strong>Incentivo Asesor</strong>: Hasta 20€/póliza directa en nómina.</li>
+                  </ul>
+                  <div style="background:#f0fdf4; padding:0.5rem 0.75rem; border-radius:var(--radius); font-size:0.75rem; color:#166534;">
+                    🏆 <em>Zona actual: 42.6% (Tramo Máximo Bonificado). Mantener por encima del 40% en todas las tiendas.</em>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Foco 3 -->
+              <div class="flat-panel" style="border-left:4px solid #d97706;">
+                <div class="panel-head">
+                  <h3 style="color:#b45309;">⚡ Foco 3: Campaña Orange Energía (Luz & Gas)</h3>
+                </div>
+                <div class="panel-body" style="font-size:0.85rem; color:#334155; line-height:1.5;">
+                  <ul style="padding-left:1.1rem; margin:0 0 0.75rem 0;">
+                    <li><strong>Estudio de Factura</strong>: Pedir la factura eléctrica a los clientes de fibra y paquetes Love.</li>
+                    <li><strong>Descuento Cruzado</strong>: Recordar el descuento directo en la factura Orange de telecomunicaciones.</li>
+                    <li><strong>Bonus Tienda</strong>: 15€ adicionales por contrato conectado.</li>
+                  </ul>
+                  <div style="background:#fefce8; padding:0.5rem 0.75rem; border-radius:var(--radius); font-size:0.75rem; color:#854d0e;">
+                    🎉 <em>Meta mensual superada (64/60 ctos). Foco en mantener el ritmo en Getafe y Loranca.</em>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Foco 4 -->
+              <div class="flat-panel" style="border-left:4px solid #2563eb;">
+                <div class="panel-head">
+                  <h3 style="color:#1d4ed8;">⏱️ Foco 4: Cobertura Máxima en Horas Punta</h3>
+                </div>
+                <div class="panel-body" style="font-size:0.85rem; color:#334155; line-height:1.5;">
+                  <ul style="padding-left:1.1rem; margin:0 0 0.75rem 0;">
+                    <li><strong>Presencia en Mostrador</strong>: 100% de asesores disponibles entre las 17:30 y 20:30 y sábados completos.</li>
+                    <li><strong>Refuerzos de Zona</strong>: Apoyo de correturnos en Paseo de Extremadura y CC Príncipe Pío.</li>
+                    <li><strong>Pausas Comerciales</strong>: Prohibidas durante picos de afluencia de clientes.</li>
+                  </ul>
+                  <div style="background:#eff6ff; padding:0.5rem 0.75rem; border-radius:var(--radius); font-size:0.75rem; color:#1e40af;">
+                    📋 <em>Pauta: Apertura y cierre supervisados según cuadrante aprobado.</em>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Foco 5 -->
+              <div class="flat-panel" style="border-left:4px solid #dc2626;">
+                <div class="panel-head">
+                  <h3 style="color:#b91c1c;">💰 Foco 5: Arqueo Diario de Caja & Control Stock IMEI</h3>
+                </div>
+                <div class="panel-body" style="font-size:0.85rem; color:#334155; line-height:1.5;">
+                  <ul style="padding-left:1.1rem; margin:0 0 0.75rem 0;">
+                    <li><strong>Recuento Físico Diario</strong>: Comprobación de terminales por IMEI en cada relevo de turno.</li>
+                    <li><strong>Cuadre de Caja</strong>: Justificación de tickets de caja chica y depósito en sobre ciego.</li>
+                    <li><strong>Plan de Choque</strong>: Seguimiento especial en CC La Vaguada (-180€) y Getafe (-200€).</li>
+                  </ul>
+                  <div style="background:#fef2f2; padding:0.5rem 0.75rem; border-radius:var(--radius); font-size:0.75rem; color:#991b1b;">
+                    🔍 <em>Tolerancia cero a descuadres. Actas remitidas diariamente por correo antes de las 21:30.</em>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- SUBTAB 3: GENERADOR & EDITOR DE INFORMES PARA TIENDAS -->
+          <div id="objSubGenerador" class="obj-subtab-pane" style="display:none;">
+            <div class="flat-panel" style="margin-bottom:1rem;">
+              <div class="panel-head" style="justify-content:space-between; align-items:center;">
+                <h3>🎯 Generador de Directivas & Planes de Acción para Tiendas</h3>
+                <span class="chip-badge success">Editor en Vivo</span>
+              </div>
+              <div class="panel-body">
+                <div style="display:grid; grid-template-columns: 1.2fr 1.2fr auto; gap:0.75rem; align-items:flex-end; margin-bottom:1rem;">
+                  <div>
+                    <label style="font-size:0.75rem; font-weight:700; color:var(--text-muted); display:block; margin-bottom:0.35rem;">SELECCIONA LA TIENDA:</label>
+                    <select id="objGenStoreSelect" class="select-flat full" onchange="cockpit.generarBorradorEnObjetivosView()">
+                      <option value="all">🌐 Todas las Tiendas (Directiva Global Zona Centro)</option>
+                      <option value="234-CC LA GAVIA" selected>CC La Gavia (Erika Castillo)</option>
+                      <option value="238-TRES AGUAS">CC Tres Aguas (Arturo Villafranca)</option>
+                      <option value="226-CC LA VAGUADA 2">CC La Vaguada (Eduardo Mateos)</option>
+                      <option value="205-CC PRINCIPE PIO">CC Príncipe Pío (María Ysabel Vílchez)</option>
+                      <option value="208-CC LORANCA">CC Loranca (Alba López)</option>
+                      <option value="209-CC PARLA">CC El Ferial Parla (Jose Ángel Barriguete)</option>
+                      <option value="025-GRAN VIA HORTALEZA">Gran Vía Hortaleza (Jose Manuel Vigo)</option>
+                      <option value="030-PALACIO DE HIELO">Palacio de Hielo (David Crespo)</option>
+                      <option value="246-GETAFE">Getafe Urbana (Carlos Martínez)</option>
+                      <option value="045-VILLAVICIOSA DE ODON">Villaviciosa de Odón (Roberto Eusebio)</option>
+                      <option value="245-PASEO EXTREMADURA">Paseo de Extremadura (Daniel Domínguez)</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label style="font-size:0.75rem; font-weight:700; color:var(--text-muted); display:block; margin-bottom:0.35rem;">TIPO DE INFORME:</label>
+                    <select id="objGenTypeSelect" class="select-flat full" onchange="cockpit.generarBorradorEnObjetivosView()">
+                      <option value="despliegue" selected>📋 Plan de Objetivos & Pautas de Aplicación</option>
+                      <option value="plan_choque">🚀 Plan de Choque Cierre de Mes (Días 29-30)</option>
+                      <option value="reparto_cuotas">👥 Reparto Nominal de Cuotas por Asesor</option>
+                      <option value="seguros_luz">🛡️ Directiva Foco: Seguros CHUBB & Campaña Energía</option>
+                    </select>
+                  </div>
+
+                  <button class="btn btn-primary" onclick="cockpit.generarBorradorEnObjetivosView()" style="font-weight:700;">
+                    ⚡ Regenerar Borrador
+                  </button>
+                </div>
+
+                <div class="field-row" style="margin-bottom:0.75rem;">
+                  <div class="field-block flex-1">
+                    <label style="font-size:0.75rem; font-weight:700; color:var(--text-muted);">Destinatario (Email Tienda):</label>
+                    <input type="text" id="objGenEmailTo" class="input-flat" value="gavia@promovil.es">
+                  </div>
+                  <div class="field-block flex-1">
+                    <label style="font-size:0.75rem; font-weight:700; color:var(--text-muted);">Asunto del Informe:</label>
+                    <input type="text" id="objGenEmailSubject" class="input-flat" value="🎯 [PLAN DE OBJETIVOS & ACCIÓN] - CC La Gavia - Mes en Curso">
+                  </div>
+                </div>
+
+                <div class="field-block" style="margin-bottom:1rem;">
+                  <label style="font-size:0.75rem; font-weight:700; color:var(--text-muted);">Cuerpo del Informe (Totalmente Editable aquí antes de transferir):</label>
+                  <textarea id="objGenEmailBody" class="textarea-flat" rows="14" style="font-family:monospace; font-size:0.85rem;"></textarea>
+                </div>
+
+                <div class="email-actions-bar" style="border-top:1px solid var(--border-color); padding-top:1rem;">
+                  <button class="btn btn-primary" onclick="cockpit.transferirObjetivosACentroCorreos()" style="font-weight:700; gap:0.5rem;">
+                    ✉️ Trasladar y Editar en Centro de Plantillas & Correos &rarr;
+                  </button>
+                  <button class="btn btn-secondary" onclick="cockpit.copiarWhatsAppDesdeObjetivosView()">
+                    💬 Copiar para WhatsApp
+                  </button>
+                  <button class="btn btn-outline" onclick="cockpit.copiarTextoDesdeObjetivosView()">
+                    📋 Copiar Texto Completo
+                  </button>
+                </div>
+              </div>
             </div>
           </div>
         </section>
@@ -1904,6 +2206,6 @@
 
   <div id="toastMessage" class="toast-popup"></div>
 
-  <script src="js/app.js?v=2.7.0"></script>
+  <script src="js/app.js?v=2.8.0"></script>
 </body>
 </html>
