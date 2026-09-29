@@ -360,6 +360,7 @@ const DOWNLOADED_DOCUMENTS = [
 
 class PromovilCockpit {
   constructor() {
+    window.cockpit = this;
     this.stores = STORE_CONFIG;
     this.advisors = ADVISORS_DATA;
     this.documents = MASTER_DOCUMENTS;
@@ -700,6 +701,10 @@ class PromovilCockpit {
   }
 
   renderCharts() {
+    if (typeof Chart === 'undefined') {
+      console.warn('Chart.js CDN not ready yet');
+      return;
+    }
     this.renderMainChart();
     this.renderMixChart();
     this.renderTrendChart();
@@ -707,6 +712,7 @@ class PromovilCockpit {
   }
 
   renderMainChart() {
+    if (typeof Chart === 'undefined') return;
     const list = this.getFilteredStores();
     const ctx = document.getElementById('chartTMT');
     if (!ctx) return;
@@ -899,6 +905,7 @@ class PromovilCockpit {
   }
 
   renderMixChart() {
+    if (typeof Chart === 'undefined') return;
     const ctx = document.getElementById('chartMix');
     if (!ctx) return;
     if (this.chartMix) this.chartMix.destroy();
@@ -924,6 +931,7 @@ class PromovilCockpit {
   }
 
   renderTrendChart() {
+    if (typeof Chart === 'undefined') return;
     const ctx = document.getElementById('chartTrend');
     if (!ctx) return;
     if (this.chartTrend) this.chartTrend.destroy();
@@ -991,6 +999,7 @@ class PromovilCockpit {
   }
 
   renderRadarZonaChart() {
+    if (typeof Chart === 'undefined') return;
     const ctx = document.getElementById('chartRadarZona');
     if (!ctx) return;
     if (this.chartRadarZona) this.chartRadarZona.destroy();
@@ -1127,18 +1136,18 @@ class PromovilCockpit {
   }
 
   render() {
-    this.renderMetrics();
-    this.renderCharts();
-    this.renderRanking();
-    this.renderCoverageGrid();
-    this.renderCuadranteSemanal();
-    this.renderStock();
-    this.renderComisiones();
-    this.renderVacaciones();
-    this.renderSolicitudesVacaciones();
-    this.renderDocRepo();
-    this.renderBackupHistory();
-    this.renderFeedbackTable();
+    try { this.renderMetrics(); } catch (e) { console.error('Error in renderMetrics:', e); }
+    try { this.renderCharts(); } catch (e) { console.error('Error in renderCharts:', e); }
+    try { this.renderRanking(); } catch (e) { console.error('Error in renderRanking:', e); }
+    try { this.renderCoverageGrid(); } catch (e) { console.error('Error in renderCoverageGrid:', e); }
+    try { this.renderCuadranteSemanal(); } catch (e) { console.error('Error in renderCuadranteSemanal:', e); }
+    try { this.renderStock(); } catch (e) { console.error('Error in renderStock:', e); }
+    try { this.renderComisiones(); } catch (e) { console.error('Error in renderComisiones:', e); }
+    try { this.renderVacaciones(); } catch (e) { console.error('Error in renderVacaciones:', e); }
+    try { this.renderSolicitudesVacaciones(); } catch (e) { console.error('Error in renderSolicitudesVacaciones:', e); }
+    try { this.renderDocRepo(); } catch (e) { console.error('Error in renderDocRepo:', e); }
+    try { this.renderBackupHistory(); } catch (e) { console.error('Error in renderBackupHistory:', e); }
+    try { this.renderFeedbackTable(); } catch (e) { console.error('Error in renderFeedbackTable:', e); }
   }
 
   renderMetrics() {
@@ -1163,63 +1172,6 @@ class PromovilCockpit {
 
     const pctGlobal = objM ? ((mov / objM) * 100) : 100;
     if (elRR) elRR.textContent = `${(pctGlobal * 1.12).toFixed(1)}%`;
-  }
-
-  renderCharts() {
-    const list = this.getFilteredStores();
-    const ctxTMT = document.getElementById('chartTMT');
-    if (ctxTMT) {
-      if (this.chartTMT) this.chartTMT.destroy();
-      this.chartTMT = new Chart(ctxTMT, {
-        type: 'bar',
-        data: {
-          labels: list.map(s => s.name),
-          datasets: [
-            { label: 'Real (Móvil+Fibra)', data: list.map(s => s.realMovil + s.realFibra), backgroundColor: '#ff7900', borderRadius: 4 },
-            { label: 'Objetivo Mensual', data: list.map(s => s.objMovil + s.objFibra), backgroundColor: '#cbd5e1', borderRadius: 4 }
-          ]
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          onClick: (e, items) => {
-            if (items && items.length > 0) {
-              const idx = items[0].index;
-              const st = list[idx];
-              if (st) this.showStoreSchedule(st.id);
-            }
-          },
-          plugins: { legend: { position: 'top', labels: { boxWidth: 12, font: { family: 'Inter', size: 11 } } } },
-          scales: {
-            x: { grid: { display: false }, ticks: { font: { size: 10 } } },
-            y: { grid: { color: '#f1f5f9' }, ticks: { font: { size: 10 } } }
-          }
-        }
-      });
-    }
-
-    const ctxMix = document.getElementById('chartMix');
-    if (ctxMix) {
-      if (this.chartMix) this.chartMix.destroy();
-      this.chartMix = new Chart(ctxMix, {
-        type: 'doughnut',
-        data: {
-          labels: ['Samsung Galaxy (54%)', 'Apple iPhone (32%)', 'Xiaomi / Otros (14%)'],
-          datasets: [{
-            data: [54, 32, 14],
-            backgroundColor: ['#2563eb', '#16a34a', '#ff7900'],
-            borderWidth: 2,
-            borderColor: '#ffffff'
-          }]
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          onClick: () => this.showDrilldown('terminales'),
-          plugins: { legend: { position: 'bottom', labels: { boxWidth: 12, font: { family: 'Inter', size: 11 } } } }
-        }
-      });
-    }
   }
 
   renderRanking() {
@@ -4016,3 +3968,9 @@ ${t.description}
 
 const cockpit = new PromovilCockpit();
 window.cockpit = cockpit;
+
+window.addEventListener('load', () => {
+  if (window.cockpit && typeof Chart !== 'undefined') {
+    try { window.cockpit.renderCharts(); } catch(e) { console.warn('Delayed chart render warning:', e); }
+  }
+});
