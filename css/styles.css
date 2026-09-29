@@ -1826,7 +1826,7 @@ body {
   box-shadow: 0 2px 4px rgba(255, 121, 0, 0.25);
 }
 
-.bi-subtab-pane {
+.bi-subtab-pane, .obj-subtab-pane {
   animation: fadeIn 0.2s ease-in-out;
 }
 
