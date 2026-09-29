@@ -649,6 +649,14 @@ class PromovilCockpit {
     this.chartTrend = null;
     this.chartRadarZona = null;
 
+    this.currentBiSubTab = 'studio';
+    this.biChart = null;
+    this.biCrossChart1 = null;
+    this.biCrossChart2 = null;
+    this.biCrossChart3 = null;
+    this.biCrossChart4 = null;
+    this.biScatterChart = null;
+
     this.initDOMElements();
     this.bindEvents();
     this.loadVacationsData();
@@ -1049,6 +1057,508 @@ class PromovilCockpit {
     });
   }
 
+  // ========================================================
+  // MÓDULO BI: DATOS, ESTADÍSTICAS & CRUCES DE INFORMACIÓN
+  // ========================================================
+  switchBiSubTab(subtab) {
+    this.currentBiSubTab = subtab;
+    const panes = ['studio', 'cruces', 'matriz', 'simulador'];
+    panes.forEach(p => {
+      const btn = document.getElementById(`btnBiSub${p.charAt(0).toUpperCase() + p.slice(1)}`);
+      const pane = document.getElementById(`biSub${p.charAt(0).toUpperCase() + p.slice(1)}`);
+      if (btn) btn.classList.toggle('active', p === subtab);
+      if (pane) pane.style.display = (p === subtab) ? 'block' : 'none';
+    });
+
+    if (subtab === 'studio') {
+      setTimeout(() => this.renderBiStudioChart(), 40);
+    } else if (subtab === 'cruces') {
+      setTimeout(() => this.renderBiCrossAnalytics(), 40);
+    } else if (subtab === 'matriz') {
+      setTimeout(() => this.renderBiAdvisorMatrix(), 40);
+    } else if (subtab === 'simulador') {
+      this.updateBiSimulation();
+    }
+  }
+
+  renderBiStudioChart() {
+    if (typeof Chart === 'undefined') return;
+    const ctx = document.getElementById('customBiChart');
+    if (!ctx) return;
+    if (this.biChart) this.biChart.destroy();
+
+    const chartTypeVal = document.getElementById('biSelectChartType')?.value || 'bar';
+    const dimension = document.getElementById('biSelectDimension')?.value || 'tienda';
+    const metric = document.getElementById('biSelectMetric')?.value || 'total';
+    const benchmark = document.getElementById('biSelectBenchmark')?.value || 'target';
+
+    let labels = [];
+    let realData = [];
+    let targetData = [];
+    let realLabel = 'Valor Real';
+    let targetLabel = 'Objetivo';
+    let isHorizontal = (chartTypeVal === 'horizontalBar');
+    let effectiveType = isHorizontal ? 'bar' : chartTypeVal;
+    let isStacked = (chartTypeVal === 'area');
+
+    if (dimension === 'tienda') {
+      labels = this.stores.map(s => s.name);
+      if (metric === 'total') {
+        realData = this.stores.map(s => s.realMovil + s.realFibra);
+        targetData = this.stores.map(s => s.objMovil + s.objFibra);
+        realLabel = 'Total Ventas (Móvil+Fibra)';
+      } else if (metric === 'movil_desglose') {
+        realData = this.stores.map(s => s.realMovil);
+        targetData = this.stores.map(s => s.objMovil);
+        realLabel = 'Líneas Móviles';
+      } else if (metric === 'fibra') {
+        realData = this.stores.map(s => s.realFibra);
+        targetData = this.stores.map(s => s.objFibra);
+        realLabel = 'Fibra Óptica';
+      } else if (metric === 'seguros') {
+        realData = this.stores.map(s => s.segurosPct);
+        targetData = this.stores.map(() => 35.0);
+        realLabel = '% Penetración Seguros';
+        targetLabel = 'Umbral Mínimo (35%)';
+      } else if (metric === 'energia') {
+        realData = this.stores.map(s => s.energia);
+        targetData = this.stores.map(s => Math.round(s.objMovil * 0.2));
+        realLabel = 'Contratos Energía';
+      } else if (metric === 'productividad') {
+        realData = this.stores.map(s => Number(((s.realMovil + s.realFibra) / (s.staffPres * 18)).toFixed(2)));
+        targetData = this.stores.map(() => 1.25);
+        realLabel = 'Ratio Ventas / Asesor Diario';
+        targetLabel = 'Estándar Zona (1.25)';
+      } else if (metric === 'faltantes') {
+        realData = this.stores.map(s => Math.abs(s.faltante));
+        targetData = this.stores.map(() => 0);
+        realLabel = 'Descuadre / Faltante (€)';
+        targetLabel = 'Tolerancia Cero (0€)';
+      } else if (metric === 'comision') {
+        realData = this.stores.map(s => Math.round((s.realMovil * 18) + (s.realFibra * 25) + (s.segurosPct >= 40 ? 350 : 150) + (s.energia * 20)));
+        targetData = this.stores.map(() => 1600);
+        realLabel = 'Bolsa Comisiones Estimada (€)';
+        targetLabel = 'Presupuesto Base (1.600€)';
+      }
+    } else if (dimension === 'canal') {
+      labels = ['Centros Comerciales (8 PDV)', 'Tiendas Urbanas (3 PDV)'];
+      const cc = this.stores.filter(s => s.canal === 'cc');
+      const urb = this.stores.filter(s => s.canal === 'urbana');
+      
+      if (metric === 'total') {
+        realData = [cc.reduce((a, b) => a + b.realMovil + b.realFibra, 0), urb.reduce((a, b) => a + b.realMovil + b.realFibra, 0)];
+        targetData = [cc.reduce((a, b) => a + b.objMovil + b.objFibra, 0), urb.reduce((a, b) => a + b.objMovil + b.objFibra, 0)];
+        realLabel = 'Total Ventas (M+F)';
+      } else if (metric === 'seguros') {
+        realData = [Number((cc.reduce((a, b) => a + b.segurosPct, 0) / cc.length).toFixed(1)), Number((urb.reduce((a, b) => a + b.segurosPct, 0) / urb.length).toFixed(1))];
+        targetData = [35.0, 35.0];
+        realLabel = '% Seguros Medio';
+        targetLabel = 'Meta (35%)';
+      } else {
+        realData = [cc.reduce((a, b) => a + b.realMovil, 0), urb.reduce((a, b) => a + b.realMovil, 0)];
+        targetData = [cc.reduce((a, b) => a + b.objMovil, 0), urb.reduce((a, b) => a + b.objMovil, 0)];
+        realLabel = 'Volumen Móvil';
+      }
+    } else if (dimension === 'asesor') {
+      const topAdvisors = this.advisors.slice(0, 15);
+      labels = topAdvisors.map(a => a.name.split(' ').slice(0, 2).join(' '));
+      if (metric === 'seguros') {
+        realData = topAdvisors.map(a => a.seguros);
+        targetData = topAdvisors.map(() => 35);
+        realLabel = '% Seguros';
+      } else if (metric === 'energia') {
+        realData = topAdvisors.map(a => a.energia);
+        targetData = topAdvisors.map(() => 2);
+        realLabel = 'Contratos Luz';
+      } else {
+        realData = topAdvisors.map(a => a.movil + a.fibra);
+        targetData = topAdvisors.map(a => a.obj);
+        realLabel = 'Producción Comercial (M+F)';
+      }
+    } else if (dimension === 'jornada') {
+      labels = ['Jornada 40h (Completa)', 'Jornada 36h (Intensiva)', 'Jornada 30h (Parcial)', 'Jornada 20h (Finde/Refuerzo)'];
+      const g40 = this.advisors.filter(a => a.jornada === '40h');
+      const g36 = this.advisors.filter(a => a.jornada === '36h');
+      const g30 = this.advisors.filter(a => a.jornada === '30h');
+      const g20 = this.advisors.filter(a => a.jornada === '20h');
+      
+      const avgProd = grp => grp.length ? Number((grp.reduce((a, b) => a + b.movil + b.fibra, 0) / grp.length).toFixed(1)) : 0;
+      realData = [avgProd(g40), avgProd(g36), avgProd(g30), avgProd(g20)];
+      targetData = [21.5, 18.5, 15.0, 10.0];
+      realLabel = 'Ventas Medias por Asesor';
+      targetLabel = 'Objetivo Medio por Jornada';
+    } else if (dimension === 'dia') {
+      labels = Array.from({ length: 30 }, (_, i) => `Día ${i + 1}`);
+      const curve = [12, 24, 38, 51, 65, 78, 92, 105, 118, 131, 144, 158, 171, 184, 198, 211, 224, 238, 251, 264, 278, 291, 304, 317, 329, 335, 340, 342, 366, 390];
+      realData = curve;
+      targetData = labels.map((_, i) => Math.round((380 / 30) * (i + 1)));
+      realLabel = 'Ventas Acumuladas';
+      targetLabel = 'Ritmo Objetivo Lineal';
+    }
+
+    const avgVal = realData.length ? Number((realData.reduce((a, b) => a + b, 0) / realData.length).toFixed(1)) : 0;
+    let datasets = [];
+
+    if (effectiveType === 'doughnut' || effectiveType === 'polarArea') {
+      const palette = ['#ff7900', '#2563eb', '#16a34a', '#d97706', '#9333ea', '#06b6d4', '#e11d48', '#84cc16', '#64748b', '#f97316', '#3b82f6'];
+      datasets = [{
+        label: realLabel,
+        data: realData,
+        backgroundColor: palette.slice(0, realData.length),
+        borderWidth: 2,
+        borderColor: '#ffffff'
+      }];
+    } else if (effectiveType === 'radar') {
+      datasets = [
+        {
+          label: realLabel,
+          data: realData,
+          backgroundColor: 'rgba(255, 121, 0, 0.25)',
+          borderColor: '#ff7900',
+          pointBackgroundColor: '#ff7900',
+          pointRadius: 4
+        }
+      ];
+      if (benchmark === 'target') {
+        datasets.push({
+          label: targetLabel,
+          data: targetData,
+          backgroundColor: 'rgba(37, 99, 235, 0.1)',
+          borderColor: '#2563eb',
+          borderDash: [4, 4],
+          pointRadius: 2
+        });
+      }
+    } else {
+      datasets = [
+        {
+          label: realLabel,
+          data: realData,
+          backgroundColor: '#ff7900',
+          borderColor: '#ff7900',
+          fill: isStacked,
+          tension: 0.35,
+          borderRadius: effectiveType === 'bar' ? 4 : 0
+        }
+      ];
+
+      if (benchmark === 'target') {
+        datasets.push({
+          label: targetLabel,
+          data: targetData,
+          backgroundColor: '#cbd5e1',
+          borderColor: '#94a3b8',
+          borderDash: effectiveType === 'line' ? [5, 5] : [],
+          tension: 0.35,
+          borderRadius: 4
+        });
+      } else if (benchmark === 'average') {
+        datasets.push({
+          label: `Media de Zona (${avgVal})`,
+          data: labels.map(() => avgVal),
+          backgroundColor: '#fca5a5',
+          borderColor: '#dc2626',
+          borderDash: [5, 5],
+          tension: 0,
+          borderRadius: 4
+        });
+      }
+    }
+
+    const titleEl = document.getElementById('biStudioChartTitle');
+    const countEl = document.getElementById('biStudioDataCount');
+    if (titleEl) titleEl.textContent = `📊 Análisis: ${realLabel} por ${dimension.toUpperCase()} (${chartTypeVal.toUpperCase()})`;
+    if (countEl) countEl.textContent = `${labels.length} Puntos de Datos Analizados`;
+
+    this.biChart = new Chart(ctx, {
+      type: effectiveType === 'radar' ? 'radar' : (effectiveType === 'area' ? 'line' : effectiveType),
+      data: { labels, datasets },
+      options: {
+        indexAxis: isHorizontal ? 'y' : 'x',
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { position: 'top', labels: { boxWidth: 12, font: { family: 'Inter', size: 11 } } },
+          tooltip: {
+            callbacks: {
+              afterLabel: (ctxItem) => {
+                const val = ctxItem.raw;
+                const tgt = targetData[ctxItem.dataIndex];
+                if (tgt && tgt > 0) {
+                  const pct = Math.round((val / tgt) * 100);
+                  return `🎯 Cumplimiento: ${pct}% sobre meta (${tgt})`;
+                }
+                return '';
+              }
+            }
+          }
+        },
+        scales: (effectiveType === 'doughnut' || effectiveType === 'polarArea' || effectiveType === 'radar') ? {} : {
+          x: { grid: { display: false }, ticks: { font: { size: 10 } } },
+          y: { grid: { color: '#f1f5f9' }, ticks: { font: { size: 10 } } }
+        }
+      }
+    });
+
+    // Render Stats Breakdown Table
+    const tbody = document.getElementById('biStudioStatsTbody');
+    if (tbody) {
+      const totalSum = realData.reduce((a, b) => a + (typeof b === 'number' ? b : 0), 0);
+      tbody.innerHTML = labels.map((lbl, i) => {
+        const val = realData[i];
+        const tgt = targetData[i] || 0;
+        const diff = tgt > 0 ? (((val - tgt) / tgt) * 100).toFixed(1) : 'N/A';
+        const contrib = totalSum > 0 ? (((val) / totalSum) * 100).toFixed(1) : '100';
+        const isGood = typeof diff === 'string' && diff.startsWith('-') ? false : true;
+        const badge = isGood ? '<span class="chip-badge success">Óptimo</span>' : '<span class="chip-badge warning">Revisar</span>';
+        
+        return `
+          <tr>
+            <td><strong>${lbl}</strong></td>
+            <td><strong style="color:var(--orange);">${val}</strong></td>
+            <td>${tgt}</td>
+            <td class="${isGood ? 'text-success' : 'text-danger'}"><strong>${diff !== 'N/A' ? (Number(diff) >= 0 ? '+' + diff + '%' : diff + '%') : '-'}</strong></td>
+            <td>${contrib}%</td>
+            <td>${badge}</td>
+          </tr>
+        `;
+      }).join('');
+    }
+  }
+
+  renderBiCrossAnalytics() {
+    if (typeof Chart === 'undefined') return;
+
+    // Cross Chart 1: CC vs Urbanas
+    const ctx1 = document.getElementById('biCrossChart1');
+    if (ctx1) {
+      if (this.biCrossChart1) this.biCrossChart1.destroy();
+      this.biCrossChart1 = new Chart(ctx1, {
+        type: 'bar',
+        data: {
+          labels: ['Ventas Móvil (Media/Tienda)', 'Fibra Óptica (Media/Tienda)', '% Seguros Penetración', 'Energía (Media/Tienda)'],
+          datasets: [
+            { label: 'Centros Comerciales (8 PDV)', data: [34.5, 12.8, 41.5, 6.4], backgroundColor: '#ff7900', borderRadius: 4 },
+            { label: 'Tiendas Urbanas (3 PDV)', data: [22.0, 8.0, 41.3, 3.0], backgroundColor: '#2563eb', borderRadius: 4 }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: { legend: { position: 'top', labels: { boxWidth: 10, font: { size: 10 } } } }
+        }
+      });
+    }
+
+    // Cross Chart 2: Productividad por Tipo de Jornada
+    const ctx2 = document.getElementById('biCrossChart2');
+    if (ctx2) {
+      if (this.biCrossChart2) this.biCrossChart2.destroy();
+      this.biCrossChart2 = new Chart(ctx2, {
+        type: 'bar',
+        data: {
+          labels: ['Jornada 40h (20 asesores)', 'Jornada 36h (14 asesores)', 'Jornada 30h (8 asesores)', 'Jornada 20h (6 asesores)'],
+          datasets: [
+            { label: 'Ventas Promedio por Asesor (M+F)', data: [20.8, 15.6, 11.2, 7.5], backgroundColor: '#16a34a', borderRadius: 4 },
+            { label: 'Eficiencia Normalizada (Ventas / 100h)', data: [13.0, 10.8, 9.3, 9.4], backgroundColor: '#d97706', borderRadius: 4 }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: { legend: { position: 'top', labels: { boxWidth: 10, font: { size: 10 } } } }
+        }
+      });
+    }
+
+    // Cross Chart 3: Impacto de Bajas y Permisos
+    const ctx3 = document.getElementById('biCrossChart3');
+    if (ctx3) {
+      if (this.biCrossChart3) this.biCrossChart3.destroy();
+      this.biCrossChart3 = new Chart(ctx3, {
+        type: 'doughnut',
+        data: {
+          labels: ['Tiendas Staff 100% (104.2% Obj)', 'Tiendas con Baja Médica (91.5% Obj)', 'Tiendas con Permiso Temporal (94.0% Obj)'],
+          datasets: [{
+            data: [8, 2, 1],
+            backgroundColor: ['#16a34a', '#dc2626', '#d97706'],
+            borderWidth: 2,
+            borderColor: '#ffffff'
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: { legend: { position: 'bottom', labels: { boxWidth: 10, font: { size: 10 } } } }
+        }
+      });
+    }
+
+    // Cross Chart 4: Control de Riesgo y Descuadres
+    const ctx4 = document.getElementById('biCrossChart4');
+    if (ctx4) {
+      if (this.biCrossChart4) this.biCrossChart4.destroy();
+      this.biCrossChart4 = new Chart(ctx4, {
+        type: 'bar',
+        data: {
+          labels: ['CC La Gavia', 'CC Tres Aguas', 'CC La Vaguada', 'CC Príncipe Pío', 'CC Loranca', 'CC Parla', 'Gran Vía', 'Palacio Hielo', 'Getafe', 'Villaviciosa', 'Extremadura'],
+          datasets: [
+            { label: 'Gasto Real Tienda (€)', data: [260, 190, 320, 210, 180, 175, 240, 160, 140, 110, 95], backgroundColor: '#64748b', borderRadius: 4 },
+            { label: 'Descuadre / Faltante (€)', data: [0, 0, 180, 0, 0, 0, 0, 0, 200, 0, 0], backgroundColor: '#dc2626', borderRadius: 4 }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: { legend: { position: 'top', labels: { boxWidth: 10, font: { size: 10 } } } }
+        }
+      });
+    }
+  }
+
+  renderBiAdvisorMatrix() {
+    if (typeof Chart === 'undefined') return;
+    const ctx = document.getElementById('biScatterChart');
+    if (!ctx) return;
+    if (this.biScatterChart) this.biScatterChart.destroy();
+
+    const starAdvisors = [];
+    const volumeAdvisors = [];
+    const valueAdvisors = [];
+    const devAdvisors = [];
+
+    this.advisors.forEach(a => {
+      const vol = a.movil + a.fibra;
+      const seg = a.seguros;
+      const pt = { x: vol, y: seg, name: a.name, center: a.center, role: a.role, term: a.term, energia: a.energia };
+
+      if (vol >= 18 && seg >= 42) {
+        starAdvisors.push(pt);
+      } else if (vol >= 18 && seg < 42) {
+        volumeAdvisors.push(pt);
+      } else if (vol < 18 && seg >= 40) {
+        valueAdvisors.push(pt);
+      } else {
+        devAdvisors.push(pt);
+      }
+    });
+
+    this.biScatterChart = new Chart(ctx, {
+      type: 'scatter',
+      data: {
+        datasets: [
+          {
+            label: '⭐ Top Stars (Alto Vol & Alto Seguro)',
+            data: starAdvisors,
+            backgroundColor: '#16a34a',
+            borderColor: '#15803d',
+            pointRadius: 6,
+            pointHoverRadius: 9
+          },
+          {
+            label: '🚀 Motores de Volumen',
+            data: volumeAdvisors,
+            backgroundColor: '#2563eb',
+            borderColor: '#1d4ed8',
+            pointRadius: 6,
+            pointHoverRadius: 9
+          },
+          {
+            label: '💎 Especialistas de Valor (Seguros > 40%)',
+            data: valueAdvisors,
+            backgroundColor: '#d97706',
+            borderColor: '#b45309',
+            pointRadius: 6,
+            pointHoverRadius: 9
+          },
+          {
+            label: '🎯 Plan de Acompañamiento',
+            data: devAdvisors,
+            backgroundColor: '#ea580c',
+            borderColor: '#c2410c',
+            pointRadius: 5,
+            pointHoverRadius: 8
+          }
+        ]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { position: 'top', labels: { boxWidth: 12, font: { size: 10 } } },
+          tooltip: {
+            callbacks: {
+              label: (ctxItem) => {
+                const raw = ctxItem.raw;
+                return `👤 ${raw.name} (${raw.center}) | Ventas: ${raw.x} uds | Seguros: ${raw.y}% | Luz: ${raw.energia}`;
+              }
+            }
+          }
+        },
+        scales: {
+          x: {
+            title: { display: true, text: 'Volumen Comercial Total (Móvil + Fibra)', font: { size: 11, weight: 'bold' } },
+            grid: { color: '#f1f5f9' },
+            suggestedMin: 5,
+            suggestedMax: 26
+          },
+          y: {
+            title: { display: true, text: '% Penetración de Seguros', font: { size: 11, weight: 'bold' } },
+            grid: { color: '#f1f5f9' },
+            suggestedMin: 30,
+            suggestedMax: 50
+          }
+        }
+      }
+    });
+  }
+
+  updateBiSimulation() {
+    const sPortas = Number(document.getElementById('simSliderPortas')?.value || 5);
+    const sSeguros = Number(document.getElementById('simSliderSeguros')?.value || 3);
+    const sEnergia = Number(document.getElementById('simSliderEnergia')?.value || 6);
+
+    const txtPortas = document.getElementById('simValPortas');
+    const txtSeguros = document.getElementById('simValSeguros');
+    const txtEnergia = document.getElementById('simValEnergia');
+
+    const extraPortasUds = Math.round(160 * (sPortas / 100));
+    if (txtPortas) txtPortas.textContent = `+${sPortas}% (+${extraPortasUds} portas)`;
+    if (txtSeguros) txtSeguros.textContent = `+${sSeguros.toFixed(1)}% (Hasta ${(42.6 + sSeguros).toFixed(1)}%)`;
+    if (txtEnergia) txtEnergia.textContent = `+${sEnergia} Contratos`;
+
+    const baseVentas = 470; // 342 real actual + runrate base
+    const extraVentas = extraPortasUds;
+    const finalVentas = baseVentas + extraVentas;
+    const baseTarget = 475;
+    const finalRunRate = ((finalVentas / baseTarget) * 100).toFixed(1);
+    const finalSegurosPct = (42.6 + sSeguros).toFixed(1);
+    const extraEuros = (extraPortasUds * 45) + (sEnergia * 50) + (sSeguros >= 3 ? 600 : 250);
+
+    const resRR = document.getElementById('simResRunRate');
+    const resVentas = document.getElementById('simResTotalVentas');
+    const resSeg = document.getElementById('simResSegurosPct');
+    const resExtra = document.getElementById('simResComisionesExtra');
+
+    if (resRR) resRR.textContent = `${finalRunRate}%`;
+    if (resVentas) resVentas.textContent = `${finalVentas} uds.`;
+    if (resSeg) resSeg.textContent = `${finalSegurosPct}%`;
+    if (resExtra) resExtra.textContent = `+${extraEuros.toLocaleString('es-ES')} €`;
+  }
+
+  downloadBiChart() {
+    let activeCanvas = document.getElementById('customBiChart');
+    if (this.currentBiSubTab === 'cruces') activeCanvas = document.getElementById('biCrossChart1');
+    else if (this.currentBiSubTab === 'matriz') activeCanvas = document.getElementById('biScatterChart');
+
+    if (!activeCanvas) return;
+    const link = document.createElement('a');
+    link.download = `Estadisticas_Promovil_ZonaCentro_${new Date().toISOString().slice(0, 10)}.png`;
+    link.href = activeCanvas.toDataURL('image/png');
+    link.click();
+    this.toast('📸 Gráfica exportada en alta resolución.');
+  }
+
   async loadVacationsData() {
     try {
       const resp = await fetch('data/vacations.json');
@@ -1109,6 +1619,10 @@ class PromovilCockpit {
     
     if (tabId === 'comercial') {
       setTimeout(() => this.renderCharts(), 40);
+    }
+    else if (tabId === 'estadisticas') {
+      if (subtab) this.switchBiSubTab(subtab);
+      else this.switchBiSubTab(this.currentBiSubTab || 'studio');
     }
     else if (tabId === 'documentos') {
       if (subtab) this.switchDocSubTab(subtab);
