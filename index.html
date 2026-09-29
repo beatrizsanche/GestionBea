@@ -3,219 +3,814 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>GestionBea - Panel de Gestión</title>
+  <title>PROMOVIL OPS - Cockpit de Control con Desglose y Trazabilidad Documental</title>
   <link rel="stylesheet" href="css/styles.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
-  <div class="app-layout">
-    <!-- Sidebar / Menú lateral -->
+  <div class="app-shell">
+    <!-- Sidebar de Navegación -->
     <aside class="sidebar">
-      <div class="brand">
-        <div class="brand-icon">GB</div>
+      <div class="brand-block">
+        <div class="brand-badge">P</div>
         <div>
-          <h1 class="brand-title">GestionBea</h1>
-          <span class="brand-sub">Tu espacio de trabajo</span>
+          <div class="brand-title">PROMOVIL OPS</div>
+          <div class="brand-sub">Zona Centro | Franquicias Orange</div>
         </div>
       </div>
 
-      <nav class="nav-menu">
-        <button class="nav-item active" data-tab="dashboard">
-          <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 3h7v7H3zM14 3h7v7h-7zM14 14h7v7h-7zM3 14h7v7H3z"/></svg>
-          Dashboard
+      <div class="user-card">
+        <div class="user-avatar">BS</div>
+        <div class="user-meta">
+          <span class="user-name">Beatriz Sánchez</span>
+          <span class="user-tag">Coordinadora de Zona (11 Tiendas)</span>
+        </div>
+      </div>
+
+      <nav class="nav-tree">
+        <div class="nav-section-title">OPERACIONES & TMT</div>
+        <button class="nav-tab active" data-tab="comercial">
+          <svg width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M18 20V10M12 20V4M6 20v-6"/></svg>
+          Seguimiento TMT & Ventas
         </button>
-        <button class="nav-item" data-tab="tasks">
-          <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
-          Tareas
+        <button class="nav-tab" data-tab="cuadrantes">
+          <svg width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+          Cuadrante Semanal & Horarios
         </button>
-        <button class="nav-item" data-tab="notes">
-          <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
-          Notas
+
+        <div class="nav-section-title">COMUNICACIÓN & CORREOS</div>
+        <button class="nav-tab" data-tab="emails">
+          <svg width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+          Centro de Plantillas & Correos
+        </button>
+
+        <div class="nav-section-title">CONTROL & AUDITORÍA</div>
+        <button class="nav-tab" data-tab="stock">
+          <svg width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
+          Stock, Faltantes & IMEIs
+        </button>
+        <button class="nav-tab" data-tab="comisiones">
+          <svg width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>
+          Comisiones & Gastos
+        </button>
+        <button class="nav-tab" data-tab="vacaciones">
+          <svg width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>
+          Plantilla & Vacaciones (48)
+        </button>
+
+        <div class="nav-section-title">TRAZABILIDAD & FUENTES</div>
+        <button class="nav-tab" data-tab="documentos">
+          <svg width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+          Documentos & Fuentes (8)
         </button>
       </nav>
 
       <div class="sidebar-footer">
-        <button id="exportBtn" class="btn-secondary btn-sm" title="Descargar copia de seguridad">
-          <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-          Exportar datos
-        </button>
+        <div class="cloud-badge">
+          <span class="status-dot green"></span>
+          <span>Supabase MCP Conectado</span>
+        </div>
       </div>
     </aside>
 
-    <!-- Contenido principal -->
-    <main class="main-content">
+    <!-- Área de Trabajo Principal -->
+    <main class="main-body">
+      <!-- Barra Superior Operativa -->
       <header class="topbar">
-        <div class="search-box">
-          <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
-          <input type="text" id="searchInput" placeholder="Buscar tareas o notas...">
+        <div class="topbar-search">
+          <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+          <input type="text" id="globalSearchInput" placeholder="Buscar comercial, tienda, IMEI, documento fuente o parte...">
         </div>
-        <div class="user-pill">
-          <span class="user-avatar">B</span>
-          <span class="user-name">Bea</span>
+
+        <div class="topbar-filters">
+          <select id="filterStoreSelect" class="select-flat">
+            <option value="all" selected>📍 Todas las Tiendas (11 PDV)</option>
+            <option value="234-CC LA GAVIA">CC La Gavia</option>
+            <option value="238-TRES AGUAS">CC Tres Aguas</option>
+            <option value="226-CC LA VAGUADA 2">CC La Vaguada</option>
+            <option value="205-CC PRINCIPE PIO">CC Príncipe Pío</option>
+            <option value="208-CC LORANCA">CC Loranca</option>
+            <option value="209-CC PARLA">CC El Ferial (Parla)</option>
+            <option value="025-GRAN VIA HORTALEZA">Gran Vía Hortaleza</option>
+            <option value="030-PALACIO DE HIELO">Palacio de Hielo</option>
+            <option value="246-GETAFE">Getafe Urbana</option>
+            <option value="045-VILLAVICIOSA DE ODON">Villaviciosa de Odón</option>
+            <option value="245-PASEO EXTREMADURA">Paseo de Extremadura</option>
+          </select>
+
+          <select id="filterCanalSelect" class="select-flat">
+            <option value="all" selected>🏬 Todos los Canales</option>
+            <option value="cc">Centros Comerciales (CC)</option>
+            <option value="urbana">Tiendas Urbanas</option>
+          </select>
+        </div>
+
+        <div class="topbar-quick-btns">
+          <button class="btn btn-secondary" onclick="cockpit.switchTab('documentos')">
+            📁 Repositorio Documental
+          </button>
+          <button class="btn btn-secondary" onclick="cockpit.openIngestaModal()">
+            📥 Registrar Cierre
+          </button>
+          <button class="btn btn-primary" onclick="cockpit.switchTab('emails')">
+            ✉️ Redactar Correo
+          </button>
         </div>
       </header>
 
-      <div class="content-container">
-        <!-- Vista: Dashboard -->
-        <section id="dashboardView" class="view active">
-          <div class="welcome-banner">
-            <h2>¡Hola de nuevo, Bea! 👋</h2>
-            <p>Aquí tienes el estado actual de tus tareas y recordatorios.</p>
-          </div>
+      <div class="workspace">
 
-          <div class="stats-grid">
-            <div class="stat-card">
-              <span class="stat-label">Total Tareas</span>
-              <span class="stat-value" id="statTotalTasks">0</span>
+        <!-- ======================================================== -->
+        <!-- MÓDULO 1: SEGUIMIENTO TMT, PRODUCCIÓN & RUN-RATE          -->
+        <!-- ======================================================== -->
+        <section id="comercialView" class="view-panel active">
+          <div class="section-title-bar">
+            <div>
+              <div style="display:flex; align-items:center; gap:0.6rem; flex-wrap:wrap;">
+                <h2 class="view-h2">Seguimiento Comercial TMT & Objetivos del Mes</h2>
+                <span class="doc-source-tag" onclick="cockpit.openDocViewer('DOC-01')" title="Ver documento fuente original">
+                  📄 Doc Fuente: Informe_TMT_Consolidado_28-09-2026.xlsx 🔍
+                </span>
+              </div>
+              <p class="view-sub">Haz clic en cualquier métrica, tienda o comercial para abrir el desglose analítico completo.</p>
             </div>
-            <div class="stat-card stat-pending">
-              <span class="stat-label">Pendientes</span>
-              <span class="stat-value" id="statPendingTasks">0</span>
-            </div>
-            <div class="stat-card stat-completed">
-              <span class="stat-label">Completadas</span>
-              <span class="stat-value" id="statCompletedTasks">0</span>
-            </div>
-            <div class="stat-card stat-notes">
-              <span class="stat-label">Notas Guardadas</span>
-              <span class="stat-value" id="statTotalNotes">0</span>
+            <div class="runrate-pill clickable" onclick="cockpit.showDrilldown('runrate')">
+              <span class="r-label">RUN-RATE PROYECTADO:</span>
+              <strong class="r-val" id="kpiRunRate">108.4%</strong>
+              <span class="chip-badge success">Ver Desglose 🔍</span>
             </div>
           </div>
 
-          <div class="dashboard-columns">
-            <div class="panel">
-              <div class="panel-header">
-                <h3>Tareas prioritarias</h3>
-                <button class="link-btn" onclick="app.switchTab('tasks')">Ver todas</button>
+          <!-- Scorecards Planas Interactivas (Clickeables) -->
+          <div class="kpi-deck">
+            <div class="kpi-tile clickable" onclick="cockpit.showDrilldown('movil')">
+              <div class="tile-header">
+                <span class="tile-title">Líneas Móviles (A/P)</span>
+                <span class="tile-icon">📱</span>
               </div>
-              <ul id="priorityTaskList" class="task-list"></ul>
+              <div class="tile-body">
+                <span class="tile-num" id="tileMovil">342</span>
+                <span class="tile-target">/ Obj. 380 (90.0%)</span>
+              </div>
+              <div class="tile-progress"><div class="bar" style="width: 90%;"></div></div>
+              <div class="tile-foot">Altas: 182 | Portas: 160 (Clic para detalle)</div>
             </div>
-            <div class="panel">
-              <div class="panel-header">
-                <h3>Últimas notas</h3>
-                <button class="link-btn" onclick="app.switchTab('notes')">Ver todas</button>
+
+            <div class="kpi-tile clickable" onclick="cockpit.showDrilldown('fibra')">
+              <div class="tile-header">
+                <span class="tile-title">Fibra & Convergencia</span>
+                <span class="tile-icon">🌐</span>
               </div>
-              <div id="recentNotesList" class="notes-mini-grid"></div>
+              <div class="tile-body">
+                <span class="tile-num" id="tileFibra">128</span>
+                <span class="tile-target">/ Obj. 135 (94.8%)</span>
+              </div>
+              <div class="tile-progress"><div class="bar success" style="width: 94.8%;"></div></div>
+              <div class="tile-foot text-success">▲ +18 ventas esta semana (Clic para detalle)</div>
+            </div>
+
+            <div class="kpi-tile clickable" onclick="cockpit.showDrilldown('seguros')">
+              <div class="tile-header">
+                <span class="tile-title">Penetración Seguros</span>
+                <span class="tile-icon">🛡️</span>
+              </div>
+              <div class="tile-body">
+                <span class="tile-num" id="tileSeguros">42.6%</span>
+                <span class="tile-target">/ Mín. 35.0%</span>
+              </div>
+              <div class="tile-progress"><div class="bar success" style="width: 100%;"></div></div>
+              <div class="tile-foot text-success">▲ +7.6% sobre objetivo (Clic para detalle)</div>
+            </div>
+
+            <div class="kpi-tile clickable" onclick="cockpit.showDrilldown('energia')">
+              <div class="tile-header">
+                <span class="tile-title">Energía (Luz)</span>
+                <span class="tile-icon">⚡</span>
+              </div>
+              <div class="tile-body">
+                <span class="tile-num" id="tileEnergia">64</span>
+                <span class="tile-target">/ Obj. 60 (106.7%)</span>
+              </div>
+              <div class="tile-progress"><div class="bar success" style="width: 100%;"></div></div>
+              <div class="tile-foot">Campaña Energy Days (Clic para detalle)</div>
+            </div>
+
+            <div class="kpi-tile clickable" onclick="cockpit.showDrilldown('terminales')">
+              <div class="tile-header">
+                <span class="tile-title">Terminales & Renoves</span>
+                <span class="tile-icon">📦</span>
+              </div>
+              <div class="tile-body">
+                <span class="tile-num" id="tileTerminales">215</span>
+                <span class="tile-target">Uds.</span>
+              </div>
+              <div class="tile-progress"><div class="bar" style="width: 82%;"></div></div>
+              <div class="tile-foot">54% Samsung | 32% Apple | 14% Otros</div>
+            </div>
+          </div>
+
+          <!-- Suite de Visualización y Análisis Gráfico Avanzado -->
+          <div class="flat-panel" style="margin-bottom: 1.25rem;">
+            <div class="panel-head" style="flex-wrap: wrap; gap: 0.75rem;">
+              <div>
+                <h3 id="mainChartTitle">Comparativa Comercial por Tienda: Ventas vs. Objetivos</h3>
+                <span class="doc-source-tag" onclick="cockpit.openDocViewer('DOC-01')">📄 Fuente: Informe_TMT_Consolidado_28-09-2026.xlsx</span>
+              </div>
+              
+              <!-- Controles Interactivos de Métrica y Tipo de Gráfico -->
+              <div class="chart-controls-bar">
+                <select id="chartMetricSelect" class="select-flat" onchange="cockpit.changeChartMetric(this.value)">
+                  <option value="total" selected>📱 Móvil + Fibra (Total)</option>
+                  <option value="movil">📱 Solo Líneas Móviles</option>
+                  <option value="fibra">🌐 Solo Fibra Óptica</option>
+                  <option value="seguros">🛡️ % Penetración Seguros</option>
+                  <option value="energia">⚡ Captación Energía (Luz)</option>
+                </select>
+
+                <div class="chart-pill-group" id="mainChartTypeGroup">
+                  <button class="btn-chart-pill active" onclick="cockpit.changeMainChartType('bar')">📊 Barras</button>
+                  <button class="btn-chart-pill" onclick="cockpit.changeMainChartType('line')">📈 Líneas</button>
+                  <button class="btn-chart-pill" onclick="cockpit.changeMainChartType('horizontalBar')">📉 Ranking</button>
+                  <button class="btn-chart-pill" onclick="cockpit.changeMainChartType('stacked')">📊 Apiladas</button>
+                  <button class="btn-chart-pill" onclick="cockpit.changeMainChartType('radar')">🕸️ Radar</button>
+                </div>
+              </div>
+            </div>
+            <div class="chart-box tall">
+              <canvas id="chartTMT"></canvas>
+            </div>
+          </div>
+
+          <!-- Cuadrícula de Gráficos Especializados (3 Paneles Analíticos) -->
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 1.25rem; margin-bottom: 1.5rem;">
+            <!-- Gráfico 2: Mix de Fabricantes -->
+            <div class="flat-panel" style="margin-bottom: 0;">
+              <div class="panel-head">
+                <h3>Mix Fabricantes & Terminales</h3>
+                <div class="chart-pill-group">
+                  <button class="btn-chart-pill active" id="btnMixDoughnut" onclick="cockpit.changeMixChartType('doughnut')">🍩 Anillo</button>
+                  <button class="btn-chart-pill" id="btnMixPolar" onclick="cockpit.changeMixChartType('polarArea')">❄️ Polar</button>
+                  <button class="btn-chart-pill" id="btnMixPie" onclick="cockpit.changeMixChartType('pie')">🥧 Tarta</button>
+                </div>
+              </div>
+              <div class="chart-box">
+                <canvas id="chartMix"></canvas>
+              </div>
+            </div>
+
+            <!-- Gráfico 3: Curva Diaria de Ventas & Proyección Run-Rate -->
+            <div class="flat-panel" style="margin-bottom: 0;">
+              <div class="panel-head">
+                <h3>Evolución Diaria & Tendencia Run-Rate</h3>
+                <span class="chip-badge success">Meta: 380 Líneas</span>
+              </div>
+              <div class="chart-box">
+                <canvas id="chartTrend"></canvas>
+              </div>
+            </div>
+
+            <!-- Gráfico 4: Radar de Desempeño Multiproducto de la Zona -->
+            <div class="flat-panel" style="margin-bottom: 0;">
+              <div class="panel-head">
+                <h3>Equilibrio Operativo de la Zona (5 Ejes)</h3>
+                <span class="chip-badge info">100% = Cumplimiento</span>
+              </div>
+              <div class="chart-box">
+                <canvas id="chartRadarZona"></canvas>
+              </div>
+            </div>
+          </div>
+
+          <!-- Ranking de Comerciales Interactivo -->
+          <div class="flat-panel">
+            <div class="panel-head">
+              <div style="display:flex; align-items:center; gap:0.6rem;">
+                <h3>Ranking de Rendimiento por Asesor Comercial</h3>
+                <span class="doc-source-tag" onclick="cockpit.openDocViewer('DOC-01')">📄 Fuente: TMT_Produccion_Comerciales.xlsx</span>
+              </div>
+              <input type="text" id="rankingSearchInput" class="input-flat-sm" placeholder="Filtrar por comercial o tienda...">
+            </div>
+            <div class="table-wrap">
+              <table class="table-flat" id="rankingTable">
+                <thead>
+                  <tr>
+                    <th>#</th>
+                    <th>Asesor Comercial (Clic para Ficha)</th>
+                    <th>Tienda Asignada</th>
+                    <th>Móvil</th>
+                    <th>Fibra</th>
+                    <th>% Seguros</th>
+                    <th>Energía</th>
+                    <th>Terminales</th>
+                    <th>% Consecución</th>
+                    <th>Estado</th>
+                  </tr>
+                </thead>
+                <tbody id="rankingTbody"></tbody>
+              </table>
             </div>
           </div>
         </section>
 
-        <!-- Vista: Tareas -->
-        <section id="tasksView" class="view">
-          <div class="section-header">
+
+        <!-- ======================================================== -->
+        <!-- MÓDULO 2: CENTRO DE CORREOS Y GENERADOR DE PLANTILLAS    -->
+        <!-- ======================================================== -->
+        <section id="emailsView" class="view-panel">
+          <div class="section-title-bar">
             <div>
-              <h2>Gestión de Tareas</h2>
-              <p>Organiza tu día a día por prioridad y categorías</p>
+              <div style="display:flex; align-items:center; gap:0.6rem; flex-wrap:wrap;">
+                <h2 class="view-h2">Centro de Correos & Generador de Plantillas Oficiales</h2>
+                <span class="doc-source-tag" onclick="cockpit.openDocViewer('DOC-08')">
+                  📄 Doc Fuente: Bandeja_Correos_Partes_Cierre_Ionos.eml 🔍
+                </span>
+              </div>
+              <p class="view-sub">Redacción inteligente con datos autocompletados en tiempo real listos para enviar o copiar.</p>
             </div>
-            <button class="btn-primary" id="openTaskModalBtn">
-              + Nueva Tarea
+          </div>
+
+          <div class="email-layout-grid">
+            <!-- Formulario Redactor -->
+            <div class="flat-panel">
+              <div class="panel-head">
+                <h3>📝 Redactor Inteligente de Correo</h3>
+              </div>
+              <div class="panel-body">
+                <div class="field-block">
+                  <label>Selecciona la Plantilla Oficial:</label>
+                  <select id="emailTplSelect" class="select-flat full" onchange="cockpit.applyEmailTemplate()">
+                    <option value="cierre_diario" selected>1. 📊 Reporte Diario de Cierre a Dirección Comercial</option>
+                    <option value="cuadrantes_rrhh">2. 📋 Envío de Cuadrante Mensual de Turnos y Festivos a RRHH</option>
+                    <option value="propuesta_objetivos">3. 🎯 Propuesta de Objetivos Mensuales a Dirección</option>
+                    <option value="liquidacion_gastos">4. 💰 Liquidación Mensual de Gastos de Tienda a Administración</option>
+                    <option value="reclamacion_comisiones">5. 💵 Validación y Precierre de Comisiones a Nóminas</option>
+                    <option value="aviso_correturnos">6. 🚨 Aviso Operativo: Asignación de Correturnos / Sustituto</option>
+                    <option value="aprobacion_vacaciones">7. 🏖️ Aprobación Formal de Vacaciones a Asesor</option>
+                  </select>
+                </div>
+
+                <div class="field-row">
+                  <div class="field-block flex-1">
+                    <label>Para (Destinatarios):</label>
+                    <input type="text" id="emailTo" class="input-flat" value="direccion.comercial@promovil.es">
+                  </div>
+                  <div class="field-block flex-1">
+                    <label>Con Copia (CC):</label>
+                    <input type="text" id="emailCc" class="input-flat" value="central@promovil.es">
+                  </div>
+                </div>
+
+                <div class="field-block">
+                  <label>Asunto:</label>
+                  <input type="text" id="emailSubject" class="input-flat" value="Cierre Diario y Seguimiento TMT - Zona Centro - 29/09/2026">
+                </div>
+
+                <div class="field-block">
+                  <label>Cuerpo del Correo (Editable):</label>
+                  <textarea id="emailBody" class="textarea-flat" rows="12"></textarea>
+                </div>
+
+                <div class="email-actions-bar">
+                  <button class="btn btn-secondary" onclick="cockpit.copyEmail()">
+                    📋 Copiar al Portapapeles
+                  </button>
+                  <button class="btn btn-primary" onclick="cockpit.sendEmail()">
+                    🚀 Enviar vía Correo (Ionos/Gmail)
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Panel de Correos Recibidos & Historial de Salida -->
+            <div class="flat-panel">
+              <div class="panel-head" style="padding:0.6rem 1rem;">
+                <div class="email-tabs-bar" style="width:100%; border-bottom:none; background:transparent;">
+                  <button class="email-tab-btn active" id="btnTabInbox" onclick="cockpit.switchEmailSubTab('inbox')">
+                    📥 Recibidos de Tiendas (4)
+                  </button>
+                  <button class="email-tab-btn" id="btnTabOutbox" onclick="cockpit.switchEmailSubTab('outbox')">
+                    📤 Historial de Envíos (Memoria)
+                  </button>
+                </div>
+              </div>
+
+              <!-- Stream Recibidos -->
+              <div class="inbox-stream" id="inboxStreamContainer">
+                <div class="inbox-card" onclick="cockpit.loadInboxIntoDashboard('gavia')">
+                  <div class="inbox-head">
+                    <strong>CC La Gavia (Erika Castillo)</strong>
+                    <span class="inbox-time">Ayer 21:30</span>
+                  </div>
+                  <div class="inbox-msg">Cierre Diario 28/09: 16 Móviles, 7 Fibras, 4 Seguros. Caja 140€ sin descuadre.</div>
+                  <div class="inbox-tags">
+                    <span class="chip-badge success">Cierre Validado</span>
+                    <span class="chip-badge">Cierre_Gavia.xlsx</span>
+                  </div>
+                </div>
+
+                <div class="inbox-card" onclick="cockpit.loadInboxIntoDashboard('extremadura')">
+                  <div class="inbox-head">
+                    <strong>Paseo de Extremadura</strong>
+                    <span class="inbox-time">Ayer 20:15</span>
+                  </div>
+                  <div class="inbox-msg">Permiso personal Daniel Domínguez 29-30 Septiembre. Solicitud de cobertura de tarde.</div>
+                  <div class="inbox-tags">
+                    <span class="chip-badge warning">Ausencia Pendiente</span>
+                  </div>
+                </div>
+
+                <div class="inbox-card" onclick="cockpit.loadInboxIntoDashboard('principe_pio')">
+                  <div class="inbox-head">
+                    <strong>CC Príncipe Pío</strong>
+                    <span class="inbox-time">Ayer 19:40</span>
+                  </div>
+                  <div class="inbox-msg">Parte médico baja laboral Cristina López (15 días). Correturnos Andrea Cerdá asignada.</div>
+                  <div class="inbox-tags">
+                    <span class="chip-badge danger">Baja Médica</span>
+                  </div>
+                </div>
+
+                <div class="inbox-card" onclick="cockpit.loadInboxIntoDashboard('vaguada')">
+                  <div class="inbox-head">
+                    <strong>CC La Vaguada</strong>
+                    <span class="inbox-time">28/09 14:10</span>
+                  </div>
+                  <div class="inbox-msg">Auditoría mensual: Faltante 1 terminal gama media (-180€). Ticket limpieza 35€.</div>
+                  <div class="inbox-tags">
+                    <span class="chip-badge danger">Descuadre Stock</span>
+                    <span class="chip-badge info">Ticket Caja Chica</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Stream Enviados (Historial & Memoria) -->
+              <div class="inbox-stream" id="outboxStreamContainer" style="display:none;">
+                <!-- Rellenado dinámicamente con los envíos realizados -->
+              </div>
+            </div>
+          </div>
+        </section>
+
+
+        <!-- ======================================================== -->
+        <!-- MÓDULO 3: CUADRANTE SEMANAL & CORRETURNOS                -->
+        <!-- ======================================================== -->
+        <section id="cuadrantesView" class="view-panel">
+          <div class="section-title-bar">
+            <div>
+              <div style="display:flex; align-items:center; gap:0.6rem; flex-wrap:wrap;">
+                <h2 class="view-h2">Cuadrante Semanal, Horarios & Dotación por Tienda</h2>
+                <span class="doc-source-tag" onclick="cockpit.openDocViewer('DOC-02')">
+                  📄 Doc Fuente: Cuadrante_Turnos_ZonaCentro_Semana39.xlsx 🔍
+                </span>
+              </div>
+              <p class="view-sub">Haz clic en cualquier tienda para ver los asesores, sus horarios detallados (M/T/P) y horas semanales.</p>
+            </div>
+            <div class="header-tools">
+              <button class="btn btn-secondary" onclick="cockpit.openAsignarCorreturnosModal()">
+                ⚡ Asignar Correturnos
+              </button>
+            </div>
+          </div>
+
+          <!-- Semáforos de Dotación Clickeables -->
+          <div class="coverage-grid" id="coverageGridContainer"></div>
+
+          <!-- Matriz Semanal de Tiendas -->
+          <div class="flat-panel" style="margin-top: 1.5rem;">
+            <div class="panel-head">
+              <div style="display:flex; align-items:center; gap:0.6rem;">
+                <h3>📅 Matriz de Cobertura Semanal (Haz clic en una tienda para ver horarios y asesores)</h3>
+                <span class="doc-source-tag" onclick="cockpit.openDocViewer('DOC-02')">📄 Fuente: Horarios_PDV_Semana39.xlsx</span>
+              </div>
+            </div>
+            <div class="table-wrap">
+              <table class="table-flat schedule-table">
+                <thead>
+                  <tr>
+                    <th>Punto de Venta (PDV)</th>
+                    <th>Lunes</th>
+                    <th>Martes</th>
+                    <th>Miércoles</th>
+                    <th>Jueves</th>
+                    <th>Viernes</th>
+                    <th>Sábado</th>
+                    <th>Domingo / Fest.</th>
+                  </tr>
+                </thead>
+                <tbody id="cuadranteSemanalTbody"></tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+
+        <!-- ======================================================== -->
+        <!-- MÓDULO 4: STOCK, FALTANTES & DETECCIÓN DE IMEIS          -->
+        <!-- ======================================================== -->
+        <section id="stockView" class="view-panel">
+          <div class="section-title-bar">
+            <div>
+              <div style="display:flex; align-items:center; gap:0.6rem; flex-wrap:wrap;">
+                <h2 class="view-h2">Auditoría de Stock & Control de Faltantes</h2>
+                <span class="doc-source-tag" onclick="cockpit.openDocViewer('DOC-04')">
+                  📄 Doc Fuente: Actas_Auditoria_Stock_IMEIs_Sep2026.pdf 🔍
+                </span>
+              </div>
+              <p class="view-sub">Haz clic en cualquier tienda para ver el inventario detallado de terminales y actas de faltantes.</p>
+            </div>
+            <button class="btn btn-primary" onclick="cockpit.openNuevaAuditoriaModal()">
+              + Nueva Auditoría
             </button>
           </div>
 
-          <!-- Filtros de tareas -->
-          <div class="filters-bar">
-            <div class="filter-group">
-              <button class="filter-chip active" data-filter="all">Todas</button>
-              <button class="filter-chip" data-filter="pending">Pendientes</button>
-              <button class="filter-chip" data-filter="completed">Completadas</button>
+          <div class="flat-panel">
+            <div class="panel-head">
+              <h3>Actas de Inventario por Tienda (Septiembre 2026)</h3>
+              <span class="doc-source-tag" onclick="cockpit.openDocViewer('DOC-04')">📄 Actas_Oficiales.pdf</span>
             </div>
-            <select id="priorityFilter" class="select-input">
-              <option value="all">Todas las prioridades</option>
-              <option value="high">Prioridad Alta 🔴</option>
-              <option value="medium">Prioridad Media 🟡</option>
-              <option value="low">Prioridad Baja 🟢</option>
-            </select>
+            <div class="table-wrap">
+              <table class="table-flat">
+                <thead>
+                  <tr>
+                    <th>Fecha</th>
+                    <th>Tienda (Clic para Desglose)</th>
+                    <th>Familia Producto</th>
+                    <th>Stock Teórico</th>
+                    <th>Stock Físico</th>
+                    <th>Descuadre (Uds)</th>
+                    <th>Impacto (€)</th>
+                    <th>Estado Acta</th>
+                    <th>Acción</th>
+                  </tr>
+                </thead>
+                <tbody id="stockTbody"></tbody>
+              </table>
+            </div>
           </div>
-
-          <ul id="allTasksList" class="task-list"></ul>
         </section>
 
-        <!-- Vista: Notas -->
-        <section id="notesView" class="view">
-          <div class="section-header">
+
+        <!-- ======================================================== -->
+        <!-- MÓDULO 5: COMISIONES & GASTOS                            -->
+        <!-- ======================================================== -->
+        <section id="comisionesView" class="view-panel">
+          <div class="section-title-bar">
             <div>
-              <h2>Bloc de Notas</h2>
-              <p>Captura ideas, listas rápidas y recordatorios importantes</p>
+              <div style="display:flex; align-items:center; gap:0.6rem; flex-wrap:wrap;">
+                <h2 class="view-h2">Control de Gastos de Tienda & Precierre de Comisiones</h2>
+                <span class="doc-source-tag" onclick="cockpit.openDocViewer('DOC-06')">
+                  📄 Doc Fuente: Liquidacion_CajaChica_Gastos_Tienda_Sep2026.xlsx 🔍
+                </span>
+                <span class="doc-source-tag" onclick="cockpit.openDocViewer('DOC-01')">
+                  📄 Doc Fuente: Baremo_Incentivos_TMT.xlsx 🔍
+                </span>
+              </div>
+              <p class="view-sub">Haz clic en cualquier asesor para ver el desglose de sus incentivos calculados.</p>
             </div>
-            <button class="btn-primary" id="openNoteModalBtn">
-              + Nueva Nota
+            <button class="btn btn-outline" onclick="cockpit.exportarComisionesExcel()">
+              📥 Exportar Ficha a Excel
             </button>
           </div>
 
-          <div id="allNotesGrid" class="notes-grid"></div>
+          <div class="flat-panel">
+            <div class="panel-head">
+              <h3>💵 Precierre Preventivo de Comisiones del Mes</h3>
+              <span class="doc-source-tag" onclick="cockpit.openDocViewer('DOC-01')">📄 Calculo_Incentivos_48Asesores.xlsx</span>
+            </div>
+            <div class="table-wrap">
+              <table class="table-flat">
+                <thead>
+                  <tr>
+                    <th>Asesor Comercial (Clic para Detalle)</th>
+                    <th>Tienda</th>
+                    <th>Comisión Móvil</th>
+                    <th>Comisión Fibra</th>
+                    <th>Comisión Seguros</th>
+                    <th>Bonus Energía</th>
+                    <th>Total Estimado</th>
+                    <th>Estado</th>
+                  </tr>
+                </thead>
+                <tbody id="comisionesTbody"></tbody>
+              </table>
+            </div>
+          </div>
         </section>
+
+
+        <!-- ======================================================== -->
+        <!-- MÓDULO 6: VACACIONES & EQUIPO                            -->
+        <!-- ======================================================== -->
+        <section id="vacacionesView" class="view-panel">
+          <div class="section-title-bar">
+            <div>
+              <div style="display:flex; align-items:center; gap:0.6rem; flex-wrap:wrap;">
+                <h2 class="view-h2">Plantilla Completa & Vacaciones (48 Asesores)</h2>
+                <span class="doc-source-tag" onclick="cockpit.openDocViewer('DOC-03')">
+                  📄 Doc Fuente: Censo_Plantilla_Vacaciones_2026.xlsx 🔍
+                </span>
+              </div>
+              <p class="view-sub">Haz clic en la tarjeta de cualquier comercial para ver su ficha completa, períodos disfrutados y pendientes.</p>
+            </div>
+            <button class="btn btn-primary" onclick="cockpit.openRegistrarVacacionModal()">
+              📅 Registrar Solicitud
+            </button>
+          </div>
+
+          <div class="vacations-deck" id="vacacionesDeck"></div>
+        </section>
+
+
+        <!-- ======================================================== -->
+        <!-- MÓDULO 7: DOCUMENTOS & FUENTES DOCUMENTALES (TRAZABILIDAD)-->
+        <!-- ======================================================== -->
+        <section id="documentosView" class="view-panel">
+          <div class="section-title-bar">
+            <div>
+              <h2 class="view-h2">Repositorio de Documentos Fuente & Trazabilidad de Datos</h2>
+              <p class="view-sub">Todos los datos del cockpit proceden de estos 8 documentos maestros. Haz clic en cualquiera para visualizar su contenido en crudo.</p>
+            </div>
+            <div class="cloud-badge">
+              <span class="status-dot green"></span>
+              <span>Integridad Verificada en Supabase (Solo Lectura)</span>
+            </div>
+          </div>
+
+          <div class="doc-repo-grid" id="docRepoContainer"></div>
+        </section>
+
       </div>
     </main>
   </div>
 
-  <!-- Modal: Crear/Editar Tarea -->
-  <div id="taskModal" class="modal-overlay">
-    <div class="modal">
-      <div class="modal-header">
-        <h3 id="taskModalTitle">Nueva Tarea</h3>
-        <button class="close-btn" id="closeTaskModal">&times;</button>
+  <!-- ======================================================== -->
+  <!-- MODAL / DRAWER LATERAL DE DESGLOSE DETALLADO             -->
+  <!-- ======================================================== -->
+  <div id="drilldownDrawer" class="drawer-backdrop" onclick="cockpit.closeDrilldown(event)">
+    <div class="drawer-flat" onclick="event.stopPropagation()">
+      <div class="drawer-head">
+        <div>
+          <h3 id="drawerTitle" class="drawer-title">Desglose Detallado</h3>
+          <span id="drawerSubtitle" class="drawer-sub">Información específica y registros</span>
+        </div>
+        <button class="drawer-close" onclick="cockpit.closeDrilldown()">&times;</button>
       </div>
-      <form id="taskForm">
-        <div class="form-group">
-          <label for="taskTitle">Título de la tarea</label>
-          <input type="text" id="taskTitle" required placeholder="Ej: Revisar presupuesto mensual">
-        </div>
-        <div class="form-row">
-          <div class="form-group">
-            <label for="taskPriority">Prioridad</label>
-            <select id="taskPriority">
-              <option value="low">Baja 🟢</option>
-              <option value="medium" selected>Media 🟡</option>
-              <option value="high">Alta 🔴</option>
-            </select>
+
+      <div class="drawer-body" id="drawerContent">
+        <!-- Rellenado dinámicamente según el elemento pulsado -->
+      </div>
+
+      <div class="drawer-footer" id="drawerFooter">
+        <button class="btn btn-secondary" onclick="cockpit.closeDrilldown()">Cerrar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ======================================================== -->
+  <!-- MODAL: VISOR DE DOCUMENTO FUENTE EN TIEMPO REAL          -->
+  <!-- ======================================================== -->
+  <div id="modalDocViewer" class="modal-backdrop">
+    <div class="modal-flat" style="max-width: 820px;">
+      <div class="modal-head">
+        <div style="display:flex; align-items:center; gap:0.6rem;">
+          <span id="docViewerIcon" style="font-size:1.4rem;">📄</span>
+          <div>
+            <h3 id="docViewerTitle">Visor de Documento Fuente</h3>
+            <span id="docViewerSub" style="font-size:0.75rem; color:var(--text-muted);">Trazabilidad y datos originales</span>
           </div>
-          <div class="form-group">
-            <label for="taskCategory">Categoría</label>
-            <input type="text" id="taskCategory" placeholder="Ej: Trabajo, Personal, Casa">
+        </div>
+        <button class="modal-close" onclick="cockpit.closeModal('modalDocViewer')">&times;</button>
+      </div>
+
+      <div class="doc-preview-modal-body" id="docViewerBody">
+        <!-- Rellenado dinámicamente -->
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="cockpit.closeModal('modalDocViewer')">Cerrar</button>
+        <button class="btn btn-primary" onclick="cockpit.descargarDocActual()">📥 Descargar Copia Oficial</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ======================================================== -->
+  <!-- MODAL: DOBLE COMPROBACIÓN DE ENVÍO DE CORREO             -->
+  <!-- ======================================================== -->
+  <div id="modalConfirmEmail" class="modal-backdrop">
+    <div class="modal-flat" style="max-width: 580px;">
+      <div class="modal-head">
+        <div style="display:flex; align-items:center; gap:0.6rem;">
+          <span style="font-size:1.4rem;">🔒</span>
+          <div>
+            <h3>Confirmación de Envío Seguro (Doble Comprobación)</h3>
+            <span style="font-size:0.75rem; color:var(--text-muted);">Verifica los destinatarios y el contenido antes de enviar</span>
           </div>
         </div>
-        <div class="modal-actions">
-          <button type="button" class="btn-secondary" id="cancelTaskModal">Cancelar</button>
-          <button type="submit" class="btn-primary">Guardar Tarea</button>
+        <button class="modal-close" onclick="cockpit.closeModal('modalConfirmEmail')">&times;</button>
+      </div>
+
+      <div class="modal-body">
+        <div class="email-confirm-box">
+          <div class="email-confirm-field">
+            <strong>De (Remitente):</strong>
+            <span id="confirmFrom">beatriz.sanchez@promovil.es (Ionos Oficial)</span>
+          </div>
+          <div class="email-confirm-field">
+            <strong>Para:</strong>
+            <span id="confirmTo" style="color:var(--orange); font-weight:700;"></span>
+          </div>
+          <div class="email-confirm-field" id="confirmCcRow">
+            <strong>Con Copia (CC):</strong>
+            <span id="confirmCc"></span>
+          </div>
+          <div class="email-confirm-field">
+            <strong>Asunto:</strong>
+            <span id="confirmSubject" style="font-weight:700;"></span>
+          </div>
+        </div>
+
+        <div style="margin-top: 1rem;">
+          <label style="font-size:0.75rem; font-weight:700; color:var(--text-muted); text-transform:uppercase;">Vista Previa del Mensaje a Despachar:</label>
+          <div id="confirmBodyPreview" style="margin-top:0.35rem; padding:0.75rem; background:var(--bg-subtle); border:1px solid var(--border-color); border-radius:var(--radius); font-size:0.8rem; max-height:160px; overflow-y:auto; white-space:pre-wrap; font-family:monospace; color:var(--text-secondary);"></div>
+        </div>
+
+        <div style="margin-top:0.85rem; font-size:0.75rem; color:#b45309; background:#fffbeb; padding:0.6rem 0.85rem; border-radius:var(--radius); border:1px solid #fde68a;">
+          🛡️ <strong>Seguridad Activa:</strong> El correo quedará registrado en el historial de salida y sincronizado en Supabase sin modificar los datos del Mac.
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" onclick="cockpit.closeModal('modalConfirmEmail')">❌ Cancelar Envío</button>
+        <button type="button" class="btn btn-primary" onclick="cockpit.confirmAndDispatchEmail()">✅ Confirmar y Enviar Ahora</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: Ingesta de Cierre Diario -->
+  <div id="modalIngesta" class="modal-backdrop">
+    <div class="modal-flat">
+      <div class="modal-head">
+        <h3>📥 Registrar Cierre Diario de Tienda</h3>
+        <button class="modal-close" onclick="cockpit.closeModal('modalIngesta')">&times;</button>
+      </div>
+      <form onsubmit="cockpit.submitCierre(event)" class="modal-body">
+        <div class="field-block">
+          <label>Tienda:</label>
+          <select id="modalCierreStore" class="select-flat full" required>
+            <option value="234-CC LA GAVIA">CC La Gavia</option>
+            <option value="238-TRES AGUAS">CC Tres Aguas</option>
+            <option value="226-CC LA VAGUADA 2">CC La Vaguada</option>
+            <option value="205-CC PRINCIPE PIO">CC Príncipe Pío</option>
+            <option value="208-CC LORANCA">CC Loranca</option>
+            <option value="209-CC PARLA">CC El Ferial (Parla)</option>
+            <option value="025-GRAN VIA HORTALEZA">Gran Vía Hortaleza</option>
+            <option value="030-PALACIO DE HIELO">Palacio de Hielo</option>
+            <option value="246-GETAFE">Getafe Urbana</option>
+            <option value="045-VILLAVICIOSA DE ODON">Villaviciosa de Odón</option>
+            <option value="245-PASEO EXTREMADURA">Paseo de Extremadura</option>
+          </select>
+        </div>
+        <div class="field-row">
+          <div class="field-block flex-1">
+            <label>Altas Móvil:</label>
+            <input type="number" id="cierreAltas" class="input-flat" min="0" value="2" required>
+          </div>
+          <div class="field-block flex-1">
+            <label>Portabilidades:</label>
+            <input type="number" id="cierrePortas" class="input-flat" min="0" value="3" required>
+          </div>
+          <div class="field-block flex-1">
+            <label>Fibra / Convergencia:</label>
+            <input type="number" id="cierreFibra" class="input-flat" min="0" value="1" required>
+          </div>
+        </div>
+        <div class="field-row">
+          <div class="field-block flex-1">
+            <label>Seguros Vendidos:</label>
+            <input type="number" id="cierreSeguros" class="input-flat" min="0" value="2" required>
+          </div>
+          <div class="field-block flex-1">
+            <label>Energía (Luz):</label>
+            <input type="number" id="cierreEnergia" class="input-flat" min="0" value="1" required>
+          </div>
+          <div class="field-block flex-1">
+            <label>Terminales Vendidos:</label>
+            <input type="number" id="cierreTerm" class="input-flat" min="0" value="3" required>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" onclick="cockpit.closeModal('modalIngesta')">Cancelar</button>
+          <button type="submit" class="btn btn-primary">Guardar e Integrar en Dashboard</button>
         </div>
       </form>
     </div>
   </div>
 
-  <!-- Modal: Crear/Editar Nota -->
-  <div id="noteModal" class="modal-overlay">
-    <div class="modal">
-      <div class="modal-header">
-        <h3>Nueva Nota</h3>
-        <button class="close-btn" id="closeNoteModal">&times;</button>
-      </div>
-      <form id="noteForm">
-        <div class="form-group">
-          <label for="noteTitle">Título</label>
-          <input type="text" id="noteTitle" required placeholder="Ej: Ideas para el proyecto">
-        </div>
-        <div class="form-group">
-          <label for="noteContent">Contenido</label>
-          <textarea id="noteContent" rows="4" required placeholder="Escribe aquí los detalles..."></textarea>
-        </div>
-        <div class="form-group">
-          <label for="noteColor">Color de tarjeta</label>
-          <select id="noteColor">
-            <option value="blue">Azul suave</option>
-            <option value="purple">Violeta</option>
-            <option value="emerald">Verde esmeralda</option>
-            <option value="amber">Ámbar cálido</option>
-          </select>
-        </div>
-        <div class="modal-actions">
-          <button type="button" class="btn-secondary" id="cancelNoteModal">Cancelar</button>
-          <button type="submit" class="btn-primary">Guardar Nota</button>
-        </div>
-      </form>
-    </div>
-  </div>
+  <div id="toastMessage" class="toast-popup"></div>
 
   <script src="js/app.js"></script>
 </body>
