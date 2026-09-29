@@ -66,6 +66,12 @@
           <svg width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
           Documentos & Descargas (15)
         </button>
+
+        <div class="nav-section-title">SISTEMA & CONFIGURACIÓN</div>
+        <button class="nav-tab" data-tab="configuracion">
+          <svg width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+          Configuración & Backups
+        </button>
       </nav>
 
       <div class="sidebar-footer" style="display:flex; flex-direction:column; gap:0.4rem;">
@@ -759,6 +765,184 @@
           <!-- SUBPANEL 2: ARCHIVOS & ADJUNTOS DESCARGADOS -->
           <div id="docPanelDescargados" style="display:none;">
             <div class="doc-repo-grid" id="docDescargadosContainer"></div>
+          </div>
+        </section>
+
+
+        <!-- ======================================================== -->
+        <!-- MÓDULO 8: CONFIGURACIÓN TÉCNICA & COPIAS DE SEGURIDAD    -->
+        <!-- ======================================================== -->
+        <section id="configuracionView" class="view-panel">
+          <div class="section-title-bar">
+            <div>
+              <h2 class="view-h2">Configuración Técnica & Copias de Seguridad Programables</h2>
+              <p class="view-sub">Programación de copias de seguridad automáticas, estado de servidores en la nube y políticas de seguridad operativa.</p>
+            </div>
+            <div style="display:flex; gap:0.5rem; flex-wrap:wrap;">
+              <button class="btn btn-secondary" onclick="cockpit.crearCopiaSeguridadManual()">
+                💾 Crear Backup Inmediato
+              </button>
+              <button class="btn btn-primary" onclick="cockpit.iniciarSincronizacionOnline()">
+                ☁️ Sincronizar GitHub & Vercel
+              </button>
+            </div>
+          </div>
+
+          <!-- FILA 1: PROGRAMACIÓN DE BACKUPS & SERVIDORES -->
+          <div class="config-grid-split">
+            <!-- TARJETA 1: PROGRAMACIÓN DE BACKUPS AUTOMÁTICOS -->
+            <div class="card-flat">
+              <div class="card-flat-head">
+                <span class="card-title">⏰ Programación de Backups Automáticos</span>
+                <span class="chip-badge success" id="badgeBackupActive">🟢 Activo</span>
+              </div>
+              <div class="backup-schedule-box">
+                <div style="font-size:0.85rem; font-weight:700; color:var(--text-primary);">
+                  Frecuencia de Ejecución Automática:
+                </div>
+                <label class="backup-option-row">
+                  <input type="radio" name="backupFreq" value="diario" checked onchange="cockpit.onBackupFreqChange()">
+                  <div>
+                    <strong>Diario a las 22:00 (Recomendado)</strong>
+                    <div style="font-size:0.75rem; color:var(--text-muted);">Al cierre de las 11 tiendas y consolidación de TMT diario.</div>
+                  </div>
+                </label>
+                <label class="backup-option-row">
+                  <input type="radio" name="backupFreq" value="6h" onchange="cockpit.onBackupFreqChange()">
+                  <div>
+                    <strong>Cada 6 Horas</strong>
+                    <div style="font-size:0.75rem; color:var(--text-muted);">Alta frecuencia para seguimiento comercial intensivo.</div>
+                  </div>
+                </label>
+                <label class="backup-option-row">
+                  <input type="radio" name="backupFreq" value="semanal" onchange="cockpit.onBackupFreqChange()">
+                  <div>
+                    <strong>Semanal los Domingos (23:00)</strong>
+                    <div style="font-size:0.75rem; color:var(--text-muted);">Consolidación semanal de cuadrantes y plantilla.</div>
+                  </div>
+                </label>
+
+                <hr style="border:none; border-top:1px solid var(--border-color); margin:0.35rem 0;">
+
+                <div style="font-size:0.85rem; font-weight:700; color:var(--text-primary);">
+                  Destinos de la Copia de Seguridad:
+                </div>
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.5rem;">
+                  <label class="backup-option-row">
+                    <input type="checkbox" id="destSupabase" checked>
+                    <span>☁️ Supabase Storage</span>
+                  </label>
+                  <label class="backup-option-row">
+                    <input type="checkbox" id="destGithub" checked>
+                    <span>🐙 GitHub Snapshots</span>
+                  </label>
+                  <label class="backup-option-row">
+                    <input type="checkbox" id="destLocal" checked>
+                    <span>💾 Archivo JSON Local</span>
+                  </label>
+                  <label class="backup-option-row">
+                    <input type="checkbox" id="destZip" checked>
+                    <span>📦 Comprimido ZIP Cifrado</span>
+                  </label>
+                </div>
+
+                <div style="margin-top:0.5rem; display:flex; justify-content:flex-end;">
+                  <button class="btn btn-primary" style="font-size:0.8rem;" onclick="cockpit.guardarProgramacionBackups()">
+                    💾 Guardar Programación
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- TARJETA 2: ESTADO DE SERVIDORES & CONECTORES TÉCNICOS -->
+            <div class="card-flat">
+              <div class="card-flat-head">
+                <span class="card-title">🖥️ Estado de Servidores & Conectores MCP</span>
+                <span class="chip-badge success">4/4 Conectados</span>
+              </div>
+              <div class="server-cards-grid">
+                <div class="server-card active">
+                  <div class="server-card-head">
+                    <span class="server-card-title">✉️ Ionos Mail (Oficial)</span>
+                    <span class="chip-badge success">Activo</span>
+                  </div>
+                  <div class="server-card-body">
+                    <div><strong>Cuenta:</strong> beatriz.sanchez@promovil.es</div>
+                    <div><strong>Servidor:</strong> imap.ionos.es:993 (SSL)</div>
+                    <div><strong>Estado:</strong> Bandejas de 11 tiendas sincronizadas</div>
+                  </div>
+                </div>
+
+                <div class="server-card active">
+                  <div class="server-card-head">
+                    <span class="server-card-title">☁️ Supabase MCP Buffer</span>
+                    <span class="chip-badge success">Protegido</span>
+                  </div>
+                  <div class="server-card-body">
+                    <div><strong>Modo:</strong> Solo Lectura (Mac Inalterable)</div>
+                    <div><strong>Base de Datos:</strong> PostgreSQL Cifrado</div>
+                    <div><strong>Tablas:</strong> Ventas, Horarios, Vacaciones, Stock</div>
+                  </div>
+                </div>
+
+                <div class="server-card active">
+                  <div class="server-card-head">
+                    <span class="server-card-title">🐙 GitHub Repository</span>
+                    <span class="chip-badge success">Sincronizado</span>
+                  </div>
+                  <div class="server-card-body">
+                    <div><strong>Repo:</strong> beatrizsanche/GestionBea</div>
+                    <div><strong>Rama:</strong> main (Producción)</div>
+                    <div><strong>Protocolo:</strong> Token MCP Seguro</div>
+                  </div>
+                </div>
+
+                <div class="server-card active">
+                  <div class="server-card-head">
+                    <span class="server-card-title">▲ Vercel Production</span>
+                    <span class="chip-badge success">Live</span>
+                  </div>
+                  <div class="server-card-body">
+                    <div><strong>URL:</strong> gestion-bea.vercel.app</div>
+                    <div><strong>Estado:</strong> HTTP 200 OK (CDN Global)</div>
+                    <div><strong>Despliegue:</strong> Continuo e Instantáneo</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- FILA 2: HISTORIAL DE BACKUPS & RESTAURACIÓN -->
+          <div class="card-flat">
+            <div class="card-flat-head" style="justify-content:space-between; flex-wrap:wrap; gap:0.5rem;">
+              <div>
+                <span class="card-title">🗄️ Historial de Copias de Seguridad & Puntos de Restauración</span>
+                <span style="font-size:0.75rem; color:var(--text-muted); margin-left:0.5rem;">Todos los snapshots disponen de hash SHA-256 de verificación.</span>
+              </div>
+              <button class="btn btn-secondary" style="font-size:0.775rem;" onclick="cockpit.crearCopiaSeguridadManual()">
+                ➕ Generar Nuevo Snapshot
+              </button>
+            </div>
+
+            <div class="table-container">
+              <table class="table-flat">
+                <thead>
+                  <tr>
+                    <th>Ref. Backup</th>
+                    <th>Fecha & Hora</th>
+                    <th>Tipo de Copia</th>
+                    <th>Tamaño</th>
+                    <th>Destinos Verificados</th>
+                    <th>Integridad SHA-256</th>
+                    <th>Estado</th>
+                    <th>Acciones</th>
+                  </tr>
+                </thead>
+                <tbody id="backupHistoryTbody">
+                  <!-- Rellenado dinámicamente -->
+                </tbody>
+              </table>
+            </div>
           </div>
         </section>
 
